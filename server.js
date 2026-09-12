@@ -6,7 +6,7 @@
 //   PUT  /api/dias/:fecha         -> fusiona el documento del día (evento a evento) y devuelve { ok, doc }
 //                                    (?replace=1 sustituye el día entero, para importaciones)
 //   DELETE /api/dias/:fecha       -> borra el día
-//   POST /api/consejo             -> { lang, contexto, mensajes: [{role, texto}] } → { fuente: 'claude'|'reglas', texto? }
+//   POST /api/consejo             -> { lang, contexto, mensajes: [{role, texto}] } → { fuente: 'claude'|'reglas', texto?, traduccion? }
 //                                    (usa la API de Claude si hay ANTHROPIC_API_KEY; si no, la app responde con reglas)
 //
 // Variables de entorno: DATABASE_URL (obligatoria), APP_KEY (contraseña de la app,
@@ -134,9 +134,9 @@ app.delete('/api/dias/:fecha', async (req, res) => {
 const anthropic = process.env.ANTHROPIC_API_KEY ? new Anthropic() : null;
 const CONSEJO_SYSTEM = {
   es: `Eres una asesora de lactancia y sueño infantil, cercana y muy concreta. Ayudas a una madre que da pecho en exclusiva a su hija Aïna, de 3 meses. Te describe lo que la niña hace ahora mismo y tú le dices qué hacer en los próximos minutos. Es una conversación: si te precisa o corrige algo, ajusta tu consejo a lo nuevo sin repetir lo ya dicho.
-Responde en español, en segunda persona, máximo 90 palabras, sin títulos ni listas con viñetas: una frase de lectura (qué le pasa probablemente) y 2–3 pasos concretos en orden, con horas si ayudan. Referencias a los 3 meses: ventana de vigilia de 1 h – 2 h, señales de sueño (frotarse la cara, bostezar, mirada perdida, gruñir, tirarse de las orejas), señales de hambre (buscar, manos a la boca, chupar), siestas de un ciclo (30–45 min), tomas cada 2–3 h de día. Nunca propongas dejarla llorar ni quitar tomas de noche. Sin alarmismos; si algo requiere pediatra, dilo en una frase.`,
+Responde en español, en segunda persona, máximo 90 palabras, sin títulos ni listas con viñetas: una frase de lectura (qué le pasa probablemente) y 2–3 pasos concretos en orden, con horas si ayudan. Después de la respuesta escribe una línea que contenga solo ===== y a continuación la misma respuesta traducida al francés (para el padre, que lee en francés). Referencias a los 3 meses: ventana de vigilia de 1 h – 2 h, señales de sueño (frotarse la cara, bostezar, mirada perdida, gruñir, tirarse de las orejas), señales de hambre (buscar, manos a la boca, chupar), siestas de un ciclo (30–45 min), tomas cada 2–3 h de día. Nunca propongas dejarla llorar ni quitar tomas de noche. Sin alarmismos; si algo requiere pediatra, dilo en una frase.`,
   fr: `Tu es une conseillère en allaitement et sommeil du nourrisson, proche et très concrète. Tu aides une mère qui allaite exclusivement sa fille Aïna, 3 mois. Elle te décrit ce que fait le bébé maintenant et tu lui dis quoi faire dans les prochaines minutes. C'est une conversation : si elle précise ou corrige quelque chose, ajuste ton conseil sans répéter ce qui a déjà été dit.
-Réponds en français, à la deuxième personne, 90 mots maximum, sans titres ni listes à puces : une phrase de lecture (ce qui se passe probablement) puis 2–3 étapes concrètes dans l'ordre, avec des heures si utile. Repères à 3 mois : fenêtre d'éveil de 1 h à 2 h, signes de fatigue (se frotter le visage, bâiller, regard dans le vide, grogner, se tirer les oreilles), signes de faim (chercher le sein, mains à la bouche, succion), siestes d'un cycle (30–45 min), tétées toutes les 2–3 h le jour. Ne propose jamais de la laisser pleurer ni de supprimer des tétées de nuit. Sans alarmisme ; si quelque chose nécessite le pédiatre, dis-le en une phrase.`,
+Réponds en français, à la deuxième personne, 90 mots maximum, sans titres ni listes à puces : une phrase de lecture (ce qui se passe probablement) puis 2–3 étapes concrètes dans l'ordre, avec des heures si utile. Après la réponse, écris une ligne contenant uniquement ===== puis la même réponse traduite en espagnol (pour la mère, qui lit en espagnol). Repères à 3 mois : fenêtre d'éveil de 1 h à 2 h, signes de fatigue (se frotter le visage, bâiller, regard dans le vide, grogner, se tirer les oreilles), signes de faim (chercher le sein, mains à la bouche, succion), siestes d'un cycle (30–45 min), tétées toutes les 2–3 h le jour. Ne propose jamais de la laisser pleurer ni de supprimer des tétées de nuit. Sans alarmisme ; si quelque chose nécessite le pédiatre, dis-le en une phrase.`,
 };
 
 app.post('/api/consejo', async (req, res) => {
@@ -164,7 +164,8 @@ app.post('/api/consejo', async (req, res) => {
     });
     if (response.stop_reason === 'refusal') return res.json({ fuente: 'reglas' });
     const out = response.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
-    res.json({ fuente: 'claude', texto: out });
+    const [texto, otro] = out.split(/\n\s*=====\s*\n/);
+    res.json({ fuente: 'claude', texto: (texto || out).trim(), traduccion: otro ? otro.trim() : null });
   } catch (e) {
     console.error('consejo:', e && e.message);
     res.json({ fuente: 'reglas' });
