@@ -872,7 +872,8 @@
         <h2>${L.qTitle}</h2>
         ${ask.turns.length ? `<div class="chat">${ask.turns.map((m, i) => m.role === 'user'
           ? `<div class="bub me"><p>${esc(m.texto).replace(/\n/g, '<br>')}</p></div>`
-          : `<div class="bub ai">${m.texto.split(/\n\n+/).map(p => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('')}${m.trad && m.open ? `<div class="trad">${m.trad.split(/\n\n+/).map(p => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('')}</div>` : ''}<div class="src">${m.source === 'claude' ? L.qByClaude : L.qByRules} · ${m.time}<button data-act="ask-save" data-i="${i}">${L.qSaveNote}</button>${m.trad ? `<button data-act="ask-trad" data-i="${i}">${m.open ? L.qHide : L.qShowFr}</button>` : ''}</div></div>`).join('')}
+          : (() => { const swap = m.trad && (m.lang || 'es') !== lang; const main = swap ? m.trad : m.texto, other = swap ? m.texto : m.trad;
+            return `<div class="bub ai">${main.split(/\n\n+/).map(p => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('')}${other && m.open ? `<div class="trad">${other.split(/\n\n+/).map(p => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('')}</div>` : ''}<div class="src">${m.source === 'claude' ? L.qByClaude : L.qByRules} · ${m.time}<button data-act="ask-save" data-i="${i}">${L.qSaveNote}</button>${other ? `<button data-act="ask-trad" data-i="${i}">${m.open ? L.qHide : L.qShowFr}</button>` : ''}</div></div>`; })()).join('')}
           ${ask.state === 'loading' ? `<div class="bub ai"><p class="src">${L.qThinking}</p></div>` : ''}</div>` : ''}
         <textarea id="q-text" placeholder="${L.qPlaceholder}">${esc(ask.text)}</textarea>
         <div class="row2"><button class="go" data-act="ask" ${ask.state === 'loading' ? 'disabled' : ''}>${L.qAsk}</button>${SR ? `<button class="mic${ask.listening ? ' on' : ''}" data-act="mic">${ask.listening ? L.qMicStop : L.qMic}</button>` : ''}</div>
@@ -1374,7 +1375,7 @@
       } catch {}
     }
     if (!answer) { answer = ruleAdvice(q, c); trad = ruleAdvice(q, c, lang === 'fr' ? 'es' : 'fr'); }
-    ask.turns.push({ role: 'assistant', texto: answer, trad, source, time: fmtTime(Date.now()) });
+    ask.turns.push({ role: 'assistant', texto: answer, trad, lang, source, time: fmtTime(Date.now()) });
     ask.state = 'done'; saveChat();
     render();
   }
@@ -1394,7 +1395,7 @@
     else if (act === 'manual') openEditor({ id: uid(), t: 'toma', ini: now - 30 * MIN, fin: now - 15 * MIN, lado: 'I' }, true);
     else if (act === 'ask') { if (rec) rec.stop(); askAdvice(); }
     else if (act === 'mic') toggleMic();
-    else if (act === 'ask-save') { const i = Number(b.dataset.i); const a = ask.turns[i]; const q = [...ask.turns.slice(0, i)].reverse().find(m => m.role === 'user'); if (a) { upsertEvent({ id: uid(), t: 'nota', ini: now, fin: null, n: `${q ? q.texto + ' → ' : ''}${a.texto}` }); toast(L.qSaved); } }
+    else if (act === 'ask-save') { const i = Number(b.dataset.i); const a = ask.turns[i]; const q = [...ask.turns.slice(0, i)].reverse().find(m => m.role === 'user'); if (a) { const shown = a.trad && (a.lang || 'es') !== lang ? a.trad : a.texto; upsertEvent({ id: uid(), t: 'nota', ini: now, fin: null, n: `${q ? q.texto + ' → ' : ''}${shown}` }); toast(L.qSaved); } }
     else if (act === 'ask-trad') { const m = ask.turns[Number(b.dataset.i)]; if (m) { m.open = !m.open; saveChat(); render(); } }
     else if (act === 'ask-new') { ask.turns = []; ask.text = ''; saveChat(); render(); }
     else if (act === 'ai') askClaude();

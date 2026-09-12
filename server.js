@@ -173,8 +173,12 @@ app.post('/api/consejo', async (req, res) => {
 });
 
 // App estática
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1h', index: 'index.html' }));
-app.get('*', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+// La página nunca se cachea (para que cada despliegue llegue al móvil al instante); icono y manifest, 1 día.
+app.use(express.static(path.join(__dirname, 'public'), {
+  index: 'index.html',
+  setHeaders: (res, filePath) => { res.setHeader('Cache-Control', filePath.endsWith('.html') ? 'no-cache' : 'public, max-age=86400'); },
+}));
+app.get('*', (_req, res) => { res.setHeader('Cache-Control', 'no-cache'); res.sendFile(path.join(__dirname, 'public', 'index.html')); });
 
 // Errores
 app.use((err, _req, res, _next) => {
