@@ -1,0 +1,1254 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17141F">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.png">
+<title>AïnaDays</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+  :root {
+    --bg: #F3F0F6;
+    --surface: #FFFFFF;
+    --surface-2: #EAE6F0;
+    --text: #2A2438;
+    --muted: #6F6880;
+    --line: #DCD7E4;
+    --toma: #D48F1F;
+    --toma-soft: #F8E7C5;
+    --toma-ink: #7A4E05;
+    --sueno: #5D63C4;
+    --sueno-soft: #DEDFF6;
+    --sueno-ink: #2F3480;
+    --panal: #5F9A74;
+    --panal-soft: #D9EBDF;
+    --night: rgba(93, 99, 196, 0.09);
+    --ok: #4C9A6A;
+    --warn: #D48F1F;
+    --bad: #C4554D;
+    --shadow: 0 1px 2px rgba(42, 36, 56, 0.06), 0 6px 18px rgba(42, 36, 56, 0.07);
+    --radius: 18px;
+    --display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --ui: 'Atkinson Hyperlegible', 'Helvetica Neue', Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17141F;
+      --surface: #211C2B;
+      --surface-2: #2B2537;
+      --text: #EEE9F4;
+      --muted: #A399B3;
+      --line: #352E43;
+      --toma: #E8AA45;
+      --toma-soft: #3B2F16;
+      --toma-ink: #F5D79A;
+      --sueno: #8A8FE6;
+      --sueno-soft: #262A4D;
+      --sueno-ink: #C9CBF5;
+      --panal: #7FBF95;
+      --panal-soft: #1F3328;
+      --night: rgba(138, 143, 230, 0.10);
+      --ok: #6DBA8A;
+      --warn: #E8AA45;
+      --bad: #E07068;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 18px rgba(0,0,0,0.25);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17141F;
+    --surface: #211C2B;
+    --surface-2: #2B2537;
+    --text: #EEE9F4;
+    --muted: #A399B3;
+    --line: #352E43;
+    --toma: #E8AA45;
+    --toma-soft: #3B2F16;
+    --toma-ink: #F5D79A;
+    --sueno: #8A8FE6;
+    --sueno-soft: #262A4D;
+    --sueno-ink: #C9CBF5;
+    --panal: #7FBF95;
+    --panal-soft: #1F3328;
+    --night: rgba(138, 143, 230, 0.10);
+    --ok: #6DBA8A;
+    --warn: #E8AA45;
+    --bad: #E07068;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 18px rgba(0,0,0,0.25);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--ui);
+    font-size: 16px;
+    line-height: 1.45;
+    min-height: 100vh;
+  }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 3px solid var(--sueno); outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+  .app { max-width: 480px; margin: 0 auto; padding: 16px 16px 96px; }
+
+  header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  header.top h1 { font-family: var(--display); font-weight: 600; font-size: 26px; margin: 0; letter-spacing: -0.01em; }
+  header.top .right { display: flex; align-items: center; gap: 10px; }
+  .sync { font-size: 12px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+  .sync::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+  .sync.on::before { background: var(--ok); }
+  .lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--surface); }
+  .lang button { border: 0; background: none; padding: 5px 10px; font-size: 12.5px; font-weight: 700; color: var(--muted); }
+  .lang button[aria-pressed="true"] { background: var(--sueno-soft); color: var(--sueno-ink); }
+
+  .eyebrow { font-size: 11.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+
+  /* Status card */
+  .status { background: var(--surface); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); display: grid; gap: 10px; }
+  .status .big { font-family: var(--display); font-weight: 500; font-size: 34px; line-height: 1.1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+  .status .big small { font-family: var(--ui); font-size: 15px; color: var(--muted); font-weight: 400; margin-left: 6px; }
+  .status .hint { color: var(--muted); font-size: 14px; }
+  .meter { height: 8px; border-radius: 4px; background: var(--surface-2); position: relative; overflow: hidden; }
+  .meter .fill { position: absolute; inset: 0 auto 0 0; border-radius: 4px; background: var(--ok); transition: width .4s; }
+  .meter .fill.warn { background: var(--warn); }
+  .meter .fill.bad { background: var(--bad); }
+  .meter-scale { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .last-row { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; }
+  .last-row b { color: var(--text); font-weight: 700; }
+
+  /* Action buttons */
+  .actions { display: grid; gap: 10px; margin-top: 14px; }
+  .actions .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .actions .row.one { grid-template-columns: 1fr; }
+  .btn-big { border: 0; border-radius: var(--radius); min-height: 84px; padding: 14px 16px; display: grid; align-content: center; justify-items: start; gap: 2px; text-align: left; box-shadow: var(--shadow); transition: transform .08s; }
+  .btn-big:active { transform: scale(0.98); }
+  .btn-big .lbl { font-size: 19px; font-weight: 700; }
+  .btn-big .sub { font-size: 13px; opacity: 0.85; font-variant-numeric: tabular-nums; }
+  .btn-big.toma { background: var(--toma-soft); color: var(--toma-ink); }
+  .btn-big.toma.live { background: var(--toma); color: #1E1503; }
+  .btn-big.sueno { background: var(--sueno-soft); color: var(--sueno-ink); }
+  .btn-big.sueno.live { background: var(--sueno); color: #FFFFFF; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 9px 14px; font-size: 14px; font-weight: 700; }
+  .chip.panal { color: var(--panal); border-color: var(--panal-soft); background: var(--panal-soft); }
+  .chip.ai-btn { background: var(--sueno-soft); border-color: var(--sueno-soft); color: var(--sueno-ink); }
+
+  /* Sections */
+  section.block { margin-top: 22px; }
+  section.block h2 { font-family: var(--display); font-weight: 600; font-size: 19px; margin: 0 0 10px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  section.block h2 .eyebrow { font-family: var(--ui); }
+
+  /* Timeline */
+  .tl { display: grid; gap: 4px; }
+  .tl-hours { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; padding: 0 1px; }
+  .tl-bar { position: relative; height: 34px; border-radius: 8px; background: var(--surface-2); overflow: hidden; }
+  .tl-bar .night { position: absolute; top: 0; bottom: 0; background: var(--night); }
+  .tl-bar .ev { position: absolute; border-radius: 3px; }
+  .tl-bar .ev.sueno { top: 4px; height: 26px; background: var(--sueno); opacity: 0.85; }
+  .tl-bar .ev.sueno.live { background: repeating-linear-gradient(90deg, var(--sueno) 0 6px, transparent 6px 9px); }
+  .tl-bar .ev.toma { top: 9px; height: 16px; background: var(--toma); min-width: 3px; }
+  .tl-bar .ev.panal { top: 27px; height: 5px; width: 5px; border-radius: 50%; background: var(--panal); }
+  .tl-bar .now { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--text); opacity: 0.6; }
+  .tl-legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }
+  .tl-legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+  .tl-legend .l-sueno::before { background: var(--sueno); }
+  .tl-legend .l-toma::before { background: var(--toma); }
+  .tl-legend .l-panal::before { background: var(--panal); border-radius: 50%; }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .stat { background: var(--surface); border-radius: 14px; padding: 10px 12px; box-shadow: var(--shadow); }
+  .stat .v { font-family: var(--display); font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1.15; }
+  .stat .v small { font-family: var(--ui); font-size: 12px; color: var(--muted); }
+  .stat .k { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* Event list */
+  .list { display: grid; gap: 6px; }
+  .item { width: 100%; border: 0; background: var(--surface); border-radius: 12px; padding: 10px 12px; text-align: left; display: grid; grid-template-columns: 52px 10px 1fr auto; align-items: center; gap: 10px; box-shadow: var(--shadow); }
+  .item .t { font-variant-numeric: tabular-nums; font-weight: 700; }
+  .item .dot { width: 10px; height: 10px; border-radius: 3px; }
+  .item .dot.toma { background: var(--toma); }
+  .item .dot.sueno { background: var(--sueno); }
+  .item .dot.panal { background: var(--panal); border-radius: 50%; }
+  .item .dot.nota { background: var(--muted); border-radius: 50%; }
+  .item .d { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .item .live { color: var(--sueno); font-weight: 700; }
+  .empty { color: var(--muted); font-size: 14px; background: var(--surface); border-radius: 12px; padding: 14px; }
+
+  /* Week */
+  .week { display: grid; gap: 8px; }
+  .wrow { display: grid; grid-template-columns: 44px 1fr; gap: 8px; align-items: center; }
+  .wrow .dl { font-size: 12px; color: var(--muted); line-height: 1.2; }
+  .wrow .dl b { display: block; color: var(--text); font-size: 14px; }
+  .wrow.today .dl b { color: var(--sueno); }
+  .wrow .tl-bar { height: 22px; }
+  .wrow .tl-bar .ev.sueno { top: 3px; height: 16px; }
+  .wrow .tl-bar .ev.toma { top: 6px; height: 10px; }
+  .wrow .tl-bar .ev.panal { display: none; }
+  .wstats { font-size: 11.5px; color: var(--muted); display: flex; gap: 10px; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .wstats b { color: var(--text); }
+  .read { background: var(--surface); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); display: grid; gap: 8px; font-size: 14.5px; }
+  .read .row { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+  .read .row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .read .row b { font-variant-numeric: tabular-nums; text-align: right; }
+  .read .note { color: var(--muted); font-size: 13.5px; }
+
+  /* Daily reading */
+  .ins-h { margin: 14px 0 8px; }
+  .ins-list { display: grid; gap: 8px; }
+  .ins { background: var(--surface); border-radius: 14px; padding: 11px 14px; box-shadow: var(--shadow); display: grid; grid-template-columns: 78px 1fr; grid-template-rows: auto auto; column-gap: 12px; row-gap: 4px; font-size: 14.5px; line-height: 1.45; }
+  .ins-k { grid-row: 1 / span 2; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--sueno); padding-top: 3px; }
+  .ins-w { color: var(--text); }
+  .ins-t { color: var(--muted); padding-left: 14px; position: relative; }
+  .ins-t::before { content: "→"; position: absolute; left: 0; color: var(--sueno); }
+  .next { margin-top: 10px; background: var(--sueno-soft); color: var(--sueno-ink); border-radius: 14px; padding: 12px 14px; display: grid; grid-template-columns: 78px 1fr; column-gap: 12px; font-size: 14.5px; line-height: 1.45; font-weight: 700; }
+  .next .ins-k { grid-row: auto; color: var(--sueno-ink); }
+  .ai { display: grid; gap: 10px; }
+  .ai-text { font-size: 14.5px; line-height: 1.55; }
+  .ai-text p { margin: 0 0 8px; }
+  .ai-status { font-size: 13px; color: var(--muted); }
+
+  /* Guide */
+  .guide { font-size: 15.5px; max-width: 62ch; }
+  .guide h3 { font-family: var(--display); font-weight: 600; font-size: 20px; margin: 26px 0 8px; text-wrap: balance; }
+  .guide h3:first-child { margin-top: 4px; }
+  .guide p { margin: 0 0 10px; }
+  .guide ul, .guide ol { padding-left: 20px; margin: 0 0 10px; }
+  .guide li { margin-bottom: 5px; }
+  .guide .ref { background: var(--surface); border-radius: 14px; padding: 12px 14px; box-shadow: var(--shadow); margin: 10px 0 14px; }
+  .guide .ref table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .guide .ref td { padding: 5px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .guide .ref tr:last-child td { border-bottom: 0; }
+  .guide .ref td:last-child { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .guide .warn { border-left: 4px solid var(--bad); padding-left: 12px; color: var(--muted); font-size: 14px; }
+  .guide .tag { display: inline-block; font-size: 11.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; background: var(--sueno-soft); color: var(--sueno-ink); margin-right: 6px; }
+
+  /* Tabs */
+  nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--line); padding: 6px 0 calc(6px + env(safe-area-inset-bottom)); }
+  nav.tabs .in { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); }
+  nav.tabs button { border: 0; background: none; padding: 12px 4px; font-size: 15px; font-weight: 700; color: var(--muted); border-radius: 10px; }
+  nav.tabs button[aria-selected="true"] { color: var(--sueno); }
+  nav.tabs button[aria-selected="true"]::after { content: ""; display: block; width: 22px; height: 3px; border-radius: 2px; background: var(--sueno); margin: 5px auto 0; }
+
+  /* Modal */
+  .modal { position: fixed; inset: 0; background: rgba(20, 16, 30, 0.55); display: grid; place-items: end center; z-index: 10; }
+  .modal .sheet { background: var(--surface); width: 100%; max-width: 480px; border-radius: 22px 22px 0 0; padding: 18px 18px calc(18px + env(safe-area-inset-bottom)); display: grid; gap: 12px; max-height: 92vh; overflow: auto; }
+  .sheet h3 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 20px; }
+  .field { display: grid; gap: 4px; }
+  .field label { font-size: 12.5px; font-weight: 700; color: var(--muted); }
+  .field input, .field select, .field textarea { font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--text); width: 100%; }
+  .seg { display: grid; grid-auto-flow: column; gap: 6px; }
+  .seg button { border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 10px; font-weight: 700; }
+  .seg button[aria-pressed="true"] { background: var(--sueno-soft); border-color: var(--sueno); color: var(--sueno-ink); }
+  .sheet .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+  .sheet .btns .primary { background: var(--sueno); color: #fff; border: 0; border-radius: 12px; padding: 13px; font-weight: 700; }
+  .sheet .btns .ghost { background: var(--surface-2); border: 0; border-radius: 12px; padding: 13px; font-weight: 700; }
+  .sheet .del { background: none; border: 0; color: var(--bad); font-weight: 700; padding: 8px; justify-self: center; }
+
+  .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: 90px; background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-size: 14px; font-weight: 700; z-index: 20; box-shadow: var(--shadow); }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <h1>AïnaDays</h1>
+    <div class="right">
+      <span class="sync" id="sync"></span>
+      <div class="lang" role="group" aria-label="Idioma / Langue">
+        <button data-lang="es" aria-pressed="true">ES</button>
+        <button data-lang="fr" aria-pressed="false">FR</button>
+      </div>
+    </div>
+  </header>
+  <main id="main"></main>
+</div>
+
+<nav class="tabs">
+  <div class="in">
+    <button data-tab="hoy" aria-selected="true"></button>
+    <button data-tab="semana" aria-selected="false"></button>
+    <button data-tab="guia" aria-selected="false"></button>
+  </div>
+</nav>
+
+<div id="modal-root"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- Textos ----------
+  const I18N = {
+    es: {
+      wd: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+      mo: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
+      min: 'min', h: 'h',
+      syncLocal: 'Solo en este dispositivo', syncOn: 'Sincronizado', syncOff: 'Sin sincronizar',
+      tabs: { hoy: 'Hoy', semana: 'Semana', guia: 'Guía' },
+      side: { I: 'izquierdo', D: 'derecho', A: 'ambos' }, sideShort: { I: 'izq', D: 'der', A: 'ambos' },
+      sleeping: 'Aïna duerme', since: t => `desde las ${t}`,
+      hintShortNap: 'Si se despierta antes de 40 min suele ser un ciclo corto: prueba a volver a dormirla antes de sacarla.',
+      hintGoodNap: 'Buena siesta. Cuando se despierte, ofrécele el pecho antes de jugar.',
+      awake: 'Aïna despierta',
+      hint45: 'Recién despierta: toma tranquila, cambio de pañal y un rato de actividad.',
+      hintOk: 'Ventana ideal para empezar a calmarla si ves señales de sueño (bostezo, mirada perdida, se frota la cara).',
+      hintWarn: 'Es el momento: baja luz y ruido y empieza el ritual de dormir.',
+      hintBad: 'Lleva mucho despierta; puede estar pasada de vueltas y costarle más. Reduce estímulos y prueba en brazos o portabebés.',
+      today: 'Hoy',
+      hintEmpty: 'Registra el primer sueño y la primera toma: a partir de ahí verás aquí cuánto lleva despierta y cuándo toca dormirla.',
+      lastFeed: (ago, t, side, dur) => `Última toma <b>hace ${ago}</b> · ${t}, ${side}, ${dur}`,
+      nextSide: s => `Toca <b>${s}</b>`,
+      endFeed: 'Terminar toma', started: t => `empezó ${t}`,
+      feedL: 'Toma · Izq', feedR: 'Toma · Der', yourTurn: 'Le toca este', startNow: 'Empezar ahora',
+      wokeUp: 'Se ha despertado', sleptSince: (t, d) => `Dormía desde ${t} · ${d}`,
+      fellAsleep: 'Se ha dormido', startCount: 'Empieza a contar el sueño',
+      pee: 'Pipí', poo: 'Caca', note: 'Nota', manual: '+ Añadir a mano',
+      legend: { sueno: 'sueño', toma: 'toma', panal: 'pañal' },
+      feedsToday: 'tomas hoy', sleepToday: n => `sueño hoy · ${n} siesta${n === 1 ? '' : 's'}`, feedsUnit: 'tomas',
+      lastNight: 'anoche', longestMax: d => `tramo máx. ${d}`, noData: 'sin datos',
+      records: 'Registros', tapToFix: 'toca uno para corregir',
+      emptyToday: 'Todavía no hay nada registrado hoy. Pulsa un botón grande cuando empiece una toma o un sueño; se puede corregir después tocando el registro.',
+      evFeed: 'Toma', evSleep: 'Sueño', evDiaper: 'Pañal', evNote: 'Nota', pooOnly: 'caca', peeOnly: 'pipí', both: 'pipí y caca', ongoing: 'en curso',
+      reading: 'Lectura de hoy', means: 'Qué significa',
+      emptyReading: 'Registra el despertar, las tomas y las siestas de hoy y aquí aparecerá la lectura del día.',
+      rWake: 'Despierta para el día a las', rFeeds: 'Tomas de día', rGap: d => `hueco máx. ${d}`, rNaps: 'Siestas', rOngoing: '(en curso)',
+      rWindows: 'Ventanas de vigilia', rDiapers: 'Pañales', rWet: n => `${n} mojado${n === 1 ? '' : 's'}`, rPoo: n => `${n} con caca`,
+      rLastPoo: 'Última caca', daysAgo: d => d === 1 ? 'hace 1 día' : `hace ${d} días`,
+      kNight: 'Noche', kFeeds: 'Tomas de día', kNaps: 'Siestas', kWindows: 'Ventanas', kDiapers: 'Pañales', kNow: 'Ahora', kTonight: 'Esta noche',
+      nightWhat: (bed, n, longest) => `${bed ? `Dormida a las ${bed}. ` : ''}${n} toma${n === 1 ? '' : 's'}; tramo más largo ${longest}`,
+      nightFrontWhat: avg => `, el primero; después cada ${avg}. Llega bien comida al acostarse y de madrugada come a demanda.`,
+      nightFrontTodo: 'Se cambia desde el día: más tomas completas antes de acostarla, no menos de noche.',
+      nightGreatWhat: '. Muy buena noche para 3 meses.', nightGreatTodo: 'Protégela: misma hora de acostarse cada día.',
+      nightShortWhat: '. Sin un tramo largo.', nightShortTodo: 'Revisa que la toma de antes de dormir sea completa (los dos pechos) y que la última siesta no acabe tarde.',
+      nightNormalWhat: '. Dentro de lo esperable (2–4 despertares).', nightNormalTodo: 'Mantén el ritual y la hora; el tramo largo irá creciendo.',
+      feedsWhat: (n, span, every, ok) => `${n} toma${n === 1 ? '' : 's'} en ${span} despierta${every ? `, una cada ${every}` : ''}. ${ok ? 'Buen ritmo.' : 'Van espaciadas.'}`,
+      feedsTodoOk: 'Sigue ofreciendo cada 2–2 h 30 hasta la noche', feedsTodoSpaced: 'Ofrécele cada 2–2 h 30 aunque no lo pida: llenar el día vacía la noche',
+      feedsNextNap: '; la siguiente, en cuanto se despierte.', feedsNextAt: t => `; siguiente orientativa a las ${t}.`, feedsNextNow: '; ya toca la siguiente.',
+      napsShortWhat: l => `De un solo ciclo (${l}). Normal a los 3 meses; se alargan solas hacia los 4–5.`, napsShortTodo: 'Si se despierta llorando, alárgala en brazos; si se despierta contenta, fue suficiente.',
+      napsLongWhat: d => `Una siesta larga (${d}). Bien.`, napsLongTodo: 'Que la última del día no acabe después de las 17:30, para no restar sueño a la noche.',
+      napsOkWhat: l => `${l}: buena duración para su edad.`, napsOkTodo: 'Nada que cambiar.',
+      winLongWhat: d => `Una de ${d}. A los 3 meses, más de 2 h suele acabar en llanto y siesta corta.`, winLongTodo: 'La próxima, empieza a dormirla en cuanto la barra de arriba se ponga ámbar.',
+      winShortWhat: (a, b) => `Entre ${a} y ${b}: dentro de lo esperable. La corta viene tras una siesta breve.`, winShortTodo: 'Tras un ciclo corto aguanta menos despierta: no la fuerces a alargar.',
+      winOkWhat: (a, b) => `Entre ${a} y ${b}: justo en su rango (1–2 h).`, winOkTodo: 'Buen ajuste, sigue igual.',
+      diapWhat: (n, enough, pooDays) => `${n} mojado${n === 1 ? '' : 's'} hasta ahora${enough ? ': ya en el mínimo diario (5–6), se alimenta bien.' : '; el mínimo diario son 5–6.'}${pooDays >= 3 ? ` Sin caca desde hace ${pooDays} días.` : ''}`,
+      diapTodoPoo: 'Con lactancia exclusiva es normal hasta 7–10 días si está tranquila y el pipí va bien.', diapTodoOk: 'Nada que vigilar.', diapTodoMore: 'Lo normal es llegar de sobra al final del día.',
+      nowNap: 'Cuando se despierte: toma primero; luego 1 h 15 – 1 h 45 de ventana hasta la siguiente siesta o la noche.',
+      tonightAt: (r, t, last) => `Ritual sobre las ${r}, dormida hacia las ${t}. Última siesta acabada antes de las ${last}.`,
+      tonightGoal: 'Objetivo: dormida entre las 19:30 y las 20:30, con la última siesta acabada al menos 1 h 30 antes.',
+      aiAsk: 'Pedir lectura a Claude', aiAgain: 'Pedir otra lectura a Claude', aiStop: 'Parar',
+      aiThinking: 'Pensando… (puede tardar medio minuto)', aiWriting: 'Escribiendo…',
+      aiNotGranted: 'Sin permiso para preguntar a Claude desde esta página.', aiRate: 'Demasiadas peticiones seguidas; prueba en un rato.', aiFail: 'No se pudo obtener la lectura. Inténtalo de nuevo.',
+      aiLang: 'Escribe en español',
+      last7: 'Últimos 7 días', noRecords: 'sin registros', wFeeds: 'tomas', wSleep: 'sueño', wNight: 'noche:', wMax: 'máx.',
+      weekReading: 'Lectura de la semana',
+      weekEmpty: 'Con 3–4 días registrados aparecerá aquí una lectura: hora habitual de despertar y de acostarse, tomas de día y de noche, y el tramo nocturno más largo. Registra unos días sin cambiar nada; primero entender, luego ajustar.',
+      wkWake: 'Despierta por la mañana sobre las', wkBed: 'Se duerme por la noche sobre las', varies: d => `(varía ${d})`,
+      wkFeeds: 'Tomas por día', wkSleep: 'Sueño total por día', wkNightFeeds: 'Tomas por noche (20:00–07:00)', wkLongest: 'Tramo nocturno más largo sin toma',
+      tipWake: 'La hora de despertar varía más de una hora: fijarla (±30 min) es el primer ancla del ritmo.',
+      tipBed: 'La hora de dormir también baila: un ritual corto y siempre igual ayuda a que se estabilice.',
+      tipFeeds: 'Menos de 7 tomas de día: puede estar compensando de noche. Ofrécele el pecho cada 2–3 h de día aunque no lo pida.',
+      tipSleep: 'Menos de 13 h de sueño total: revisa si las ventanas de vigilia se alargan más de 2 h.',
+      tipLong: 'Ya hay un tramo largo de 4 h o más: protégelo poniéndola a dormir a la misma hora cada noche.',
+      edAdd: 'Añadir registro', edFix: 'Corregir registro', edType: 'Tipo', edBreast: 'Pecho', edDiaper: 'Pañal', edStart: 'Empieza', edTime: 'Hora',
+      edEnd: 'Termina', edEndHint: '(vacío = en curso)', edNote: 'Nota', edPlaceholder: 'p. ej. se durmió al pecho, muy inquieta…',
+      cancel: 'Cancelar', save: 'Guardar', del: 'Eliminar registro',
+      tMissingStart: 'Falta la hora de inicio', tEndBefore: 'El final no puede ser antes del inicio', tWriteNote: 'Escribe la nota', tSaved: 'Guardado',
+      tFeedSaved: d => `Toma de ${d} guardada`, tSlept: d => `Ha dormido ${d}`, tPoo: 'Pañal con caca anotado', tPee: 'Pañal de pipí anotado',
+      tFull: 'Base de datos llena: borra días antiguos', tNoSync: 'No se pudo sincronizar, guardado en el móvil',
+      tlLabel: d => `Línea de tiempo de ${d}`,
+    },
+    fr: {
+      wd: ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'],
+      mo: ['janv', 'févr', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'],
+      min: 'min', h: 'h',
+      syncLocal: 'Sur cet appareil seulement', syncOn: 'Synchronisé', syncOff: 'Non synchronisé',
+      tabs: { hoy: "Aujourd'hui", semana: 'Semaine', guia: 'Guide' },
+      side: { I: 'gauche', D: 'droit', A: 'les deux' }, sideShort: { I: 'g.', D: 'd.', A: 'les deux' },
+      sleeping: 'Aïna dort', since: t => `depuis ${t}`,
+      hintShortNap: "Si elle se réveille avant 40 min, c'est souvent un cycle court : essaie de la rendormir avant de la lever.",
+      hintGoodNap: 'Bonne sieste. À son réveil, propose-lui le sein avant de jouer.',
+      awake: 'Aïna est réveillée',
+      hint45: 'Tout juste réveillée : tétée tranquille, change et un moment d’éveil.',
+      hintOk: 'Fenêtre idéale pour commencer à la calmer si tu vois des signes de fatigue (bâillement, regard dans le vide, se frotte le visage).',
+      hintWarn: "C'est le moment : baisse la lumière et le bruit et lance le rituel du coucher.",
+      hintBad: 'Elle est éveillée depuis longtemps ; elle risque d’être surstimulée. Réduis les stimulations et essaie dans les bras ou en porte-bébé.',
+      today: "Aujourd'hui",
+      hintEmpty: 'Enregistre le premier sommeil et la première tétée : tu verras ensuite ici depuis combien de temps elle est éveillée et quand la coucher.',
+      lastFeed: (ago, t, side, dur) => `Dernière tétée <b>il y a ${ago}</b> · ${t}, ${side}, ${dur}`,
+      nextSide: s => `Au tour du <b>${s}</b>`,
+      endFeed: 'Terminer la tétée', started: t => `commencée à ${t}`,
+      feedL: 'Tétée · G', feedR: 'Tétée · D', yourTurn: 'C’est son tour', startNow: 'Commencer',
+      wokeUp: 'Elle s’est réveillée', sleptSince: (t, d) => `Dormait depuis ${t} · ${d}`,
+      fellAsleep: 'Elle s’est endormie', startCount: 'Lance le compteur de sommeil',
+      pee: 'Pipi', poo: 'Caca', note: 'Note', manual: '+ Ajouter à la main',
+      legend: { sueno: 'sommeil', toma: 'tétée', panal: 'couche' },
+      feedsToday: 'tétées aujourd’hui', sleepToday: n => `sommeil aujourd’hui · ${n} sieste${n === 1 ? '' : 's'}`, feedsUnit: 'tétées',
+      lastNight: 'cette nuit', longestMax: d => `plus long : ${d}`, noData: 'pas de données',
+      records: 'Enregistrements', tapToFix: 'touche pour corriger',
+      emptyToday: 'Rien d’enregistré aujourd’hui. Appuie sur un grand bouton au début d’une tétée ou d’un sommeil ; tu pourras corriger ensuite en touchant la ligne.',
+      evFeed: 'Tétée', evSleep: 'Sommeil', evDiaper: 'Couche', evNote: 'Note', pooOnly: 'caca', peeOnly: 'pipi', both: 'pipi et caca', ongoing: 'en cours',
+      reading: 'Lecture du jour', means: 'Ce que ça veut dire',
+      emptyReading: 'Enregistre le réveil, les tétées et les siestes du jour : la lecture apparaîtra ici.',
+      rWake: 'Réveil de la journée à', rFeeds: 'Tétées de jour', rGap: d => `écart max. ${d}`, rNaps: 'Siestes', rOngoing: '(en cours)',
+      rWindows: 'Fenêtres d’éveil', rDiapers: 'Couches', rWet: n => `${n} mouillée${n === 1 ? '' : 's'}`, rPoo: n => `${n} avec caca`,
+      rLastPoo: 'Dernier caca', daysAgo: d => d === 1 ? 'il y a 1 jour' : `il y a ${d} jours`,
+      kNight: 'Nuit', kFeeds: 'Tétées', kNaps: 'Siestes', kWindows: 'Éveil', kDiapers: 'Couches', kNow: 'Maintenant', kTonight: 'Ce soir',
+      nightWhat: (bed, n, longest) => `${bed ? `Endormie à ${bed}. ` : ''}${n} tétée${n === 1 ? '' : 's'} ; plus longue période ${longest}`,
+      nightFrontWhat: avg => `, la première ; ensuite toutes les ${avg}. Elle se couche bien nourrie et tète à la demande en fin de nuit.`,
+      nightFrontTodo: 'Ça se joue le jour : plus de tétées complètes avant le coucher, pas moins la nuit.',
+      nightGreatWhat: '. Très bonne nuit pour 3 mois.', nightGreatTodo: 'Protège-la : même heure de coucher chaque jour.',
+      nightShortWhat: '. Pas de longue période.', nightShortTodo: 'Vérifie que la tétée du coucher est complète (les deux seins) et que la dernière sieste ne finit pas tard.',
+      nightNormalWhat: '. Dans la norme (2–4 réveils).', nightNormalTodo: 'Garde le rituel et l’heure ; la longue période va s’allonger.',
+      feedsWhat: (n, span, every, ok) => `${n} tétée${n === 1 ? '' : 's'} en ${span} d’éveil${every ? `, une toutes les ${every}` : ''}. ${ok ? 'Bon rythme.' : 'Elles sont espacées.'}`,
+      feedsTodoOk: 'Continue à proposer toutes les 2–2 h 30 jusqu’au soir', feedsTodoSpaced: 'Propose toutes les 2–2 h 30 même si elle ne réclame pas : remplir la journée allège la nuit',
+      feedsNextNap: ' ; la prochaine dès son réveil.', feedsNextAt: t => ` ; prochaine indicative vers ${t}.`, feedsNextNow: ' ; c’est déjà l’heure de la prochaine.',
+      napsShortWhat: l => `D’un seul cycle (${l}). Normal à 3 mois ; elles s’allongent d’elles-mêmes vers 4–5 mois.`, napsShortTodo: 'Si elle se réveille en pleurant, prolonge dans les bras ; si elle se réveille contente, c’était assez.',
+      napsLongWhat: d => `Une longue sieste (${d}). Bien.`, napsLongTodo: 'Que la dernière de la journée ne finisse pas après 17 h 30, pour ne pas rogner la nuit.',
+      napsOkWhat: l => `${l} : bonne durée pour son âge.`, napsOkTodo: 'Rien à changer.',
+      winLongWhat: d => `Une de ${d}. À 3 mois, plus de 2 h finit souvent en pleurs et sieste courte.`, winLongTodo: 'La prochaine fois, commence à l’endormir dès que la barre du haut passe à l’orange.',
+      winShortWhat: (a, b) => `Entre ${a} et ${b} : dans la norme. La courte suit une sieste brève.`, winShortTodo: 'Après un cycle court elle tient moins longtemps éveillée : ne force pas.',
+      winOkWhat: (a, b) => `Entre ${a} et ${b} : pile dans sa plage (1–2 h).`, winOkTodo: 'Bon réglage, continue ainsi.',
+      diapWhat: (n, enough, pooDays) => `${n} mouillée${n === 1 ? '' : 's'} pour l’instant${enough ? ' : déjà au minimum quotidien (5–6), elle se nourrit bien.' : ' ; le minimum quotidien est de 5–6.'}${pooDays >= 3 ? ` Pas de caca depuis ${pooDays} jours.` : ''}`,
+      diapTodoPoo: 'En allaitement exclusif c’est normal jusqu’à 7–10 jours si elle est sereine et que le pipi va bien.', diapTodoOk: 'Rien à surveiller.', diapTodoMore: 'En général on dépasse largement en fin de journée.',
+      nowNap: 'À son réveil : tétée d’abord ; puis 1 h 15 – 1 h 45 de fenêtre jusqu’à la sieste suivante ou la nuit.',
+      tonightAt: (r, t, last) => `Rituel vers ${r}, endormie vers ${t}. Dernière sieste terminée avant ${last}.`,
+      tonightGoal: 'Objectif : endormie entre 19 h 30 et 20 h 30, dernière sieste terminée au moins 1 h 30 avant.',
+      aiAsk: 'Demander une lecture à Claude', aiAgain: 'Redemander une lecture à Claude', aiStop: 'Arrêter',
+      aiThinking: 'Réflexion… (peut prendre une trentaine de secondes)', aiWriting: 'Rédaction…',
+      aiNotGranted: 'Pas d’autorisation pour interroger Claude depuis cette page.', aiRate: 'Trop de demandes d’affilée ; réessaie dans un moment.', aiFail: 'Impossible d’obtenir la lecture. Réessaie.',
+      aiLang: 'Écris en français',
+      last7: '7 derniers jours', noRecords: 'aucun enregistrement', wFeeds: 'tétées', wSleep: 'sommeil', wNight: 'nuit :', wMax: 'max.',
+      weekReading: 'Lecture de la semaine',
+      weekEmpty: 'Après 3–4 jours enregistrés, une lecture apparaîtra ici : heure habituelle de réveil et de coucher, tétées de jour et de nuit, et plus longue période nocturne. Enregistre quelques jours sans rien changer ; comprendre d’abord, ajuster ensuite.',
+      wkWake: 'Réveil le matin vers', wkBed: 'Endormie le soir vers', varies: d => `(varie de ${d})`,
+      wkFeeds: 'Tétées par jour', wkSleep: 'Sommeil total par jour', wkNightFeeds: 'Tétées par nuit (20 h–7 h)', wkLongest: 'Plus longue période nocturne sans tétée',
+      tipWake: 'L’heure du réveil varie de plus d’une heure : la fixer (±30 min) est le premier repère du rythme.',
+      tipBed: 'L’heure du coucher bouge aussi : un rituel court et toujours identique aide à la stabiliser.',
+      tipFeeds: 'Moins de 7 tétées de jour : elle compense peut-être la nuit. Propose le sein toutes les 2–3 h le jour même sans demande.',
+      tipSleep: 'Moins de 13 h de sommeil total : vérifie si les fenêtres d’éveil dépassent 2 h.',
+      tipLong: 'Il y a déjà une période de 4 h ou plus : protège-la en la couchant à la même heure chaque soir.',
+      edAdd: 'Ajouter', edFix: 'Corriger', edType: 'Type', edBreast: 'Sein', edDiaper: 'Couche', edStart: 'Début', edTime: 'Heure',
+      edEnd: 'Fin', edEndHint: '(vide = en cours)', edNote: 'Note', edPlaceholder: 'ex. endormie au sein, très agitée…',
+      cancel: 'Annuler', save: 'Enregistrer', del: 'Supprimer',
+      tMissingStart: 'Il manque l’heure de début', tEndBefore: 'La fin ne peut pas précéder le début', tWriteNote: 'Écris la note', tSaved: 'Enregistré',
+      tFeedSaved: d => `Tétée de ${d} enregistrée`, tSlept: d => `Elle a dormi ${d}`, tPoo: 'Couche avec caca notée', tPee: 'Couche pipi notée',
+      tFull: 'Base de données pleine : supprime d’anciens jours', tNoSync: 'Synchronisation impossible, enregistré sur le téléphone',
+      tlLabel: d => `Chronologie du ${d}`,
+    },
+  };
+  let lang = 'es';
+  try { lang = localStorage.getItem('ritmo.lang') === 'fr' ? 'fr' : 'es'; } catch {}
+  let L = I18N[lang];
+
+  // ---------- Utilidades de tiempo ----------
+  const MIN = 60000, H = 3600000, DAY = 86400000;
+  const pad = n => String(n).padStart(2, '0');
+  const dayId = d => { d = new Date(d); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+  const dayStart = id => { const [y, m, d] = id.split('-').map(Number); return new Date(y, m - 1, d).getTime(); };
+  const shiftDay = (id, n) => dayId(dayStart(id) + n * DAY + H * 12);
+  const fmtTime = ms => { const d = new Date(ms); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+  const fmtDur = ms => {
+    if (ms < 0) ms = 0;
+    const m = Math.round(ms / MIN);
+    if (m < 60) return `${m} ${L.min}`;
+    const h = Math.floor(m / 60), r = m % 60;
+    return r ? `${h} ${L.h} ${pad(r)}` : `${h} ${L.h}`;
+  };
+  const fmtHours = ms => (ms / H).toFixed(1).replace('.0', '').replace('.', ',');
+  const fmtDay = id => { const d = new Date(dayStart(id)); return `${L.wd[d.getDay()]} ${d.getDate()} ${L.mo[d.getMonth()]}`; };
+  const toLocalInput = ms => { const d = new Date(ms); return `${dayId(d)}T${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+  const fromLocalInput = s => s ? new Date(s).getTime() : null;
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // Ventana de vigilia orientativa a los 3 meses (minutos)
+  const WAKE_OK = 75, WAKE_WARN = 105, WAKE_MAX = 120;
+
+  // ---------- Estado ----------
+  let days = {};          // id -> { fecha, ev: [...] }
+  let tab = 'hoy';
+  let db = null;
+  const LS_KEY = 'ritmo.dias';
+
+  try { days = JSON.parse(localStorage.getItem(LS_KEY) || '{}') || {}; } catch { days = {}; }
+
+  const allEvents = () => Object.values(days).flatMap(d => d.ev || []).sort((a, b) => a.ini - b.ini);
+
+  function saveDay(id) {
+    const doc = days[id] || (days[id] = { fecha: id, ev: [] });
+    doc.fecha = id;
+    try { localStorage.setItem(LS_KEY, JSON.stringify(days)); } catch {}
+    if (db) {
+      db.doc('dias/' + id).set(JSON.parse(JSON.stringify(doc))).catch(e => {
+        toast(e && e.code === 'quota_exceeded' ? L.tFull : L.tNoSync);
+      });
+    } else if (api) pushApi(id);
+  }
+
+  function upsertEvent(ev) {
+    const touched = new Set();
+    for (const id in days) {
+      const before = days[id].ev.length;
+      days[id].ev = days[id].ev.filter(e => e.id !== ev.id);
+      if (days[id].ev.length !== before) touched.add(id);
+    }
+    const id = dayId(ev.ini);
+    (days[id] || (days[id] = { fecha: id, ev: [] })).ev.push(ev);
+    touched.add(id);
+    touched.forEach(saveDay);
+    render();
+  }
+  function deleteEvent(evId) {
+    for (const id in days) {
+      const before = days[id].ev.length;
+      days[id].ev = days[id].ev.filter(e => e.id !== evId);
+      if (days[id].ev.length !== before) saveDay(id);
+    }
+    render();
+  }
+  const activeOf = tipo => allEvents().find(e => e.t === tipo && e.fin == null);
+
+  // ---------- Métricas ----------
+  function clipToDay(evs, id) {
+    const s = dayStart(id), e = s + DAY, now = Date.now();
+    return evs.map(ev => {
+      const fin = ev.fin == null ? now : ev.fin;
+      const a = Math.max(ev.ini, s), b = Math.min(fin, e);
+      return b > a || (ev.t === 'panal' || ev.t === 'nota') && ev.ini >= s && ev.ini < e ? { ...ev, a, b: Math.max(b, a) } : null;
+    }).filter(Boolean);
+  }
+  function dayStats(evs, id) {
+    const clipped = clipToDay(evs, id);
+    const s = dayStart(id);
+    const tomas = evs.filter(e => e.t === 'toma' && e.ini >= s && e.ini < s + DAY);
+    const sueno = clipped.filter(e => e.t === 'sueno').reduce((acc, e) => acc + (e.b - e.a), 0);
+    const siestas = evs.filter(e => e.t === 'sueno' && e.ini >= s + 7 * H && e.ini < s + 19 * H).length;
+    return { tomas: tomas.length, tomaMin: tomas.reduce((a, e) => a + ((e.fin ?? Date.now()) - e.ini), 0), sueno, siestas };
+  }
+  // Noche que empieza la tarde del día `id`: 19:00 -> 08:00 del siguiente
+  function nightStats(evs, id) {
+    const s = dayStart(id) + 19 * H, e = s + 13 * H, now = Date.now();
+    if (now < s + 2 * H) return null;
+    const sleeps = evs.filter(x => x.t === 'sueno');
+    const bed = sleeps.find(x => x.ini >= s - 0.5 * H && x.ini < s + 5 * H);
+    const bedtime = bed ? bed.ini : s + H;
+    let wake = null;
+    for (const x of sleeps) { const fin = x.fin ?? now; if (fin > s + 10 * H && fin <= e + 2 * H && x.ini < e) wake = fin; }
+    const end = Math.min(wake ?? (now < e ? now : s + 12 * H), now);
+    const feeds = evs.filter(x => x.t === 'toma' && x.ini >= s + H && x.ini < e).map(x => x.ini).sort((a, b) => a - b);
+    const points = [bedtime, ...feeds, end].filter(p => p >= bedtime && p <= end);
+    let longest = 0; const gaps = [];
+    for (let i = 1; i < points.length; i++) { gaps.push(points[i] - points[i - 1]); longest = Math.max(longest, points[i] - points[i - 1]); }
+    const finished = now >= e || wake != null;
+    return { feeds: feeds.length, longest, gaps, bedtime: bed ? bed.ini : null, wake, finished };
+  }
+  const median = arr => { if (!arr.length) return null; const a = [...arr].sort((x, y) => x - y); const m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; };
+  const minutesOfDay = ms => { const d = new Date(ms); return d.getHours() * 60 + d.getMinutes(); };
+  const fmtMinutes = m => `${pad(Math.floor(m / 60))}:${pad(Math.round(m % 60))}`;
+
+  // Despertar de la mañana: final del bloque de sueño nocturno (sueños encadenados
+  // con pausas cortas para tomas). Una siesta tras un rato despierta no cuenta.
+  function morningWake(sleeps, s) {
+    const morning = sleeps.filter(e => e.fin != null && e.fin >= s + 5 * H && e.fin <= s + 11 * H && e.ini < s + 9 * H).sort((a, b) => a.fin - b.fin);
+    if (!morning.length) return null;
+    let wake = morning[0].fin;
+    for (const e of morning.slice(1)) { if (e.ini - wake <= 35 * MIN) wake = e.fin; else break; }
+    return wake;
+  }
+
+  // Lectura del día: filas de datos + interpretación
+  function dayInsights(evs, today) {
+    const now = Date.now(), s = dayStart(today);
+    const rows = [], notes = [];
+    const sleeps = evs.filter(e => e.t === 'sueno');
+    const napping = !!activeOf('sueno');
+    const wake = morningWake(sleeps, s);
+    const dayFrom = wake ?? s + 7 * H;
+    if (wake) rows.push([L.rWake, fmtTime(wake)]);
+
+    const dayFeeds = evs.filter(e => e.t === 'toma' && e.ini >= dayFrom && e.ini < s + DAY);
+    let maxGap = 0;
+    for (let i = 1; i < dayFeeds.length; i++) maxGap = Math.max(maxGap, dayFeeds[i].ini - dayFeeds[i - 1].ini);
+    const lastFeed = dayFeeds[dayFeeds.length - 1];
+    if (dayFeeds.length) rows.push([L.rFeeds, `${dayFeeds.length}${maxGap ? ` · ${L.rGap(fmtDur(maxGap))}` : ''}`]);
+
+    const naps = sleeps.filter(e => e.ini >= dayFrom && e.ini < s + 19 * H);
+    const napDone = naps.filter(e => e.fin != null);
+    if (naps.length) rows.push([L.rNaps, naps.map(e => fmtDur((e.fin ?? now) - e.ini) + (e.fin == null ? ' ' + L.rOngoing : '')).join(' · ')]);
+    const windows = [];
+    let prevEnd = wake;
+    for (const n of naps) { if (prevEnd != null && n.ini > prevEnd) windows.push(n.ini - prevEnd); prevEnd = n.fin; }
+    if (windows.length) rows.push([L.rWindows, windows.map(fmtDur).join(' · ')]);
+
+    const diapers = evs.filter(e => e.t === 'panal' && e.ini >= s && e.ini < s + DAY);
+    const poo = diapers.filter(e => e.p === 'caca' || e.p === 'ambos').length;
+    if (diapers.length) rows.push([L.rDiapers, `${L.rWet(diapers.length)}${poo ? `, ${L.rPoo(poo)}` : ''}`]);
+    const lastPoo = [...evs].reverse().find(e => e.t === 'panal' && (e.p === 'caca' || e.p === 'ambos'));
+    const pooDays = lastPoo ? Math.floor((now - lastPoo.ini) / DAY) : null;
+    if (pooDays != null && pooDays >= 1) rows.push([L.rLastPoo, L.daysAgo(pooDays)]);
+
+    // Noche anterior
+    const night = nightStats(evs, shiftDay(today, -1));
+    if (night && (night.feeds || night.bedtime)) {
+      const first = night.gaps[0] || 0;
+      const rest = night.gaps.slice(1, -1);
+      const avgRest = rest.length ? rest.reduce((a, b) => a + b, 0) / rest.length : null;
+      let what = L.nightWhat(night.bedtime ? fmtTime(night.bedtime) : null, night.feeds, fmtDur(night.longest)), todo;
+      if (night.feeds >= 2 && first >= 3 * H && avgRest && avgRest < 2.5 * H) { what += L.nightFrontWhat(fmtDur(avgRest)); todo = L.nightFrontTodo; }
+      else if (night.longest >= 5 * H && night.feeds <= 2) { what += L.nightGreatWhat; todo = L.nightGreatTodo; }
+      else if (night.longest < 3 * H) { what += L.nightShortWhat; todo = L.nightShortTodo; }
+      else { what += L.nightNormalWhat; todo = L.nightNormalTodo; }
+      notes.push({ k: L.kNight, what, todo });
+    }
+    // Ritmo de tomas de día
+    if (wake && dayFeeds.length) {
+      const span = now - wake, every = span / dayFeeds.length, ok = every <= 2.5 * H;
+      const what = L.feedsWhat(dayFeeds.length, fmtDur(span), dayFeeds.length >= 2 ? fmtDur(every) : null, ok);
+      let todo = ok ? L.feedsTodoOk : L.feedsTodoSpaced;
+      if (lastFeed) { const next = lastFeed.ini + 2.5 * H; todo += napping ? L.feedsNextNap : next > now ? L.feedsNextAt(fmtTime(next)) : L.feedsNextNow; }
+      else todo += '.';
+      notes.push({ k: L.kFeeds, what, todo });
+    }
+    // Siestas
+    if (napDone.length) {
+      const lens = napDone.map(e => e.fin - e.ini);
+      const allShort = lens.every(l => l < 45 * MIN), anyLong = lens.some(l => l >= 90 * MIN);
+      if (allShort) notes.push({ k: L.kNaps, what: L.napsShortWhat(lens.map(fmtDur).join(', ')), todo: L.napsShortTodo });
+      else if (anyLong) notes.push({ k: L.kNaps, what: L.napsLongWhat(fmtDur(Math.max(...lens))), todo: L.napsLongTodo });
+      else notes.push({ k: L.kNaps, what: L.napsOkWhat(lens.map(fmtDur).join(', ')), todo: L.napsOkTodo });
+    }
+    // Ventanas de vigilia
+    if (windows.length) {
+      const mx = Math.max(...windows), mn = Math.min(...windows);
+      if (mx > 2 * H) notes.push({ k: L.kWindows, what: L.winLongWhat(fmtDur(mx)), todo: L.winLongTodo });
+      else if (mn < 50 * MIN && windows.length >= 2) notes.push({ k: L.kWindows, what: L.winShortWhat(fmtDur(mn), fmtDur(mx)), todo: L.winShortTodo });
+      else notes.push({ k: L.kWindows, what: L.winOkWhat(fmtDur(mn), fmtDur(mx)), todo: L.winOkTodo });
+    }
+    // Pañales
+    if (diapers.length) {
+      const enough = diapers.length >= 5;
+      notes.push({ k: L.kDiapers, what: L.diapWhat(diapers.length, enough, pooDays), todo: pooDays >= 3 ? L.diapTodoPoo : enough ? L.diapTodoOk : L.diapTodoMore });
+    }
+    // Siguiente paso
+    let next = null;
+    if (wake) {
+      const lastEnd = napDone.length ? napDone[napDone.length - 1].fin : wake;
+      const target = Math.max(s + 19 * H, Math.min(s + 20.5 * H, lastEnd + 105 * MIN));
+      if (napping) next = { k: L.kNow, what: L.nowNap };
+      else if (now < target && now > s + 16 * H) next = { k: L.kTonight, what: L.tonightAt(fmtTime(target - 25 * MIN), fmtTime(target), fmtTime(target - 90 * MIN)) };
+      else if (now < s + 16 * H) next = { k: L.kTonight, what: L.tonightGoal };
+    }
+    return { rows, notes, next };
+  }
+
+  // Resumen en texto plano para pedir una lectura a Claude
+  function daySummaryText(evs, today) {
+    const s = dayStart(today), from = s - 5 * H, now = Date.now();
+    const Ln = e => e.t === 'toma' ? `${fmtTime(e.ini)} ${L.evFeed.toLowerCase()}${e.lado ? ' ' + L.side[e.lado] : ''}${e.fin ? ' ' + fmtDur(e.fin - e.ini) : ' (' + L.ongoing + ')'}`
+      : e.t === 'sueno' ? `${fmtTime(e.ini)}–${e.fin ? fmtTime(e.fin) : '…'} ${L.evSleep.toLowerCase()} ${fmtDur((e.fin ?? now) - e.ini)}${e.fin ? '' : ' (' + L.ongoing + ')'}`
+      : e.t === 'panal' ? `${fmtTime(e.ini)} ${L.evDiaper.toLowerCase()} ${e.p === 'caca' ? L.pooOnly : e.p === 'ambos' ? L.both : L.peeOnly}`
+      : `${fmtTime(e.ini)} ${L.evNote.toLowerCase()}`;
+    return evs.filter(e => e.ini >= from && e.ini < s + DAY).map(e => `${e.ini < s ? '(-1) ' : ''}${Ln(e)}${e.n ? ` — ${e.n}` : ''}`).join('\n');
+  }
+
+  // ---------- Render ----------
+  const main = document.getElementById('main');
+  function applyChrome() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('nav.tabs button').forEach(b => { b.textContent = L.tabs[b.dataset.tab]; });
+    document.querySelectorAll('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+    const sy = document.getElementById('sync');
+    sy.textContent = sy.dataset.state === 'on' ? L.syncOn : sy.dataset.state === 'off' ? L.syncOff : L.syncLocal;
+  }
+  function render() {
+    applyChrome();
+    if (tab === 'hoy') renderHoy();
+    else if (tab === 'semana') renderSemana();
+    else renderGuia();
+  }
+
+  function timelineHTML(evs, id, opts = {}) {
+    const s = dayStart(id), now = Date.now();
+    const pct = ms => Math.max(0, Math.min(100, (ms - s) / DAY * 100));
+    const clipped = clipToDay(evs, id);
+    let html = `<div class="tl-bar" role="img" aria-label="${L.tlLabel(fmtDay(id))}">
+      <div class="night" style="left:0;width:${pct(s + 7 * H)}%"></div>
+      <div class="night" style="left:${pct(s + 20 * H)}%;right:0"></div>`;
+    for (const e of clipped) {
+      if (e.t === 'nota') continue;
+      const l = pct(e.a), w = Math.max(e.t === 'toma' ? 0.35 : 0, pct(e.b) - l);
+      html += `<div class="ev ${e.t}${e.fin == null ? ' live' : ''}" style="left:${l}%;${e.t === 'panal' ? '' : `width:${w}%`}" title="${fmtTime(e.a)}"></div>`;
+    }
+    if (now >= s && now < s + DAY) html += `<div class="now" style="left:${pct(now)}%"></div>`;
+    html += `</div>`;
+    if (opts.hours !== false) html = `<div class="tl-hours"><span>0</span><span>6</span><span>12</span><span>18</span><span>24 ${L.h}</span></div>` + html;
+    return `<div class="tl">${html}</div>`;
+  }
+
+  function renderHoy() {
+    const now = Date.now(), evs = allEvents(), today = dayId(now);
+    const toma = activeOf('toma'), sueno = activeOf('sueno');
+    const lastSleep = [...evs].reverse().find(e => e.t === 'sueno' && e.fin != null);
+    const lastToma = [...evs].reverse().find(e => e.t === 'toma' && e.fin != null);
+
+    let statusHTML;
+    if (sueno) {
+      statusHTML = `<div class="eyebrow">${L.sleeping}</div>
+        <div class="big">${fmtDur(now - sueno.ini)}<small>${L.since(fmtTime(sueno.ini))}</small></div>
+        <div class="hint">${now - sueno.ini < 40 * MIN ? L.hintShortNap : L.hintGoodNap}</div>`;
+    } else if (lastSleep) {
+      const awake = now - lastSleep.fin, m = awake / MIN;
+      const cls = m < WAKE_OK ? '' : m < WAKE_WARN ? 'warn' : 'bad';
+      const hint = m < 45 ? L.hint45 : m < WAKE_OK ? L.hintOk : m < WAKE_WARN ? L.hintWarn : L.hintBad;
+      statusHTML = `<div class="eyebrow">${L.awake}</div>
+        <div class="big">${fmtDur(awake)}<small>${L.since(fmtTime(lastSleep.fin))}</small></div>
+        <div class="meter" aria-hidden="true"><div class="fill ${cls}" style="width:${Math.min(100, m / WAKE_MAX * 100)}%"></div></div>
+        <div class="meter-scale"><span>0</span><span>1 ${L.h}</span><span>2 ${L.h}</span></div>
+        <div class="hint">${hint}</div>`;
+    } else {
+      statusHTML = `<div class="eyebrow">${L.today}</div><div class="big">${fmtTime(now)}</div><div class="hint">${L.hintEmpty}</div>`;
+    }
+    const nextSide = lastToma ? (lastToma.lado === 'I' ? 'D' : lastToma.lado === 'D' ? 'I' : null) : null;
+    const lastRow = lastToma
+      ? `<div class="last-row"><span>${L.lastFeed(fmtDur(now - lastToma.fin), fmtTime(lastToma.ini), L.sideShort[lastToma.lado] || '', fmtDur(lastToma.fin - lastToma.ini))}</span>${nextSide ? `<span>${L.nextSide(L.side[nextSide])}</span>` : ''}</div>`
+      : '';
+
+    const tomaBtns = toma
+      ? `<div class="row one"><button class="btn-big toma live" data-act="stop-toma"><span class="lbl">${L.endFeed}</span><span class="sub">${L.side[toma.lado] || ''} · ${fmtDur(now - toma.ini)} · ${L.started(fmtTime(toma.ini))}</span></button></div>`
+      : `<div class="row"><button class="btn-big toma" data-act="start-toma" data-lado="I"><span class="lbl">${L.feedL}</span><span class="sub">${nextSide === 'I' ? L.yourTurn : L.startNow}</span></button>
+         <button class="btn-big toma" data-act="start-toma" data-lado="D"><span class="lbl">${L.feedR}</span><span class="sub">${nextSide === 'D' ? L.yourTurn : L.startNow}</span></button></div>`;
+    const suenoBtn = sueno
+      ? `<div class="row one"><button class="btn-big sueno live" data-act="stop-sueno"><span class="lbl">${L.wokeUp}</span><span class="sub">${L.sleptSince(fmtTime(sueno.ini), fmtDur(now - sueno.ini))}</span></button></div>`
+      : `<div class="row one"><button class="btn-big sueno" data-act="start-sueno"><span class="lbl">${L.fellAsleep}</span><span class="sub">${L.startCount}</span></button></div>`;
+
+    const st = dayStats(evs, today);
+    const night = nightStats(evs, shiftDay(today, -1));
+    const statsHTML = `<div class="stats">
+      <div class="stat"><div class="v">${st.tomas}<small> · ${fmtDur(st.tomaMin)}</small></div><div class="k">${L.feedsToday}</div></div>
+      <div class="stat"><div class="v">${fmtHours(st.sueno)}<small> ${L.h}</small></div><div class="k">${L.sleepToday(st.siestas)}</div></div>
+      <div class="stat"><div class="v">${night ? (night.feeds + `<small> ${L.feedsUnit}</small>`) : '—'}</div><div class="k">${L.lastNight} · ${night ? L.longestMax(fmtDur(night.longest)) : L.noData}</div></div>
+    </div>`;
+
+    const ins = dayInsights(evs, today);
+    const aiBlock = sampleFn ? `<div class="ai">
+        ${ai.text ? `<div class="ai-text"><p>${esc(ai.text).replace(/\n\n+/g, '</p><p>').replace(/\n/g, '<br>')}</p></div>` : ''}
+        ${ai.state === 'loading' ? `<div class="ai-status">${ai.text ? L.aiWriting : L.aiThinking}</div>` : ''}
+        ${ai.error ? `<div class="ai-status">${esc(ai.error)}</div>` : ''}
+        <div class="chips">${ai.state === 'loading' ? `<button class="chip" data-act="ai-stop">${L.aiStop}</button>` : `<button class="chip ai-btn" data-act="ai">${ai.text ? L.aiAgain : L.aiAsk}</button>`}</div>
+      </div>` : '';
+    const insightsHTML = `<section class="block"><h2>${L.reading}</h2>
+      ${ins.rows.length ? `<div class="read">${ins.rows.map(([k, v]) => `<div class="row"><span>${k}</span><b>${v}</b></div>`).join('')}</div>` : ''}
+      ${ins.notes.length ? `<div class="eyebrow ins-h">${L.means}</div><div class="ins-list">${ins.notes.map(n => `<div class="ins"><div class="ins-k">${n.k}</div><div class="ins-w">${n.what}</div><div class="ins-t">${n.todo}</div></div>`).join('')}</div>` : ''}
+      ${ins.next ? `<div class="next"><div class="ins-k">${ins.next.k}</div><div>${ins.next.what}</div></div>` : ''}
+      ${!ins.rows.length && !ins.notes.length ? `<div class="empty">${L.emptyReading}</div>` : ''}
+      ${aiBlock ? `<div class="read" style="margin-top:10px">${aiBlock}</div>` : ''}
+    </section>`;
+
+    const s = dayStart(today);
+    const listEvs = evs.filter(e => e.ini >= s - 5 * H && (e.ini >= s || (e.fin ?? now) >= s)).reverse();
+    const listHTML = listEvs.length ? `<div class="list">${listEvs.map(e => {
+      const desc = e.t === 'toma' ? `${L.evFeed} · ${L.side[e.lado] || ''}`
+        : e.t === 'sueno' ? L.evSleep
+        : e.t === 'panal' ? `${L.evDiaper} · ${e.p === 'caca' ? L.pooOnly : e.p === 'ambos' ? L.both : L.peeOnly}`
+        : L.evNote;
+      const dur = e.fin == null && (e.t === 'toma' || e.t === 'sueno') ? `<span class="live">${L.ongoing}</span>`
+        : e.t === 'toma' || e.t === 'sueno' ? fmtDur(e.fin - e.ini) : '';
+      return `<button class="item" data-edit="${e.id}"><span class="t">${fmtTime(e.ini)}</span><span class="dot ${e.t}"></span><span>${desc}${e.n ? ` <span class="d">· ${esc(e.n)}</span>` : ''}</span><span class="d">${dur}</span></button>`;
+    }).join('')}</div>` : `<div class="empty">${L.emptyToday}</div>`;
+
+    main.innerHTML = `
+      <div class="status">${statusHTML}${lastRow}</div>
+      <div class="actions">
+        ${tomaBtns}${suenoBtn}
+        <div class="chips">
+          <button class="chip panal" data-act="panal" data-p="pipi">${L.pee}</button>
+          <button class="chip panal" data-act="panal" data-p="caca">${L.poo}</button>
+          <button class="chip" data-act="nota">${L.note}</button>
+          <button class="chip" data-act="manual">${L.manual}</button>
+        </div>
+      </div>
+      <section class="block">
+        <h2>${L.today} <span class="eyebrow">${fmtDay(today)}</span></h2>
+        ${timelineHTML(evs, today)}
+        <div class="tl-legend" style="margin-top:6px"><span class="l-sueno">${L.legend.sueno}</span><span class="l-toma">${L.legend.toma}</span><span class="l-panal">${L.legend.panal}</span></div>
+        ${statsHTML}
+      </section>
+      ${insightsHTML}
+      <section class="block">
+        <h2>${L.records} <span class="eyebrow">${L.tapToFix}</span></h2>
+        ${listHTML}
+      </section>`;
+  }
+
+  function renderSemana() {
+    const now = Date.now(), evs = allEvents(), today = dayId(now);
+    const ids = []; for (let i = 6; i >= 0; i--) ids.push(shiftDay(today, -i));
+    const rows = ids.map(id => {
+      const st = dayStats(evs, id), n = nightStats(evs, id);
+      const has = clipToDay(evs, id).length > 0;
+      const d = new Date(dayStart(id));
+      return `<div class="wrow${id === today ? ' today' : ''}">
+        <div class="dl"><b>${L.wd[d.getDay()]}</b>${d.getDate()} ${L.mo[d.getMonth()]}</div>
+        <div>${timelineHTML(evs, id, { hours: false })}
+          <div class="wstats">${has ? `<span><b>${st.tomas}</b> ${L.wFeeds}</span><span><b>${fmtHours(st.sueno)} ${L.h}</b> ${L.wSleep}</span>${n ? `<span>${L.wNight} <b>${n.feeds}</b> ${L.wFeeds}, ${L.wMax} <b>${fmtDur(n.longest)}</b></span>` : ''}` : `<span>${L.noRecords}</span>`}</div>
+        </div></div>`;
+    }).join('');
+
+    const withData = ids.filter(id => clipToDay(evs, id).length > 0 && id !== today);
+    const nights = ids.map(id => nightStats(evs, id)).filter(n => n && n.finished);
+    const wakes = [], beds = [];
+    for (const id of ids) {
+      const s = dayStart(id);
+      const w = morningWake(evs.filter(e => e.t === 'sueno'), s);
+      if (w != null) wakes.push(minutesOfDay(w));
+      const n = nightStats(evs, id); if (n && n.bedtime) beds.push(minutesOfDay(n.bedtime));
+    }
+    const avg = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
+    const avgTomas = avg(withData.map(id => dayStats(evs, id).tomas));
+    const avgSueno = avg(withData.map(id => dayStats(evs, id).sueno));
+    const avgNightFeeds = avg(nights.map(n => n.feeds));
+    const avgLongest = avg(nights.map(n => n.longest));
+    const medWake = median(wakes), medBed = median(beds);
+    const spread = arr => arr.length > 1 ? Math.max(...arr) - Math.min(...arr) : 0;
+    const dec = x => x.toFixed(1).replace('.', ',');
+
+    let read = '';
+    if (withData.length < 2 && nights.length < 2) {
+      read = `<div class="read"><div class="note">${L.weekEmpty}</div></div>`;
+    } else {
+      const lines = [];
+      if (medWake != null) lines.push(`<div class="row"><span>${L.wkWake}</span><b>${fmtMinutes(medWake)}${spread(wakes) > 60 ? ` <span class="note">${L.varies(fmtDur(spread(wakes) * MIN))}</span>` : ''}</b></div>`);
+      if (medBed != null) lines.push(`<div class="row"><span>${L.wkBed}</span><b>${fmtMinutes(medBed)}${spread(beds) > 60 ? ` <span class="note">${L.varies(fmtDur(spread(beds) * MIN))}</span>` : ''}</b></div>`);
+      if (avgTomas != null) lines.push(`<div class="row"><span>${L.wkFeeds}</span><b>${dec(avgTomas)}</b></div>`);
+      if (avgSueno != null) lines.push(`<div class="row"><span>${L.wkSleep}</span><b>${fmtHours(avgSueno)} ${L.h}</b></div>`);
+      if (avgNightFeeds != null) lines.push(`<div class="row"><span>${L.wkNightFeeds}</span><b>${dec(avgNightFeeds)}</b></div>`);
+      if (avgLongest != null) lines.push(`<div class="row"><span>${L.wkLongest}</span><b>${fmtDur(avgLongest)}</b></div>`);
+      const tips = [];
+      if (medWake != null && spread(wakes) > 60) tips.push(L.tipWake);
+      if (medBed != null && spread(beds) > 60) tips.push(L.tipBed);
+      if (avgTomas != null && avgTomas < 7) tips.push(L.tipFeeds);
+      if (avgSueno != null && avgSueno < 13 * H) tips.push(L.tipSleep);
+      if (avgLongest != null && avgLongest >= 4 * H) tips.push(L.tipLong);
+      if (tips.length) lines.push(`<div class="note">${tips.map(t => '• ' + t).join('<br>')}</div>`);
+      read = `<div class="read">${lines.join('')}</div>`;
+    }
+
+    main.innerHTML = `
+      <section class="block" style="margin-top:0">
+        <h2>${L.last7}</h2>
+        <div class="tl-hours" style="padding-left:52px;margin-bottom:4px"><span>0</span><span>6</span><span>12</span><span>18</span><span>24 ${L.h}</span></div>
+        <div class="week">${rows}</div>
+        <div class="tl-legend" style="margin-top:8px"><span class="l-sueno">${L.legend.sueno}</span><span class="l-toma">${L.legend.toma}</span></div>
+      </section>
+      <section class="block">
+        <h2>${L.weekReading}</h2>
+        ${read}
+      </section>`;
+  }
+
+  const GUIDE = {
+    es: `<div class="guide">
+      <h3>Qué es normal a los 3 meses con lactancia materna exclusiva</h3>
+      <div class="ref"><table>
+        <tr><td>Tomas en 24 h</td><td>8–12</td></tr>
+        <tr><td>Sueño total en 24 h</td><td>14–17 h</td></tr>
+        <tr><td>Ventana de vigilia (entre sueños)</td><td>1 h – 2 h</td></tr>
+        <tr><td>Siestas al día</td><td>3–5</td></tr>
+        <tr><td>Tramo nocturno más largo</td><td>3–6 h</td></tr>
+        <tr><td>Despertares nocturnos para mamar</td><td>2–4 (normal)</td></tr>
+        <tr><td>Pañales mojados al día</td><td>≥ 5–6</td></tr>
+      </table></div>
+      <p>Despertarse varias veces por la noche a mamar es lo esperable a esta edad: el estómago es pequeño, la leche materna se digiere rápido y por la noche el pecho produce más prolactina. El objetivo realista ahora no es "que duerma del tirón", sino que el día tenga forma para que la noche se vaya alargando sola.</p>
+      <p>Alrededor de los 3 meses muchos bebés hacen tomas de día más cortas y distraídas (el llamado "bache de los 3 meses") y lo compensan de noche. Si ves eso en la app (pocas tomas de día, muchas de noche), la palanca está en el día, no en la noche.</p>
+
+      <h3>Paso 1 · Una semana de registro sin cambiar nada</h3>
+      <p>Antes de organizar, hay que ver. Durante 5–7 días registra tomas, sueños y pañales tal cual salen. En <b>Semana</b> verás la hora real a la que se despierta, a la que cae por la noche, cuántas tomas hace de día y de noche y cuál es su tramo más largo. Eso es tu punto de partida y ya te dirá dónde apretar.</p>
+
+      <h3>Paso 2 · Anclas, no horarios</h3>
+      <p>A los 3 meses un horario rígido no funciona; lo que sí funciona es repetir un ciclo y fijar dos anclas:</p>
+      <ul>
+        <li><b>Hora de despertar fija</b> (±30 min). Abre persianas, luz natural, hablarle: el día empieza aquí aunque haya sido una noche mala.</li>
+        <li><b>Ciclo repetible</b> durante el día: <span class="tag">comer</span><span class="tag">actividad</span><span class="tag">dormir</span>. Toma al despertar, un rato de actividad (cambio, juego en el suelo, paseo), y a dormir cuando la ventana de vigilia se acerque a 1 h 15 – 1 h 45. La app te avisa con la barra de la pantalla Hoy.</li>
+        <li><b>Ofrecer pecho cada 2–3 h de día</b> aunque no lo pida, sobre todo si la app muestra menos de 7 tomas diurnas. Llenar el día vacía la noche.</li>
+        <li><b>Última siesta</b> terminada como muy tarde 1 h 30 antes de la hora de dormir de noche.</li>
+      </ul>
+
+      <h3>Paso 3 · El ritual de noche</h3>
+      <p>Empieza a la misma hora cada día (entre las 19:00 y las 20:30 suele encajar) y dura 20–30 minutos. Siempre el mismo orden, siempre en el mismo sitio, con la luz baja:</p>
+      <ol>
+        <li>Baño corto o lavado con esponja, masaje.</li>
+        <li>Pijama y saco de dormir.</li>
+        <li>Toma tranquila con poca luz y sin pantallas.</li>
+        <li>Una canción o frase que sea siempre la misma.</li>
+        <li>A la cuna, somnolienta. Si se duerme al pecho no pasa nada: a esta edad es normal y no crea "vicios".</li>
+      </ol>
+      <p>Lo importante no es cada paso sino que la secuencia sea idéntica: en 1–2 semanas el cuerpo la reconoce y se relaja solo.</p>
+
+      <h3>Las tomas de noche: cómo hacerlas sin desvelar</h3>
+      <ul>
+        <li>Luz mínima, ámbar o roja. Nada de techo ni de pantalla.</li>
+        <li>Sin hablar, sin jugar, sin mirarla a los ojos: toma y vuelta.</li>
+        <li>Pañal solo si hay caca o está empapado; cámbialo <em>antes</em> de la toma, no después.</li>
+        <li>Pulsa el botón de toma al empezar y al terminar: en la app verás si hay una toma "de costumbre" (cada noche a la misma hora, corta) frente a tomas de hambre (largas, tragando).</li>
+        <li>Si despierta antes de 1 h desde la última toma, prueba primero a calmarla sin pecho (mano en el pecho, sonido "shhh", chupete si lo usa). Si no funciona, pecho sin culpa.</li>
+      </ul>
+
+      <h3>Cómo puede ayudar otra persona con lactancia exclusiva</h3>
+      <p>La toma es lo único que solo puedes hacer tú. Todo lo demás se puede repartir, y de hecho la bebé aprende a dormirse también con otra persona:</p>
+      <ul>
+        <li><b>El ritual de noche entero</b> menos la toma: baño, pijama, canción, cuna.</li>
+        <li><b>Las siestas de día</b>: en brazos, portabebés o carrito. Que salga a pasear con ella una siesta al día te da 1–2 h para dormir tú.</li>
+        <li><b>De noche</b>: quien no da el pecho la coge, le cambia el pañal si toca, te la trae y la vuelve a dormir después. Tú solo haces la toma.</li>
+        <li><b>El registro</b>: cualquiera con el enlace puede pulsar los botones; así la app sigue siendo fiel aunque no estés tú.</li>
+        <li>Si quieres delegar una toma (por ejemplo la de las 23:00), extrae leche a esa misma hora otro día y que se la dé la otra persona en vaso o biberón de flujo lento; tú te extraes en ese hueco para mantener producción. Es opcional, no obligatorio.</li>
+      </ul>
+
+      <h3>Qué NO hace falta ahora</h3>
+      <ul>
+        <li>Dejarla llorar para que "aprenda": no se recomienda antes de los 4–6 meses y con lactancia materna exclusiva no es necesario.</li>
+        <li>Quitar tomas de noche: a los 3 meses aún las necesita. Se reducen solas cuando el día está organizado.</li>
+        <li>Cereales, leche de fórmula "para que aguante" o espaciar tomas de día para que tenga más hambre de noche: lo contrario de lo que funciona.</li>
+      </ul>
+
+      <h3>Sueño seguro</h3>
+      <ul>
+        <li>Siempre boca arriba, en superficie firme, sin almohadas, cojines ni peluches.</li>
+        <li>En la misma habitación que tú al menos hasta los 6 meses.</li>
+        <li>Si haces colecho: colchón firme, sin huecos, sin edredones pesados, y nunca si has tomado alcohol, medicación que dé sueño o estás agotada hasta el punto de dormirte en el sofá (el sofá es el sitio más peligroso).</li>
+      </ul>
+
+      <h3>Cuándo consultar</h3>
+      <div class="warn">
+        Con el pediatra: menos de 5 pañales mojados al día, no gana peso, fiebre, la ves apagada o rechaza el pecho. Con la matrona o el médico de cabecera: tú. Agotamiento que no mejora al dormir, tristeza o ansiedad la mayor parte del día durante más de dos semanas, o sensación de no poder con esto. No es debilidad, es posparto, y tiene tratamiento.
+      </div>
+
+      <h3>Cómo usar esta app cada día</h3>
+      <ul>
+        <li>Pulsa <b>Toma · Izq/Der</b> al enganchar y <b>Terminar toma</b> al soltar. La app te dice qué pecho toca.</li>
+        <li>Pulsa <b>Se ha dormido</b> / <b>Se ha despertado</b>. La barra de vigilia te avisa de cuándo dormirla.</li>
+        <li>Se te ha pasado algo: <b>+ Añadir a mano</b>, o toca un registro para corregir la hora.</li>
+        <li>El domingo mira <b>Semana</b> y elige <em>un</em> cambio para la semana siguiente. Uno solo.</li>
+      </ul>
+    </div>`,
+    fr: `<div class="guide">
+      <h3>Ce qui est normal à 3 mois en allaitement maternel exclusif</h3>
+      <div class="ref"><table>
+        <tr><td>Tétées par 24 h</td><td>8–12</td></tr>
+        <tr><td>Sommeil total par 24 h</td><td>14–17 h</td></tr>
+        <tr><td>Fenêtre d’éveil (entre deux sommeils)</td><td>1 h – 2 h</td></tr>
+        <tr><td>Siestes par jour</td><td>3–5</td></tr>
+        <tr><td>Plus longue période de nuit</td><td>3–6 h</td></tr>
+        <tr><td>Réveils nocturnes pour téter</td><td>2–4 (normal)</td></tr>
+        <tr><td>Couches mouillées par jour</td><td>≥ 5–6</td></tr>
+      </table></div>
+      <p>Se réveiller plusieurs fois par nuit pour téter est attendu à cet âge : l’estomac est petit, le lait maternel se digère vite et la nuit le sein produit plus de prolactine. L’objectif réaliste n’est pas « qu’elle fasse ses nuits », mais que la journée ait une forme pour que la nuit s’allonge d’elle-même.</p>
+      <p>Vers 3 mois, beaucoup de bébés font des tétées de jour plus courtes et distraites (le « creux des 3 mois ») et compensent la nuit. Si tu le vois dans l’appli (peu de tétées le jour, beaucoup la nuit), le levier est dans la journée, pas dans la nuit.</p>
+
+      <h3>Étape 1 · Une semaine d’observation sans rien changer</h3>
+      <p>Avant d’organiser, il faut voir. Pendant 5–7 jours, enregistre tétées, sommeils et couches tels qu’ils viennent. Dans <b>Semaine</b> tu verras l’heure réelle du réveil, celle où elle s’endort le soir, le nombre de tétées de jour et de nuit et sa plus longue période. C’est ton point de départ, et il te dira où agir.</p>
+
+      <h3>Étape 2 · Des repères, pas des horaires</h3>
+      <p>À 3 mois un horaire rigide ne marche pas ; ce qui marche, c’est répéter un cycle et fixer deux repères :</p>
+      <ul>
+        <li><b>Heure de réveil fixe</b> (±30 min). Volets ouverts, lumière du jour, lui parler : la journée commence là, même après une mauvaise nuit.</li>
+        <li><b>Cycle répétable</b> dans la journée : <span class="tag">manger</span><span class="tag">activité</span><span class="tag">dormir</span>. Tétée au réveil, un moment d’activité (change, jeu au sol, promenade), puis dodo quand la fenêtre d’éveil approche 1 h 15 – 1 h 45. L’appli te prévient avec la barre de l’écran Aujourd’hui.</li>
+        <li><b>Proposer le sein toutes les 2–3 h le jour</b> même sans demande, surtout si l’appli montre moins de 7 tétées diurnes. Remplir la journée allège la nuit.</li>
+        <li><b>Dernière sieste</b> terminée au plus tard 1 h 30 avant l’heure du coucher.</li>
+      </ul>
+
+      <h3>Étape 3 · Le rituel du soir</h3>
+      <p>Il commence à la même heure chaque jour (entre 19 h et 20 h 30 en général) et dure 20–30 minutes. Toujours le même ordre, au même endroit, lumière basse :</p>
+      <ol>
+        <li>Bain court ou toilette à l’éponge, massage.</li>
+        <li>Pyjama et gigoteuse.</li>
+        <li>Tétée calme, peu de lumière, pas d’écran.</li>
+        <li>Une chanson ou une phrase toujours identique.</li>
+        <li>Au lit, somnolente. Si elle s’endort au sein, aucun souci : à cet âge c’est normal et ça ne crée pas de « mauvaise habitude ».</li>
+      </ol>
+      <p>L’important n’est pas chaque étape mais que la séquence soit identique : en 1–2 semaines le corps la reconnaît et se détend tout seul.</p>
+
+      <h3>Les tétées de nuit : sans la réveiller complètement</h3>
+      <ul>
+        <li>Lumière minimale, ambre ou rouge. Ni plafonnier ni écran.</li>
+        <li>Sans parler, sans jouer, sans la regarder dans les yeux : tétée et retour au lit.</li>
+        <li>Couche seulement s’il y a du caca ou si elle est trempée ; change-la <em>avant</em> la tétée, pas après.</li>
+        <li>Appuie sur le bouton tétée au début et à la fin : dans l’appli tu verras s’il y a une tétée « d’habitude » (chaque nuit à la même heure, courte) ou des tétées de faim (longues, avec déglutition).</li>
+        <li>Si elle se réveille moins d’1 h après la dernière tétée, essaie d’abord de la calmer sans le sein (main sur la poitrine, « chhh », tétine si elle en a une). Si ça ne marche pas, le sein sans culpabilité.</li>
+      </ul>
+
+      <h3>Comment une autre personne peut aider en allaitement exclusif</h3>
+      <p>La tétée est la seule chose que toi seule peux faire. Tout le reste se partage, et le bébé apprend d’ailleurs à s’endormir aussi avec quelqu’un d’autre :</p>
+      <ul>
+        <li><b>Tout le rituel du soir</b> sauf la tétée : bain, pyjama, chanson, lit.</li>
+        <li><b>Les siestes de jour</b> : dans les bras, en porte-bébé ou en poussette. Une promenade-sieste par jour te donne 1–2 h pour dormir.</li>
+        <li><b>La nuit</b> : celui qui n’allaite pas la prend, la change s’il le faut, te l’amène et la rendort ensuite. Toi, tu ne fais que la tétée.</li>
+        <li><b>L’enregistrement</b> : toute personne avec le lien peut appuyer sur les boutons ; l’appli reste fidèle même quand tu n’es pas là.</li>
+        <li>Pour déléguer une tétée (celle de 23 h par exemple), tire ton lait à cette heure un autre jour et que l’autre personne le donne au gobelet ou au biberon à débit lent ; toi, tu tires pendant ce créneau pour maintenir la lactation. Optionnel, pas obligatoire.</li>
+      </ul>
+
+      <h3>Ce dont tu n’as PAS besoin maintenant</h3>
+      <ul>
+        <li>La laisser pleurer pour « apprendre » : déconseillé avant 4–6 mois, et inutile en allaitement exclusif.</li>
+        <li>Supprimer des tétées de nuit : à 3 mois elle en a encore besoin. Elles diminuent d’elles-mêmes quand la journée est organisée.</li>
+        <li>Céréales, lait infantile « pour qu’elle tienne » ou espacer les tétées de jour pour qu’elle ait plus faim la nuit : l’inverse de ce qui marche.</li>
+      </ul>
+
+      <h3>Sommeil sûr</h3>
+      <ul>
+        <li>Toujours sur le dos, sur une surface ferme, sans oreiller, coussin ni peluche.</li>
+        <li>Dans la même chambre que toi au moins jusqu’à 6 mois.</li>
+        <li>En cododo : matelas ferme, sans espace, sans couette lourde, et jamais après de l’alcool, un médicament qui endort, ou si tu es épuisée au point de t’endormir sur le canapé (le canapé est l’endroit le plus dangereux).</li>
+      </ul>
+
+      <h3>Quand consulter</h3>
+      <div class="warn">
+        Le pédiatre : moins de 5 couches mouillées par jour, pas de prise de poids, fièvre, bébé apathique ou qui refuse le sein. La sage-femme ou le médecin traitant : pour toi. Épuisement qui ne s’améliore pas avec le sommeil, tristesse ou anxiété la majeure partie de la journée pendant plus de deux semaines, ou sentiment de ne plus y arriver. Ce n’est pas une faiblesse, c’est le post-partum, et ça se soigne.
+      </div>
+
+      <h3>Utiliser l’appli au quotidien</h3>
+      <ul>
+        <li>Appuie sur <b>Tétée · G/D</b> à la mise au sein et <b>Terminer la tétée</b> à la fin. L’appli te dit quel sein est au tour.</li>
+        <li>Appuie sur <b>Elle s’est endormie</b> / <b>Elle s’est réveillée</b>. La barre d’éveil te dit quand la coucher.</li>
+        <li>Un oubli : <b>+ Ajouter à la main</b>, ou touche une ligne pour corriger l’heure.</li>
+        <li>Le dimanche, regarde <b>Semaine</b> et choisis <em>un</em> changement pour la semaine suivante. Un seul.</li>
+      </ul>
+    </div>`,
+  };
+  function renderGuia() { main.innerHTML = GUIDE[lang]; }
+
+  // ---------- Acciones ----------
+  main.addEventListener('click', ev => {
+    const b = ev.target.closest('button'); if (!b) return;
+    const act = b.dataset.act, now = Date.now();
+    if (b.dataset.edit) return openEditor(allEvents().find(e => e.id === b.dataset.edit));
+    if (act === 'start-toma') { if (!activeOf('toma')) upsertEvent({ id: uid(), t: 'toma', ini: now, fin: null, lado: b.dataset.lado }); }
+    else if (act === 'stop-toma') { const t = activeOf('toma'); if (t) { upsertEvent({ ...t, fin: now }); toast(L.tFeedSaved(fmtDur(now - t.ini))); } }
+    else if (act === 'start-sueno') { if (!activeOf('sueno')) upsertEvent({ id: uid(), t: 'sueno', ini: now, fin: null }); }
+    else if (act === 'stop-sueno') { const s = activeOf('sueno'); if (s) { upsertEvent({ ...s, fin: now }); toast(L.tSlept(fmtDur(now - s.ini))); } }
+    else if (act === 'panal') { upsertEvent({ id: uid(), t: 'panal', ini: now, fin: null, p: b.dataset.p }); toast(b.dataset.p === 'caca' ? L.tPoo : L.tPee); }
+    else if (act === 'nota') openEditor({ id: uid(), t: 'nota', ini: now, fin: null, n: '' }, true);
+    else if (act === 'manual') openEditor({ id: uid(), t: 'toma', ini: now - 30 * MIN, fin: now - 15 * MIN, lado: 'I' }, true);
+    else if (act === 'ai') askClaude();
+    else if (act === 'ai-stop') { if (ai.ctl) ai.ctl.abort(); }
+  });
+
+  document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('click', () => {
+    tab = b.dataset.tab;
+    document.querySelectorAll('nav.tabs button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    window.scrollTo({ top: 0 });
+    render();
+  }));
+  document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => {
+    lang = b.dataset.lang; L = I18N[lang];
+    try { localStorage.setItem('ritmo.lang', lang); } catch {}
+    ai.text = ''; ai.error = '';
+    render();
+  }));
+
+  // ---------- Lectura de Claude (capacidad sample) ----------
+  let sampleFn = null;
+  const ai = { state: 'idle', text: '', error: '', ctl: null };
+  async function askClaude() {
+    if (!sampleFn || ai.state === 'loading') return;
+    const today = dayId(Date.now()), evs = allEvents();
+    const ins = dayInsights(evs, today);
+    const prompt = `Eres una asesora de lactancia y sueño infantil, cercana y concreta. Una madre da pecho en exclusiva a su hija Aïna, de 3 meses, y registra tomas, sueños y pañales en una app. Hoy es ${fmtDay(today)} y son las ${fmtTime(Date.now())}.
+
+Registros desde ayer por la tarde (hora local; "(-1)" = ayer):
+${daySummaryText(evs, today) || '(sin registros)'}
+
+Cifras ya calculadas por la app (no las repitas, interprétalas):
+${ins.rows.map(([k, v]) => `- ${k}: ${v.replace(/<[^>]+>/g, '')}`).join('\n')}
+
+${L.aiLang}, en segunda persona, 3 o 4 párrafos cortos y sin títulos ni listas:
+1. Qué dice la noche y el día de hoy sobre su ritmo (qué va bien y qué patrón se ve).
+2. Una sola cosa concreta que cambiar o mantener hoy, con hora orientativa.
+3. Qué esperar esta noche y cómo prepararla.
+Referencias: a los 3 meses son normales 8–12 tomas/24 h, 14–17 h de sueño, ventanas de vigilia de 1–2 h, siestas de un ciclo (30–45 min) y 2–4 despertares nocturnos para mamar; con lactancia exclusiva pueden pasar varios días sin caca. No propongas dejarla llorar ni quitar tomas de noche. Sin alarmismos; si algo merece consulta con pediatra o matrona, dilo en una frase. Máximo 180 palabras.`;
+    ai.state = 'loading'; ai.text = ''; ai.error = ''; ai.ctl = new AbortController();
+    render();
+    try {
+      const { text } = await sampleFn(prompt, { signal: ai.ctl.signal, modelTier: 'default', onText: ({ text }) => { ai.text = text; render(); } });
+      ai.text = text; ai.state = 'done';
+    } catch (e) {
+      ai.text = e && e.text ? e.text : ai.text; ai.state = 'done';
+      const code = e && e.code;
+      ai.error = code === 'cancelled' ? '' : code === 'not_granted' ? L.aiNotGranted : code === 'rate_limited' ? L.aiRate : L.aiFail;
+      if (code === 'not_granted') sampleFn = null;
+    }
+    ai.ctl = null;
+    render();
+  }
+  async function initSample() {
+    try { sampleFn = window.claude && window.claude.use ? await window.claude.use('sample') : null; } catch { sampleFn = null; }
+    if (sampleFn && tab === 'hoy' && !modalRoot.firstChild) render();
+  }
+
+  // ---------- Editor ----------
+  const modalRoot = document.getElementById('modal-root');
+  function openEditor(ev, isNew = false) {
+    if (!ev) return;
+    const draft = { lado: 'I', p: 'pipi', n: '', ...ev };
+    const draw = () => {
+      const isDur = draft.t === 'toma' || draft.t === 'sueno';
+      modalRoot.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-label="${isNew ? L.edAdd : L.edFix}">
+        <div class="sheet">
+          <h3>${isNew ? L.edAdd : L.edFix}</h3>
+          <div class="field"><label>${L.edType}</label>
+            <div class="seg" data-f="t">
+              <button aria-pressed="${draft.t === 'toma'}" data-v="toma">${L.evFeed}</button>
+              <button aria-pressed="${draft.t === 'sueno'}" data-v="sueno">${L.evSleep}</button>
+              <button aria-pressed="${draft.t === 'panal'}" data-v="panal">${L.evDiaper}</button>
+              <button aria-pressed="${draft.t === 'nota'}" data-v="nota">${L.evNote}</button>
+            </div></div>
+          ${draft.t === 'toma' ? `<div class="field"><label>${L.edBreast}</label><div class="seg" data-f="lado">
+              <button aria-pressed="${draft.lado === 'I'}" data-v="I">${L.side.I}</button>
+              <button aria-pressed="${draft.lado === 'D'}" data-v="D">${L.side.D}</button>
+              <button aria-pressed="${draft.lado === 'A'}" data-v="A">${L.side.A}</button></div></div>` : ''}
+          ${draft.t === 'panal' ? `<div class="field"><label>${L.edDiaper}</label><div class="seg" data-f="p">
+              <button aria-pressed="${draft.p === 'pipi'}" data-v="pipi">${L.pee}</button>
+              <button aria-pressed="${draft.p === 'caca'}" data-v="caca">${L.poo}</button>
+              <button aria-pressed="${draft.p === 'ambos'}" data-v="ambos">${L.side.A}</button></div></div>` : ''}
+          <div class="field"><label>${isDur ? L.edStart : L.edTime}</label><input type="datetime-local" id="f-ini" value="${toLocalInput(draft.ini)}"></div>
+          ${isDur ? `<div class="field"><label>${L.edEnd} <span style="font-weight:400">${L.edEndHint}</span></label><input type="datetime-local" id="f-fin" value="${draft.fin != null ? toLocalInput(draft.fin) : ''}"></div>` : ''}
+          <div class="field"><label>${L.edNote}</label><input type="text" id="f-n" value="${esc(draft.n)}" placeholder="${L.edPlaceholder}"></div>
+          <div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button><button class="primary" data-m="save">${L.save}</button></div>
+          ${isNew ? '' : `<button class="del" data-m="delete">${L.del}</button>`}
+        </div></div>`;
+    };
+    draw();
+    modalRoot.onclick = e => {
+      const seg = e.target.closest('.seg button');
+      if (seg) { const f = seg.closest('.seg').dataset.f; draft.ini = fromLocalInput(modalRoot.querySelector('#f-ini').value) ?? draft.ini; draft.n = modalRoot.querySelector('#f-n').value; draft[f] = seg.dataset.v; draw(); return; }
+      const m = e.target.closest('[data-m]');
+      if (!m) { if (e.target.classList.contains('modal')) close(); return; }
+      if (m.dataset.m === 'cancel') return close();
+      if (m.dataset.m === 'delete') { deleteEvent(draft.id); return close(); }
+      if (m.dataset.m === 'save') {
+        const ini = fromLocalInput(modalRoot.querySelector('#f-ini').value);
+        if (!ini) { toast(L.tMissingStart); return; }
+        const finEl = modalRoot.querySelector('#f-fin');
+        const fin = finEl ? fromLocalInput(finEl.value) : null;
+        if (fin != null && fin < ini) { toast(L.tEndBefore); return; }
+        const out = { id: draft.id, t: draft.t, ini, fin: (draft.t === 'toma' || draft.t === 'sueno') ? fin : null };
+        if (draft.t === 'toma') out.lado = draft.lado;
+        if (draft.t === 'panal') out.p = draft.p;
+        const n = modalRoot.querySelector('#f-n').value.trim(); if (n) out.n = n;
+        if (draft.t === 'nota' && !n) { toast(L.tWriteNote); return; }
+        upsertEvent(out); close(); toast(L.tSaved);
+      }
+    };
+    const close = () => { modalRoot.innerHTML = ''; modalRoot.onclick = null; };
+  }
+
+  let toastTimer;
+  function toast(msg) {
+    let el = document.querySelector('.toast');
+    if (!el) { el = document.createElement('div'); el.className = 'toast'; document.body.appendChild(el); }
+    el.textContent = msg; clearTimeout(toastTimer); toastTimer = setTimeout(() => el.remove(), 2200);
+  }
+
+  // ---------- Sincronización ----------
+  // Tres modos, por orden: base de datos del artefacto (claude.use('db')),
+  // API propia (/api, servidor Node + PostgreSQL) o solo este dispositivo.
+  const syncEl = document.getElementById('sync');
+  function setSync(state) { syncEl.dataset.state = state; syncEl.classList.toggle('on', state === 'on'); applyChrome(); }
+
+  async function initDb() {
+    let d = null;
+    try { d = window.claude && window.claude.use ? await window.claude.use('db') : null; } catch { d = null; }
+    if (!d) return initApi();
+    db = d;
+    const cutoff = shiftDay(dayId(Date.now()), -14);
+    let first = true;
+    db.collection('dias').where('fecha', '>=', cutoff).onSnapshot(snap => {
+      const remote = {};
+      snap.docs.forEach(doc => { if (doc.exists) remote[doc.id] = doc.data(); });
+      if (first) {
+        first = false;
+        for (const id in days) if (!remote[id] && days[id].ev && days[id].ev.length) db.doc('dias/' + id).set(JSON.parse(JSON.stringify(days[id]))).catch(() => {});
+      }
+      mergeRemote(remote);
+      setSync('on');
+    }, err => {
+      setSync('off');
+      if (err && err.code === 'revoked') db = null;
+    });
+  }
+
+  // --- API propia ---
+  let api = false;
+  const KEY_LS = 'ainadays.key';
+  let apiKey = ''; try { apiKey = localStorage.getItem(KEY_LS) || ''; } catch {}
+  const apiFetch = (path, opts = {}) => fetch(path, { ...opts, headers: { 'Content-Type': 'application/json', ...(apiKey ? { Authorization: 'Bearer ' + apiKey } : {}), ...(opts.headers || {}) } });
+
+  function mergeRemote(remote) {
+    const merged = { ...days };
+    for (const id in remote) merged[id] = JSON.parse(JSON.stringify(remote[id]));
+    days = merged;
+    try { localStorage.setItem(LS_KEY, JSON.stringify(days)); } catch {}
+    if (!modalRoot.firstChild) render(); else applyChrome();
+  }
+
+  async function initApi() {
+    try {
+      const r = await fetch('/api/health');
+      if (!r.ok) return;
+    } catch { return; }
+    api = true;
+    await pullApi(true);
+  }
+
+  async function pullApi(first = false) {
+    if (!api) return;
+    const cutoff = shiftDay(dayId(Date.now()), -14);
+    let r;
+    try { r = await apiFetch('/api/dias?desde=' + cutoff); } catch { setSync('off'); return; }
+    if (r.status === 401) { setSync('off'); askKey(); return; }
+    if (!r.ok) { setSync('off'); return; }
+    const data = await r.json();
+    const remote = {};
+    for (const row of data.dias) remote[row.fecha] = row.doc;
+    if (first) for (const id in days) if (!remote[id] && days[id].ev && days[id].ev.length) pushApi(id);
+    mergeRemote(remote);
+    setSync('on');
+  }
+
+  async function pushApi(id) {
+    if (!api) return;
+    try {
+      const r = await apiFetch('/api/dias/' + id, { method: 'PUT', body: JSON.stringify(days[id]) });
+      if (r.status === 401) { setSync('off'); askKey(); return; }
+      if (!r.ok) throw new Error(r.status);
+      setSync('on');
+    } catch { setSync('off'); toast(L.tNoSync); }
+  }
+
+  let askingKey = false;
+  function askKey() {
+    if (askingKey) return;
+    askingKey = true;
+    const v = window.prompt(lang === 'fr' ? 'Mot de passe de l’application' : 'Contraseña de la aplicación');
+    askingKey = false;
+    if (v == null) return;
+    apiKey = v.trim();
+    try { localStorage.setItem(KEY_LS, apiKey); } catch {}
+    pullApi(true);
+  }
+
+  render();
+  initDb();
+  initSample();
+  setInterval(() => { if (modalRoot.firstChild) return; if (api) pullApi(); else if (tab !== 'guia') render(); }, 30000);
+  document.addEventListener('visibilitychange', () => { if (document.hidden || modalRoot.firstChild) return; if (api) pullApi(); else render(); });
+})();
+</script>
+</body>
+</html>
