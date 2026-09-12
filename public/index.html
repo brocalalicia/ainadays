@@ -152,9 +152,14 @@
   .ask .mic.on { background: var(--toma-soft); border-color: var(--toma); color: var(--toma-ink); }
   .ask .mic.on::before { background: var(--bad); animation: pulse 1s infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
-  .ask .ans { border-left: 3px solid var(--sueno); padding: 4px 0 4px 12px; font-size: 15px; line-height: 1.5; display: grid; gap: 6px; }
-  .ask .ans p { margin: 0; }
-  .ask .src { font-size: 12px; color: var(--muted); }
+  .chat { display: grid; gap: 8px; }
+  .bub { max-width: 92%; padding: 9px 12px; border-radius: 14px; font-size: 15px; line-height: 1.5; display: grid; gap: 6px; }
+  .bub p { margin: 0; }
+  .bub.me { justify-self: end; background: var(--sueno-soft); color: var(--sueno-ink); border-bottom-right-radius: 4px; }
+  .bub.ai { justify-self: start; background: var(--surface-2); border-bottom-left-radius: 4px; }
+  .bub .src { font-size: 11.5px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+  .bub .src button { border: 0; background: none; color: var(--sueno); font-weight: 700; padding: 0; font-size: 11.5px; }
+  .ask .newc { border: 0; background: none; color: var(--muted); font-size: 12.5px; font-weight: 700; padding: 0; justify-self: end; }
   /* Sections */
   section.block { margin-top: 22px; }
   section.block h2 { font-family: var(--display); font-weight: 600; font-size: 19px; margin: 0 0 10px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
@@ -432,7 +437,7 @@
       tTable: 'Tabla por día', thDay: 'Día', thFeedsD: 'Tomas día', thFeedsN: 'Tomas noche', thSleep: 'Sueño', thNaps: 'Siestas', thLongest: 'Tramo máx.', thBed: 'Acostada', thWake: 'Despierta',
       tipFeeds: 'tomas', tipHours: 'h', night: 'noche del', pending: 'noche en curso',
       // Consejo
-      qTitle: '¿Qué está haciendo?', qPlaceholder: 'p. ej. juega en el parque, se frota la cara y grita un poco', qAsk: '¿Qué hago?', qThinking: 'Pensando…', qSaveNote: 'Guardar como nota', qSaved: 'Guardado como nota', qByClaude: 'Respuesta de Claude', qByRules: 'Respuesta de la app', qFail: 'No he podido responder; inténtalo de nuevo.',
+      qTitle: '¿Qué está haciendo?', qPlaceholder: 'p. ej. juega en el parque, se frota la cara y grita un poco… o precisa algo', qAsk: 'Enviar', qNew: 'Nueva conversación', qThinking: 'Pensando…', qSaveNote: 'Guardar', qSaved: 'Guardado como nota', qByClaude: 'Respuesta de Claude', qByRules: 'Respuesta de la app', qFail: 'No he podido responder; inténtalo de nuevo.',
       qNeedText: 'Cuéntame qué está haciendo', qMic: 'Hablar', qMicStop: 'Escuchando… toca para parar', qMicFail: 'El micrófono no está disponible en este navegador',
     },
     fr: {
@@ -523,7 +528,7 @@
       tTable: 'Tableau par jour', thDay: 'Jour', thFeedsD: 'Tétées jour', thFeedsN: 'Tétées nuit', thSleep: 'Sommeil', thNaps: 'Siestes', thLongest: 'Max. nuit', thBed: 'Couchée', thWake: 'Réveil',
       tipFeeds: 'tétées', tipHours: 'h', night: 'nuit du', pending: 'nuit en cours',
       // Conseil
-      qTitle: 'Que fait-elle en ce moment ?', qPlaceholder: 'ex. elle joue sur le tapis, se frotte le visage et crie un peu', qAsk: 'Que faire ?', qThinking: 'Réflexion…', qSaveNote: 'Enregistrer comme note', qSaved: 'Enregistré comme note', qByClaude: 'Réponse de Claude', qByRules: 'Réponse de l’appli', qFail: 'Je n’ai pas pu répondre ; réessaie.',
+      qTitle: 'Que fait-elle en ce moment ?', qPlaceholder: 'ex. elle joue sur le tapis, se frotte le visage et crie un peu… ou précise quelque chose', qAsk: 'Envoyer', qNew: 'Nouvelle conversation', qThinking: 'Réflexion…', qSaveNote: 'Enregistrer', qSaved: 'Enregistré comme note', qByClaude: 'Réponse de Claude', qByRules: 'Réponse de l’appli', qFail: 'Je n’ai pas pu répondre ; réessaie.',
       qNeedText: 'Dis-moi ce qu’elle fait', qMic: 'Parler', qMicStop: 'À l’écoute… touche pour arrêter', qMicFail: 'Le micro n’est pas disponible dans ce navigateur',
     },
   };
@@ -864,9 +869,13 @@
       </div>
       <div class="ask">
         <h2>${L.qTitle}</h2>
+        ${ask.turns.length ? `<div class="chat">${ask.turns.map((m, i) => m.role === 'user'
+          ? `<div class="bub me"><p>${esc(m.texto).replace(/\n/g, '<br>')}</p></div>`
+          : `<div class="bub ai">${m.texto.split(/\n\n+/).map(p => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('')}<div class="src">${m.source === 'claude' ? L.qByClaude : L.qByRules} · ${m.time}<button data-act="ask-save" data-i="${i}">${L.qSaveNote}</button></div></div>`).join('')}
+          ${ask.state === 'loading' ? `<div class="bub ai"><p class="src">${L.qThinking}</p></div>` : ''}</div>` : ''}
         <textarea id="q-text" placeholder="${L.qPlaceholder}">${esc(ask.text)}</textarea>
-        <div class="row2"><button class="go" data-act="ask" ${ask.state === 'loading' ? 'disabled' : ''}>${ask.state === 'loading' ? L.qThinking : L.qAsk}</button>${SR ? `<button class="mic${ask.listening ? ' on' : ''}" data-act="mic">${ask.listening ? L.qMicStop : L.qMic}</button>` : ''}${ask.answer ? `<button class="chip" data-act="ask-save">${L.qSaveNote}</button>` : ''}</div>
-        ${ask.answer ? `<div class="ans">${ask.answer.split(/\n\n+/).map(p => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('')}<div class="src">${ask.source === 'claude' ? L.qByClaude : L.qByRules} · ${ask.time}</div></div>` : ''}
+        <div class="row2"><button class="go" data-act="ask" ${ask.state === 'loading' ? 'disabled' : ''}>${L.qAsk}</button>${SR ? `<button class="mic${ask.listening ? ' on' : ''}" data-act="mic">${ask.listening ? L.qMicStop : L.qMic}</button>` : ''}</div>
+        ${ask.turns.length ? `<button class="newc" data-act="ask-new">${L.qNew}</button>` : ''}
       </div>
       <section class="block">
         <h2>${L.today} <span class="eyebrow">${fmtDay(today)}</span></h2>
@@ -1265,7 +1274,9 @@
   function renderGuia() { main.innerHTML = GUIDE[lang]; }
 
   // ---------- Consejo: «¿Qué está haciendo?» ----------
-  const ask = { text: '', answer: '', source: '', time: '', state: 'idle', listening: false };
+  const ask = { text: '', turns: [], day: '', state: 'idle', listening: false };
+  try { const saved = JSON.parse(localStorage.getItem('ainadays.chat') || 'null'); if (saved && saved.day === dayId(Date.now())) { ask.turns = saved.turns || []; ask.day = saved.day; } } catch {}
+  function saveChat() { try { localStorage.setItem('ainadays.chat', JSON.stringify({ day: dayId(Date.now()), turns: ask.turns })); } catch {} }
 
   // Dictado por voz con el reconocimiento del navegador (Chrome, Safari iOS 14.5+; requiere HTTPS)
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
@@ -1349,17 +1360,21 @@
     ask.text = ta ? ta.value.trim() : ask.text;
     if (!ask.text) { toast(L.qNeedText); return; }
     if (ask.state === 'loading') return;
+    if (ask.day !== dayId(Date.now())) { ask.turns = []; ask.day = dayId(Date.now()); }
     const c = nowContext();
-    ask.state = 'loading'; render();
+    const q = ask.text;
+    ask.turns.push({ role: 'user', texto: q, time: fmtTime(Date.now()) });
+    ask.text = ''; ask.state = 'loading'; saveChat(); render();
     let answer = '', source = 'reglas';
     if (api) {
       try {
-        const r = await apiFetch('/api/consejo', { method: 'POST', body: JSON.stringify({ lang, texto: ask.text, contexto: contextText(c) }) });
+        const r = await apiFetch('/api/consejo', { method: 'POST', body: JSON.stringify({ lang, contexto: contextText(c), mensajes: ask.turns.map(m => ({ role: m.role, texto: m.texto })) }) });
         if (r.ok) { const d = await r.json(); if (d.fuente === 'claude' && d.texto) { answer = d.texto; source = 'claude'; } }
       } catch {}
     }
-    if (!answer) answer = ruleAdvice(ask.text, c);
-    ask.answer = answer; ask.source = source; ask.time = fmtTime(Date.now()); ask.state = 'done';
+    if (!answer) answer = ruleAdvice(q, c);
+    ask.turns.push({ role: 'assistant', texto: answer, source, time: fmtTime(Date.now()) });
+    ask.state = 'done'; saveChat();
     render();
   }
 
@@ -1378,7 +1393,8 @@
     else if (act === 'manual') openEditor({ id: uid(), t: 'toma', ini: now - 30 * MIN, fin: now - 15 * MIN, lado: 'I' }, true);
     else if (act === 'ask') { if (rec) rec.stop(); askAdvice(); }
     else if (act === 'mic') toggleMic();
-    else if (act === 'ask-save') { upsertEvent({ id: uid(), t: 'nota', ini: now, fin: null, n: `${ask.text} → ${ask.answer}` }); toast(L.qSaved); }
+    else if (act === 'ask-save') { const i = Number(b.dataset.i); const a = ask.turns[i]; const q = [...ask.turns.slice(0, i)].reverse().find(m => m.role === 'user'); if (a) { upsertEvent({ id: uid(), t: 'nota', ini: now, fin: null, n: `${q ? q.texto + ' → ' : ''}${a.texto}` }); toast(L.qSaved); } }
+    else if (act === 'ask-new') { ask.turns = []; ask.text = ''; saveChat(); render(); }
     else if (act === 'ai') askClaude();
     else if (act === 'ai-stop') { if (ai.ctl) ai.ctl.abort(); }
   });
