@@ -16,8 +16,8 @@ Registro de tomas, sueño y pañales de Aïna (3 meses, lactancia materna exclus
    - `DATABASE_URL` = la URL interna del paso 1.
    - `APP_KEY` = una contraseña larga. Es la que la app pide la primera vez que se abre en cada móvil (se guarda en el dispositivo).
    - `PORT` = `3000` (opcional).
-4. Asigna un dominio (p. ej. `ainadays.tudominio.com`) con HTTPS y pulsa **Deploy**. La tabla se crea sola al arrancar.
-5. Comprueba `https://ainadays.tudominio.com/api/health` → `{"ok":true}`.
+4. Asigna un dominio (p. ej. `ainadays.aliciabrocal.cloud`) con HTTPS y pulsa **Deploy**. La tabla se crea sola al arrancar.
+5. Comprueba `https://ainadays.aliciabrocal.cloud/api/health` → `{"ok":true}`.
 
 ### Opción B: todo en uno con docker-compose
 
@@ -30,7 +30,7 @@ Abre el dominio en Safari/Chrome → *Compartir* → *Añadir a pantalla de inic
 ## Importar datos existentes
 
 ```bash
-API_URL=https://ainadays.tudominio.com APP_KEY=... node scripts/import.js datos/2026-09-12.json
+API_URL=https://ainadays.aliciabrocal.cloud APP_KEY=... node scripts/import.js datos/2026-09-12.json
 ```
 
 Acepta ficheros `{ fecha, ev }` o el volcado completo de `localStorage['ritmo.dias']`.
