@@ -101,7 +101,7 @@
   header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
   header.top h1 { font-family: var(--display); font-weight: 600; font-size: 26px; margin: 0; letter-spacing: -0.01em; }
   header.top .right { display: flex; align-items: center; gap: 10px; }
-  .sync { font-size: 12px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+  .sync { font-size: 12px; white-space: nowrap; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
   .sync::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
   .sync.on::before { background: var(--ok); }
   .lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--surface); }
@@ -215,6 +215,48 @@
   .ai-text p { margin: 0 0 8px; }
   .ai-status { font-size: 13px; color: var(--muted); }
 
+
+  /* Panel */
+  :root { --c-toma: #D48F1F; --c-sueno: #5D63C4; --c-sueno-2: #A9ACE3; --c-grid: #E6E2EC; --c-ref: #B8B2C2; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --c-toma: #C4861E; --c-sueno: #7F84E0; --c-sueno-2: #4A4E8F; --c-grid: #2E2839; --c-ref: #5E5770; } }
+  :root[data-theme="dark"] { --c-toma: #C4861E; --c-sueno: #7F84E0; --c-sueno-2: #4A4E8F; --c-grid: #2E2839; --c-ref: #5E5770; }
+  .filters { display: flex; gap: 6px; margin: 0 0 12px; }
+  .filters button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 13px; font-size: 13.5px; font-weight: 700; color: var(--muted); }
+  .filters button[aria-pressed="true"] { background: var(--sueno-soft); border-color: var(--sueno); color: var(--sueno-ink); }
+  .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kpi { background: var(--surface); border-radius: 14px; padding: 12px 14px; box-shadow: var(--shadow); }
+  .kpi .l { font-size: 12.5px; color: var(--muted); }
+  .kpi .v { font-size: 26px; font-weight: 700; line-height: 1.2; margin-top: 2px; }
+  .kpi .v small { font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 2px; }
+  .kpi .d { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .kpi .d b { font-weight: 700; }
+  .kpi .d.up b { color: var(--ok); } .kpi .d.down b { color: var(--bad); }
+  .card { background: var(--surface); border-radius: var(--radius); padding: 14px 14px 10px; box-shadow: var(--shadow); margin-top: 12px; }
+  .card h3 { margin: 0; font-size: 15px; font-weight: 700; }
+  .card .sub { font-size: 12.5px; color: var(--muted); margin: 2px 0 8px; }
+  .card svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .card svg text { font-family: var(--ui); font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+  .card svg .grid { stroke: var(--c-grid); stroke-width: 1; }
+  .card svg .ref { stroke: var(--c-ref); stroke-width: 1; }
+  .card svg .bar { rx: 0; }
+  .card svg .hit { fill: transparent; }
+  .card svg .pending { opacity: 0.45; }
+  .card svg .hit:hover + .mark, .card svg .mark:hover { filter: brightness(1.12); }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; background: var(--sw); }
+  .legend .line::before { height: 3px; border-radius: 2px; vertical-align: 3px; }
+  .heat { display: grid; grid-template-columns: repeat(24, 1fr); gap: 2px; }
+  .heat div { aspect-ratio: 1 / 1.4; border-radius: 3px; background: var(--surface-2); }
+  .heat-x { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .ptable { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  .ptable th, .ptable td { padding: 6px 4px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .ptable th { color: var(--muted); font-weight: 700; font-size: 11.5px; }
+  .ptable th:first-child, .ptable td:first-child { text-align: left; }
+  .ptable tr:last-child td { border-bottom: 0; }
+  .tscroll { overflow-x: auto; }
+  .tip { position: fixed; z-index: 30; pointer-events: none; background: var(--text); color: var(--bg); padding: 7px 10px; border-radius: 10px; font-size: 12.5px; line-height: 1.35; box-shadow: var(--shadow); max-width: 220px; }
+  .tip b { font-size: 14px; }
+
   /* Guide */
   .guide { font-size: 15.5px; max-width: 62ch; }
   .guide h3 { font-family: var(--display); font-weight: 600; font-size: 20px; margin: 26px 0 8px; text-wrap: balance; }
@@ -232,7 +274,7 @@
 
   /* Tabs */
   nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--line); padding: 6px 0 calc(6px + env(safe-area-inset-bottom)); }
-  nav.tabs .in { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); }
+  nav.tabs .in { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
   nav.tabs button { border: 0; background: none; padding: 12px 4px; font-size: 15px; font-weight: 700; color: var(--muted); border-radius: 10px; }
   nav.tabs button[aria-selected="true"] { color: var(--sueno); }
   nav.tabs button[aria-selected="true"]::after { content: ""; display: block; width: 22px; height: 3px; border-radius: 2px; background: var(--sueno); margin: 5px auto 0; }
@@ -274,6 +316,7 @@
   <div class="in">
     <button data-tab="hoy" aria-selected="true"></button>
     <button data-tab="semana" aria-selected="false"></button>
+    <button data-tab="panel" aria-selected="false"></button>
     <button data-tab="guia" aria-selected="false"></button>
   </div>
 </nav>
@@ -290,8 +333,8 @@
       wd: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
       mo: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
       min: 'min', h: 'h',
-      syncLocal: 'Solo en este dispositivo', syncOn: 'Sincronizado', syncOff: 'Sin sincronizar',
-      tabs: { hoy: 'Hoy', semana: 'Semana', guia: 'Guía' },
+      syncLocal: 'Solo en este móvil', syncOn: 'Sincronizado', syncOff: 'Sin sincronizar',
+      tabs: { hoy: 'Hoy', semana: 'Semana', panel: 'Panel', guia: 'Guía' },
       side: { I: 'izquierdo', D: 'derecho', A: 'ambos' }, sideShort: { I: 'izq', D: 'der', A: 'ambos' },
       sleeping: 'Aïna duerme', since: t => `desde las ${t}`,
       hintShortNap: 'Si se despierta antes de 40 min suele ser un ciclo corto: prueba a volver a dormirla antes de sacarla.',
@@ -363,13 +406,23 @@
       tFeedSaved: d => `Toma de ${d} guardada`, tSlept: d => `Ha dormido ${d}`, tPoo: 'Pañal con caca anotado', tPee: 'Pañal de pipí anotado',
       tFull: 'Base de datos llena: borra días antiguos', tNoSync: 'No se pudo sincronizar, guardado en el móvil',
       tlLabel: d => `Línea de tiempo de ${d}`,
+      // Panel
+      pTitle: 'Panel de seguimiento', pRange: n => `Últimos ${n} días`, pVsPrev: 'vs. periodo anterior', pNoData: 'Todavía no hay días completos para comparar. Con 3–4 días registrados el panel cobra sentido.',
+      kFeeds24: 'Tomas por 24 h', kSleep24: 'Sueño por 24 h', kNightFeeds: 'Tomas por noche', kLongest: 'Tramo nocturno máx.',
+      cLongest: 'Tramo nocturno más largo sin toma', cLongestSub: 'por noche, en horas · la línea marca 4 h',
+      cFeeds: 'Tomas de día y de noche', cFeedsSub: 'día 07–20 h · noche 20–07 h', sDay: 'día', sNight: 'noche',
+      cSleep: 'Sueño por día', cSleepSub: 'noche (19–08 h) y siestas, en horas', sNightSleep: 'noche', sNaps: 'siestas',
+      cTimes: 'Hora de acostarse y de despertar', cTimesSub: 'cuanto más planas las líneas, más estable el ritmo', sBed: 'se duerme', sWake: 'despierta',
+      cHeat: 'A qué horas come', cHeatSub: n => `tomas por hora del día, sumadas en ${n} días`,
+      tTable: 'Tabla por día', thDay: 'Día', thFeedsD: 'Tomas día', thFeedsN: 'Tomas noche', thSleep: 'Sueño', thNaps: 'Siestas', thLongest: 'Tramo máx.', thBed: 'Acostada', thWake: 'Despierta',
+      tipFeeds: 'tomas', tipHours: 'h', night: 'noche del', pending: 'noche en curso',
     },
     fr: {
       wd: ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'],
       mo: ['janv', 'févr', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'],
       min: 'min', h: 'h',
-      syncLocal: 'Sur cet appareil seulement', syncOn: 'Synchronisé', syncOff: 'Non synchronisé',
-      tabs: { hoy: "Aujourd'hui", semana: 'Semaine', guia: 'Guide' },
+      syncLocal: 'Cet appareil seulement', syncOn: 'Synchronisé', syncOff: 'Non synchronisé',
+      tabs: { hoy: "Aujourd'hui", semana: 'Semaine', panel: 'Tableau', guia: 'Guide' },
       side: { I: 'gauche', D: 'droit', A: 'les deux' }, sideShort: { I: 'g.', D: 'd.', A: 'les deux' },
       sleeping: 'Aïna dort', since: t => `depuis ${t}`,
       hintShortNap: "Si elle se réveille avant 40 min, c'est souvent un cycle court : essaie de la rendormir avant de la lever.",
@@ -441,6 +494,16 @@
       tFeedSaved: d => `Tétée de ${d} enregistrée`, tSlept: d => `Elle a dormi ${d}`, tPoo: 'Couche avec caca notée', tPee: 'Couche pipi notée',
       tFull: 'Base de données pleine : supprime d’anciens jours', tNoSync: 'Synchronisation impossible, enregistré sur le téléphone',
       tlLabel: d => `Chronologie du ${d}`,
+      // Panel
+      pTitle: 'Tableau de suivi', pRange: n => `${n} derniers jours`, pVsPrev: 'vs période précédente', pNoData: 'Pas encore de journées complètes à comparer. Avec 3–4 jours enregistrés, le tableau prend du sens.',
+      kFeeds24: 'Tétées par 24 h', kSleep24: 'Sommeil par 24 h', kNightFeeds: 'Tétées par nuit', kLongest: 'Période de nuit max.',
+      cLongest: 'Plus longue période de nuit sans tétée', cLongestSub: 'par nuit, en heures · la ligne marque 4 h',
+      cFeeds: 'Tétées de jour et de nuit', cFeedsSub: 'jour 7–20 h · nuit 20–7 h', sDay: 'jour', sNight: 'nuit',
+      cSleep: 'Sommeil par jour', cSleepSub: 'nuit (19–8 h) et siestes, en heures', sNightSleep: 'nuit', sNaps: 'siestes',
+      cTimes: 'Heure du coucher et du réveil', cTimesSub: 'plus les lignes sont plates, plus le rythme est stable', sBed: 's’endort', sWake: 'se réveille',
+      cHeat: 'À quelles heures elle tète', cHeatSub: n => `tétées par heure de la journée, cumulées sur ${n} jours`,
+      tTable: 'Tableau par jour', thDay: 'Jour', thFeedsD: 'Tétées jour', thFeedsN: 'Tétées nuit', thSleep: 'Sommeil', thNaps: 'Siestes', thLongest: 'Max. nuit', thBed: 'Couchée', thWake: 'Réveil',
+      tipFeeds: 'tétées', tipHours: 'h', night: 'nuit du', pending: 'nuit en cours',
     },
   };
   let lang = 'es';
@@ -671,6 +734,7 @@
     applyChrome();
     if (tab === 'hoy') renderHoy();
     else if (tab === 'semana') renderSemana();
+    else if (tab === 'panel') renderPanel();
     else renderGuia();
   }
 
@@ -853,6 +917,153 @@
       </section>`;
   }
 
+
+  // ---------- Panel de seguimiento ----------
+  let panelRange = 14;
+  try { panelRange = Number(localStorage.getItem('ainadays.range')) || 14; } catch {}
+  const clipSum = (evs, a, b, t) => evs.filter(e => e.t === t).reduce((acc, e) => { const fin = e.fin ?? Date.now(); const x = Math.max(e.ini, a), y = Math.min(fin, b); return acc + (y > x ? y - x : 0); }, 0);
+
+  // Una fila por día: día D (07–20 h) + noche que empieza la tarde de D (19–08 h)
+  function panelRows(evs, ids) {
+    const now = Date.now();
+    return ids.map(id => {
+      const s = dayStart(id);
+      const feedsD = evs.filter(e => e.t === 'toma' && e.ini >= s + 7 * H && e.ini < s + 20 * H).length;
+      const feedsN = evs.filter(e => e.t === 'toma' && e.ini >= s + 20 * H && e.ini < s + 31 * H).length;
+      const naps = clipSum(evs, s + 8 * H, s + 19 * H, 'sueno');
+      const nightSleep = clipSum(evs, s + 19 * H, s + 32 * H, 'sueno');
+      const n = nightStats(evs, id);
+      const wake = morningWake(evs.filter(e => e.t === 'sueno'), s + DAY);
+      const has = clipToDay(evs, id).length > 0;
+      const hours = evs.filter(e => e.t === 'toma' && e.ini >= s && e.ini < s + DAY).map(e => new Date(e.ini).getHours());
+      return { id, has, feedsD, feedsN, naps, nightSleep, longest: n && (n.bedtime || n.feeds) ? n.longest : null, nightDone: !!(n && n.finished && (n.bedtime || n.feeds)), bed: n && n.bedtime ? minutesOfDay(n.bedtime) : null, wake: wake != null ? minutesOfDay(wake) : null, hours, future: s > now };
+    });
+  }
+
+  function renderPanel() {
+    const evs = allEvents(), today = dayId(Date.now());
+    const ids = []; for (let i = panelRange - 1; i >= 0; i--) ids.push(shiftDay(today, -i));
+    const rows = panelRows(evs, ids);
+    const prevIds = []; for (let i = 2 * panelRange - 1; i >= panelRange; i--) prevIds.push(shiftDay(today, -i));
+    const prev = panelRows(evs, prevIds).filter(r => r.has);
+    const withData = rows.filter(r => r.has);
+    const avg = (arr, f) => { const v = arr.map(f).filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+    const dec = x => x == null ? '—' : x.toFixed(1).replace('.', ',');
+
+    // KPIs (media diaria del rango, con delta frente al periodo anterior)
+    const kpi = (label, cur, before, fmt, unit, upGood) => {
+      const delta = cur != null && before != null ? cur - before : null;
+      const cls = delta == null || Math.abs(delta) < 1e-9 ? '' : (delta > 0) === upGood ? 'up' : 'down';
+      return `<div class="kpi"><div class="l">${label}</div><div class="v">${cur == null ? '—' : fmt(cur)}<small>${unit}</small></div>${delta != null ? `<div class="d ${cls}"><b>${delta > 0 ? '+' : ''}${fmt(delta)}</b> ${L.pVsPrev}</div>` : ''}</div>`;
+    };
+    const fullDays = withData.filter(r => r.nightDone);
+    const kpis = `<div class="kpis">
+      ${kpi(L.kFeeds24, avg(fullDays, r => r.feedsD + r.feedsN), avg(prev.filter(r => r.nightDone), r => r.feedsD + r.feedsN), dec, '', true)}
+      ${kpi(L.kSleep24, avg(fullDays, r => (r.naps + r.nightSleep) / H), avg(prev.filter(r => r.nightDone), r => (r.naps + r.nightSleep) / H), dec, ' ' + L.h, true)}
+      ${kpi(L.kNightFeeds, avg(fullDays, r => r.feedsN), avg(prev.filter(r => r.nightDone), r => r.feedsN), dec, '', false)}
+      ${kpi(L.kLongest, avg(fullDays, r => r.longest / H), avg(prev.filter(r => r.nightDone), r => r.longest / H), dec, ' ' + L.h, true)}
+    </div>`;
+
+    // Geometría común
+    const W = 400, PL = 26, PR = 8, PT = 8, PB = 20, IH = 120, PH = PT + IH + PB;
+    const n = rows.length, slot = (W - PL - PR) / n, bw = Math.min(24, slot * 0.62);
+    const x = i => PL + slot * i + (slot - bw) / 2;
+    const labelEvery = n > 16 ? 4 : n > 8 ? 2 : 1;
+    const xLabels = rows.map((r, i) => i % labelEvery === 0 || i === n - 1 ? `<text x="${PL + slot * i + slot / 2}" y="${PH - 5}" text-anchor="middle">${new Date(dayStart(r.id)).getDate()}</text>` : '').join('');
+    const yTicks = (max, step, unit = '') => { let out = ''; for (let v = 0; v <= max + 1e-9; v += step) { const y = PT + IH - v / max * IH; out += `<line class="grid" x1="${PL}" x2="${W - PR}" y1="${y}" y2="${y}"></line><text x="${PL - 5}" y="${y + 3.5}" text-anchor="end">${v}${unit}</text>`; } return out; };
+    const dayName = id => fmtDay(id);
+    const tipAttr = txt => `data-tip="${esc(txt)}"`;
+    const col = (i, y0, h, fill, tip, cls = '') => h <= 0 ? '' : `<rect class="mark ${cls}" x="${x(i)}" y="${y0 - h}" width="${bw}" height="${h}" fill="${fill}" ${tipAttr(tip)}></rect>`;
+
+    // 1. Tramo nocturno más largo
+    const longMax = Math.max(6, ...rows.map(r => r.longest != null ? r.longest / H : 0));
+    const lmax = Math.ceil(longMax / 2) * 2;
+    const y1 = v => PT + IH - v / lmax * IH;
+    let c1 = yTicks(lmax, 2, '');
+    c1 += `<line class="ref" x1="${PL}" x2="${W - PR}" y1="${y1(4)}" y2="${y1(4)}"></line>`;
+    rows.forEach((r, i) => { if (r.longest == null) return; const v = r.longest / H; const tip = `<b>${fmtDur(r.longest)}</b><br>${L.night} ${dayName(r.id)}${r.nightDone ? '' : ' · ' + L.pending}`; c1 += `<rect class="hit" x="${PL + slot * i}" y="${PT}" width="${slot}" height="${IH}" ${tipAttr(tip)}></rect>` + col(i, y1(0), IH - (y1(v) - PT), 'var(--c-sueno)', tip, r.nightDone ? '' : 'pending'); });
+    const lastL = [...rows].reverse().find(r => r.longest != null && r.nightDone);
+    if (lastL) { const i = rows.indexOf(lastL); c1 += `<text x="${x(i) + bw / 2}" y="${y1(lastL.longest / H) - 4}" text-anchor="middle" style="fill:var(--text);font-weight:700">${fmtDur(lastL.longest)}</text>`; }
+
+    // 2. Tomas día / noche (apiladas)
+    const fmax = Math.max(4, ...rows.map(r => r.feedsD + r.feedsN));
+    const fm = Math.ceil(fmax / 2) * 2;
+    const y2 = v => PT + IH - v / fm * IH;
+    let c2 = yTicks(fm, fm > 8 ? 4 : 2);
+    rows.forEach((r, i) => { if (!r.has) return; const tip = `<b>${r.feedsD + r.feedsN} ${L.tipFeeds}</b><br>${dayName(r.id)}<br>${L.sDay}: ${r.feedsD} · ${L.sNight}: ${r.feedsN}`;
+      c2 += `<rect class="hit" x="${PL + slot * i}" y="${PT}" width="${slot}" height="${IH}" ${tipAttr(tip)}></rect>`;
+      const hD = IH - (y2(r.feedsD) - PT), hN = IH - (y2(r.feedsN) - PT);
+      c2 += col(i, y2(0), hD, 'var(--c-toma)', tip);
+      if (hN > 0) c2 += col(i, y2(0) - hD - 2, hN, 'var(--c-sueno)', tip); });
+
+    // 3. Sueño noche / siestas (apiladas, horas)
+    const smax = Math.max(12, ...rows.map(r => (r.naps + r.nightSleep) / H));
+    const sm = Math.ceil(smax / 4) * 4;
+    const y3 = v => PT + IH - v / sm * IH;
+    let c3 = yTicks(sm, 4, '');
+    rows.forEach((r, i) => { if (!r.has) return; const tot = (r.naps + r.nightSleep) / H; const tip = `<b>${fmtHours(r.naps + r.nightSleep)} ${L.h}</b><br>${dayName(r.id)}<br>${L.sNightSleep}: ${fmtHours(r.nightSleep)} ${L.h} · ${L.sNaps}: ${fmtHours(r.naps)} ${L.h}`;
+      c3 += `<rect class="hit" x="${PL + slot * i}" y="${PT}" width="${slot}" height="${IH}" ${tipAttr(tip)}></rect>`;
+      const hN = IH - (y3(r.nightSleep / H) - PT), hS = IH - (y3(r.naps / H) - PT);
+      c3 += col(i, y3(0), hN, 'var(--c-sueno)', tip);
+      if (hS > 0) c3 += col(i, y3(0) - hN - 2, hS, 'var(--c-sueno-2)', tip); });
+
+    // 4. Hora de acostarse y de despertar (eje: 18:00 → 12:00 del día siguiente)
+    const tmin = 18 * 60, tmax = 36 * 60;
+    const y4 = m => PT + IH - (m - tmin) / (tmax - tmin) * IH;
+    let c4 = '';
+    for (let hh = 18; hh <= 36; hh += 6) { const y = y4(hh * 60); c4 += `<line class="grid" x1="${PL}" x2="${W - PR}" y1="${y}" y2="${y}"></line><text x="${PL - 5}" y="${y + 3.5}" text-anchor="end">${pad(hh % 24)}</text>`; }
+    const pts = (key, adjust) => rows.map((r, i) => r[key] != null ? { i, m: adjust(r[key]), r } : null).filter(Boolean);
+    const bedPts = pts('bed', m => m < 12 * 60 ? m + 24 * 60 : m), wakePts = pts('wake', m => m + 24 * 60);
+    const path = ps => ps.length > 1 ? `<path d="${ps.map((p, k) => `${k ? 'L' : 'M'}${x(p.i) + bw / 2} ${y4(p.m)}`).join(' ')}" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"` : '';
+    if (bedPts.length > 1) c4 += path(bedPts) + ` stroke="var(--c-sueno)"></path>`;
+    if (wakePts.length > 1) c4 += path(wakePts) + ` stroke="var(--c-toma)"></path>`;
+    const dot = (p, fill, label) => `<circle cx="${x(p.i) + bw / 2}" cy="${y4(p.m)}" r="6" fill="var(--surface)"></circle><circle class="mark" cx="${x(p.i) + bw / 2}" cy="${y4(p.m)}" r="4" fill="${fill}" ${tipAttr(`<b>${fmtMinutes(p.m % (24 * 60))}</b><br>${label} · ${dayName(p.r.id)}`)}></circle><circle class="hit" cx="${x(p.i) + bw / 2}" cy="${y4(p.m)}" r="12" ${tipAttr(`<b>${fmtMinutes(p.m % (24 * 60))}</b><br>${label} · ${dayName(p.r.id)}`)}></circle>`;
+    bedPts.forEach(p => c4 += dot(p, 'var(--c-sueno)', L.sBed));
+    wakePts.forEach(p => c4 += dot(p, 'var(--c-toma)', L.sWake));
+
+    // 5. Mapa de calor: tomas por hora
+    const heat = new Array(24).fill(0);
+    withData.forEach(r => r.hours.forEach(h => heat[h]++));
+    const hmax = Math.max(1, ...heat);
+    const heatHTML = `<div class="heat">${heat.map((v, h) => `<div style="background:${v ? `color-mix(in oklab, var(--c-toma) ${Math.round(25 + 75 * v / hmax)}%, var(--surface-2))` : 'var(--surface-2)'}" ${tipAttr(`<b>${v} ${L.tipFeeds}</b><br>${pad(h)}:00–${pad((h + 1) % 24)}:00`)}></div>`).join('')}</div>
+      <div class="heat-x"><span>0</span><span>6</span><span>12</span><span>18</span><span>24 ${L.h}</span></div>`;
+
+    // 6. Tabla
+    const table = `<div class="tscroll"><table class="ptable"><thead><tr><th>${L.thDay}</th><th>${L.thFeedsD}</th><th>${L.thFeedsN}</th><th>${L.thSleep}</th><th>${L.thNaps}</th><th>${L.thLongest}</th><th>${L.thBed}</th><th>${L.thWake}</th></tr></thead><tbody>${
+      [...rows].reverse().filter(r => r.has).map(r => `<tr><td>${dayName(r.id)}</td><td>${r.feedsD}</td><td>${r.nightDone ? r.feedsN : '·'}</td><td>${fmtHours(r.naps + r.nightSleep)} ${L.h}</td><td>${fmtHours(r.naps)} ${L.h}</td><td>${r.longest != null && r.nightDone ? fmtDur(r.longest) : '·'}</td><td>${r.bed != null ? fmtMinutes(r.bed) : '·'}</td><td>${r.wake != null ? fmtMinutes(r.wake) : '·'}</td></tr>`).join('')
+    }</tbody></table></div>`;
+
+    const svg = (inner, h = PH) => `<svg viewBox="0 0 ${W} ${h}" role="img">${inner}${xLabels}</svg>`;
+    const legend = items => `<div class="legend">${items.map(([k, c, line]) => `<span class="${line ? 'line' : ''}" style="--sw:${c}">${k}</span>`).join('')}</div>`;
+    main.innerHTML = `
+      <section class="block" style="margin-top:0">
+        <h2>${L.pTitle}</h2>
+        <div class="filters">${[7, 14, 30].map(d => `<button data-range="${d}" aria-pressed="${d === panelRange}">${d}</button>`).join('')}<span style="align-self:center;font-size:12.5px;color:var(--muted);margin-left:4px">${L.pRange(panelRange)}</span></div>
+        ${withData.length ? kpis : `<div class="empty">${L.pNoData}</div>`}
+        <div class="card"><h3>${L.cLongest}</h3><div class="sub">${L.cLongestSub}</div>${svg(c1)}</div>
+        <div class="card"><h3>${L.cFeeds}</h3><div class="sub">${L.cFeedsSub}</div>${svg(c2)}${legend([[L.sDay, 'var(--c-toma)'], [L.sNight, 'var(--c-sueno)']])}</div>
+        <div class="card"><h3>${L.cSleep}</h3><div class="sub">${L.cSleepSub}</div>${svg(c3)}${legend([[L.sNightSleep, 'var(--c-sueno)'], [L.sNaps, 'var(--c-sueno-2)']])}</div>
+        <div class="card"><h3>${L.cTimes}</h3><div class="sub">${L.cTimesSub}</div>${svg(c4)}${legend([[L.sBed, 'var(--c-sueno)', true], [L.sWake, 'var(--c-toma)', true]])}</div>
+        <div class="card"><h3>${L.cHeat}</h3><div class="sub">${L.cHeatSub(withData.length)}</div>${heatHTML}</div>
+        <div class="card"><h3>${L.tTable}</h3><div class="sub">&nbsp;</div>${table}</div>
+      </section>`;
+  }
+
+  // Tooltip compartido (hover y toque)
+  const tipEl = document.createElement('div'); tipEl.className = 'tip'; tipEl.hidden = true; document.body.appendChild(tipEl);
+  function showTip(target, ev) {
+    tipEl.innerHTML = target.dataset.tip; tipEl.hidden = false;
+    const pad2 = 12, vw = window.innerWidth;
+    let left = ev.clientX + pad2, top = ev.clientY - tipEl.offsetHeight - pad2;
+    if (left + tipEl.offsetWidth > vw - 8) left = ev.clientX - tipEl.offsetWidth - pad2;
+    if (top < 8) top = ev.clientY + pad2;
+    tipEl.style.left = left + 'px'; tipEl.style.top = top + 'px';
+  }
+  main.addEventListener('pointermove', ev => { const t = ev.target.closest('[data-tip]'); if (t) showTip(t, ev); else tipEl.hidden = true; });
+  main.addEventListener('pointerleave', () => { tipEl.hidden = true; });
+  main.addEventListener('pointerdown', ev => { const t = ev.target.closest('[data-tip]'); if (t) showTip(t, ev); else tipEl.hidden = true; });
+  document.addEventListener('scroll', () => { tipEl.hidden = true; }, { passive: true });
+
   const GUIDE = {
     es: `<div class="guide">
       <h3>Qué es normal a los 3 meses con lactancia materna exclusiva</h3>
@@ -1027,6 +1238,7 @@
   main.addEventListener('click', ev => {
     const b = ev.target.closest('button'); if (!b) return;
     const act = b.dataset.act, now = Date.now();
+    if (b.dataset.range) { panelRange = Number(b.dataset.range); try { localStorage.setItem('ainadays.range', String(panelRange)); } catch {} render(); return; }
     if (b.dataset.edit) return openEditor(allEvents().find(e => e.id === b.dataset.edit));
     if (act === 'start-toma') { if (!activeOf('toma')) upsertEvent({ id: uid(), t: 'toma', ini: now, fin: null, lado: b.dataset.lado }); }
     else if (act === 'stop-toma') { const t = activeOf('toma'); if (t) { upsertEvent({ ...t, fin: now }); toast(L.tFeedSaved(fmtDur(now - t.ini))); } }
@@ -1166,7 +1378,7 @@ Referencias: a los 3 meses son normales 8–12 tomas/24 h, 14–17 h de sueño, 
     try { d = window.claude && window.claude.use ? await window.claude.use('db') : null; } catch { d = null; }
     if (!d) return initApi();
     db = d;
-    const cutoff = shiftDay(dayId(Date.now()), -14);
+    const cutoff = shiftDay(dayId(Date.now()), -35);
     let first = true;
     db.collection('dias').where('fecha', '>=', cutoff).onSnapshot(snap => {
       const remote = {};
@@ -1208,7 +1420,7 @@ Referencias: a los 3 meses son normales 8–12 tomas/24 h, 14–17 h de sueño, 
 
   async function pullApi(first = false) {
     if (!api) return;
-    const cutoff = shiftDay(dayId(Date.now()), -14);
+    const cutoff = shiftDay(dayId(Date.now()), -35);
     let r;
     try { r = await apiFetch('/api/dias?desde=' + cutoff); } catch { setSync('off'); return; }
     if (r.status === 401) { setSync('off'); apiKey = ''; askKey(); return; }
