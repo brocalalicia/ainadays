@@ -1211,7 +1211,7 @@ Referencias: a los 3 meses son normales 8–12 tomas/24 h, 14–17 h de sueño, 
     const cutoff = shiftDay(dayId(Date.now()), -14);
     let r;
     try { r = await apiFetch('/api/dias?desde=' + cutoff); } catch { setSync('off'); return; }
-    if (r.status === 401) { setSync('off'); askKey(); return; }
+    if (r.status === 401) { setSync('off'); apiKey = ''; askKey(); return; }
     if (!r.ok) { setSync('off'); return; }
     const data = await r.json();
     const remote = {};
@@ -1233,14 +1233,29 @@ Referencias: a los 3 meses son normales 8–12 tomas/24 h, 14–17 h de sueño, 
 
   let askingKey = false;
   function askKey() {
-    if (askingKey) return;
+    if (askingKey || modalRoot.firstChild) return;
     askingKey = true;
-    const v = window.prompt(lang === 'fr' ? 'Mot de passe de l’application' : 'Contraseña de la aplicación');
-    askingKey = false;
-    if (v == null) return;
-    apiKey = v.trim();
-    try { localStorage.setItem(KEY_LS, apiKey); } catch {}
-    pullApi(true);
+    const fr = lang === 'fr';
+    modalRoot.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-label="${fr ? 'Mot de passe' : 'Contraseña'}">
+      <div class="sheet">
+        <h3>${fr ? 'Mot de passe de l’application' : 'Contraseña de la aplicación'}</h3>
+        <div class="field"><label>${fr ? 'Saisis-le une seule fois sur cet appareil' : 'Solo hay que escribirla una vez en este dispositivo'}</label>
+          <input type="password" id="f-key" autocomplete="current-password" autofocus></div>
+        <div class="btns"><button class="ghost" data-k="cancel">${L.cancel}</button><button class="primary" data-k="ok">${fr ? 'Entrer' : 'Entrar'}</button></div>
+      </div></div>`;
+    const done = v => {
+      modalRoot.innerHTML = ''; modalRoot.onclick = null; askingKey = false;
+      if (v == null) { render(); return; }
+      apiKey = v.trim();
+      try { localStorage.setItem(KEY_LS, apiKey); } catch {}
+      pullApi(true);
+    };
+    modalRoot.onclick = e => {
+      const b = e.target.closest('[data-k]');
+      if (b) done(b.dataset.k === 'ok' ? modalRoot.querySelector('#f-key').value : null);
+    };
+    modalRoot.querySelector('#f-key').addEventListener('keydown', e => { if (e.key === 'Enter') done(e.target.value); });
+    setTimeout(() => modalRoot.querySelector('#f-key')?.focus(), 50);
   }
 
   render();
