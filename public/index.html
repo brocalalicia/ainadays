@@ -563,8 +563,11 @@
       if (days[id].ev.length !== before) touched.add(id);
     }
     const id = dayId(ev.ini);
+    ev.u = Date.now();
     (days[id] || (days[id] = { fecha: id, ev: [] })).ev.push(ev);
     touched.add(id);
+    // si el evento cambia de día, el día antiguo guarda una tumba para que no resucite al fusionar
+    for (const t of touched) if (t !== id) (days[t].del || (days[t].del = [])).push(ev.id);
     touched.forEach(saveDay);
     render();
   }
@@ -572,7 +575,7 @@
     for (const id in days) {
       const before = days[id].ev.length;
       days[id].ev = days[id].ev.filter(e => e.id !== evId);
-      if (days[id].ev.length !== before) saveDay(id);
+      if (days[id].ev.length !== before) { (days[id].del || (days[id].del = [])).push(evId); saveDay(id); }
     }
     render();
   }
@@ -1439,6 +1442,8 @@ Referencias: a los 3 meses son normales 8–12 tomas/24 h, 14–17 h de sueño, 
       const r = await apiFetch('/api/dias/' + id, { method: 'PUT', body: JSON.stringify(days[id]) });
       if (r.status === 401) { setSync('off'); askKey(); return; }
       if (!r.ok) throw new Error(r.status);
+      const data = await r.json();
+      if (data && data.doc) mergeRemote({ [id]: data.doc });
       setSync('on');
     } catch { setSync('off'); toast(L.tNoSync); }
   }

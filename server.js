@@ -3,7 +3,8 @@
 //   GET  /api/health              -> { ok: true }
 //   GET  /api/dias?desde=YYYY-MM-DD -> { dias: [{ fecha, doc, updated_at }] }
 //   GET  /api/dias/:fecha         -> { fecha, doc } | 404
-//   PUT  /api/dias/:fecha         -> guarda el documento del día (JSON) y responde { ok: true }
+//   PUT  /api/dias/:fecha         -> fusiona el documento del día (evento a evento) y devuelve { ok, doc }
+//                                    (?replace=1 sustituye el día entero, para importaciones)
 //   DELETE /api/dias/:fecha       -> borra el día
 //
 // Variables de entorno: DATABASE_URL (obligatoria), APP_KEY (contraseña de la app,
@@ -80,18 +81,44 @@ app.get('/api/dias/:fecha', async (req, res) => {
   res.json(rows[0]);
 });
 
+// Fusión evento a evento: dos móviles pueden guardar el mismo día sin pisarse.
+// Cada evento lleva `u` (última modificación, ms); gana el más reciente. Los
+// borrados viajan en `del` (ids) para que no resuciten al fusionar.
+function mergeDocs(existing, incoming, fecha) {
+  const del = new Set([...(existing?.del || []), ...(incoming.del || [])]);
+  const byId = new Map();
+  for (const e of existing?.ev || []) byId.set(e.id, e);
+  for (const e of incoming.ev || []) {
+    const cur = byId.get(e.id);
+    if (!cur || (e.u || 0) >= (cur.u || 0)) byId.set(e.id, e);
+  }
+  const ev = [...byId.values()].filter(e => !del.has(e.id)).sort((a, b) => a.ini - b.ini);
+  return { fecha, ev, del: [...del].slice(-200) };
+}
+
 app.put('/api/dias/:fecha', async (req, res) => {
   const { fecha } = req.params;
   if (!FECHA.test(fecha)) return res.status(400).json({ error: 'fecha inválida' });
   const doc = req.body;
   if (!doc || typeof doc !== 'object' || !Array.isArray(doc.ev)) return res.status(400).json({ error: 'el documento debe ser { fecha, ev: [...] }' });
-  doc.fecha = fecha;
-  await pool.query(
-    `INSERT INTO dias (fecha, doc, updated_at) VALUES ($1, $2, now())
-     ON CONFLICT (fecha) DO UPDATE SET doc = EXCLUDED.doc, updated_at = now()`,
-    [fecha, JSON.stringify(doc)],
-  );
-  res.json({ ok: true });
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows } = await client.query('SELECT doc FROM dias WHERE fecha = $1 FOR UPDATE', [fecha]);
+    const merged = req.query.replace === '1' ? { fecha, ev: doc.ev, del: doc.del || [] } : mergeDocs(rows[0]?.doc, doc, fecha);
+    await client.query(
+      `INSERT INTO dias (fecha, doc, updated_at) VALUES ($1, $2, now())
+       ON CONFLICT (fecha) DO UPDATE SET doc = EXCLUDED.doc, updated_at = now()`,
+      [fecha, JSON.stringify(merged)],
+    );
+    await client.query('COMMIT');
+    res.json({ ok: true, doc: merged });
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw e;
+  } finally {
+    client.release();
+  }
 });
 
 app.delete('/api/dias/:fecha', async (req, res) => {

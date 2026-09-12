@@ -20,7 +20,7 @@ for (const f of files) {
   else for (const k in j) if (j[k] && Array.isArray(j[k].ev)) docs[k] = { ...j[k], fecha: k };
 }
 for (const fecha of Object.keys(docs).sort()) {
-  const r = await fetch(`${API_URL}/api/dias/${fecha}`, {
+  const r = await fetch(`${API_URL}/api/dias/${fecha}?replace=1`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...(APP_KEY ? { Authorization: `Bearer ${APP_KEY}` } : {}) },
     body: JSON.stringify(docs[fecha]),
