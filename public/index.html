@@ -147,6 +147,11 @@
   .ask .row2 { display: flex; gap: 8px; align-items: center; }
   .ask .go { background: var(--sueno); color: #fff; border: 0; border-radius: 12px; padding: 11px 16px; font-weight: 700; }
   .ask .go:disabled { opacity: .6; }
+  .ask .mic { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 10px 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+  .ask .mic::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--muted); }
+  .ask .mic.on { background: var(--toma-soft); border-color: var(--toma); color: var(--toma-ink); }
+  .ask .mic.on::before { background: var(--bad); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
   .ask .ans { border-left: 3px solid var(--sueno); padding: 4px 0 4px 12px; font-size: 15px; line-height: 1.5; display: grid; gap: 6px; }
   .ask .ans p { margin: 0; }
   .ask .src { font-size: 12px; color: var(--muted); }
@@ -428,7 +433,7 @@
       tipFeeds: 'tomas', tipHours: 'h', night: 'noche del', pending: 'noche en curso',
       // Consejo
       qTitle: '¿Qué está haciendo?', qPlaceholder: 'p. ej. juega en el parque, se frota la cara y grita un poco', qAsk: '¿Qué hago?', qThinking: 'Pensando…', qSaveNote: 'Guardar como nota', qSaved: 'Guardado como nota', qByClaude: 'Respuesta de Claude', qByRules: 'Respuesta de la app', qFail: 'No he podido responder; inténtalo de nuevo.',
-      qNeedText: 'Cuéntame qué está haciendo',
+      qNeedText: 'Cuéntame qué está haciendo', qMic: 'Hablar', qMicStop: 'Escuchando… toca para parar', qMicFail: 'El micrófono no está disponible en este navegador',
     },
     fr: {
       wd: ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'],
@@ -519,7 +524,7 @@
       tipFeeds: 'tétées', tipHours: 'h', night: 'nuit du', pending: 'nuit en cours',
       // Conseil
       qTitle: 'Que fait-elle en ce moment ?', qPlaceholder: 'ex. elle joue sur le tapis, se frotte le visage et crie un peu', qAsk: 'Que faire ?', qThinking: 'Réflexion…', qSaveNote: 'Enregistrer comme note', qSaved: 'Enregistré comme note', qByClaude: 'Réponse de Claude', qByRules: 'Réponse de l’appli', qFail: 'Je n’ai pas pu répondre ; réessaie.',
-      qNeedText: 'Dis-moi ce qu’elle fait',
+      qNeedText: 'Dis-moi ce qu’elle fait', qMic: 'Parler', qMicStop: 'À l’écoute… touche pour arrêter', qMicFail: 'Le micro n’est pas disponible dans ce navigateur',
     },
   };
   let lang = 'es';
@@ -860,7 +865,7 @@
       <div class="ask">
         <h2>${L.qTitle}</h2>
         <textarea id="q-text" placeholder="${L.qPlaceholder}">${esc(ask.text)}</textarea>
-        <div class="row2"><button class="go" data-act="ask" ${ask.state === 'loading' ? 'disabled' : ''}>${ask.state === 'loading' ? L.qThinking : L.qAsk}</button>${ask.answer ? `<button class="chip" data-act="ask-save">${L.qSaveNote}</button>` : ''}</div>
+        <div class="row2"><button class="go" data-act="ask" ${ask.state === 'loading' ? 'disabled' : ''}>${ask.state === 'loading' ? L.qThinking : L.qAsk}</button>${SR ? `<button class="mic${ask.listening ? ' on' : ''}" data-act="mic">${ask.listening ? L.qMicStop : L.qMic}</button>` : ''}${ask.answer ? `<button class="chip" data-act="ask-save">${L.qSaveNote}</button>` : ''}</div>
         ${ask.answer ? `<div class="ans">${ask.answer.split(/\n\n+/).map(p => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('')}<div class="src">${ask.source === 'claude' ? L.qByClaude : L.qByRules} · ${ask.time}</div></div>` : ''}
       </div>
       <section class="block">
@@ -1260,7 +1265,29 @@
   function renderGuia() { main.innerHTML = GUIDE[lang]; }
 
   // ---------- Consejo: «¿Qué está haciendo?» ----------
-  const ask = { text: '', answer: '', source: '', time: '', state: 'idle' };
+  const ask = { text: '', answer: '', source: '', time: '', state: 'idle', listening: false };
+
+  // Dictado por voz con el reconocimiento del navegador (Chrome, Safari iOS 14.5+; requiere HTTPS)
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+  let rec = null, recBase = '';
+  function toggleMic() {
+    if (!SR) { toast(L.qMicFail); return; }
+    if (rec) { rec.stop(); return; }
+    const ta = document.getElementById('q-text');
+    recBase = ta ? ta.value.trim() : ask.text;
+    rec = new SR();
+    rec.lang = lang === 'fr' ? 'fr-FR' : 'es-ES';
+    rec.interimResults = true; rec.continuous = true;
+    rec.onresult = ev => {
+      let finalTxt = '', interim = '';
+      for (let i = 0; i < ev.results.length; i++) { const r = ev.results[i]; if (r.isFinal) finalTxt += r[0].transcript + ' '; else interim += r[0].transcript; }
+      ask.text = (recBase + ' ' + finalTxt + interim).trim();
+      const t = document.getElementById('q-text'); if (t) t.value = ask.text;
+    };
+    rec.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast(L.qMicFail); };
+    rec.onend = () => { rec = null; ask.listening = false; const t = document.getElementById('q-text'); if (t) ask.text = t.value; render(); };
+    try { rec.start(); ask.listening = true; render(); } catch { rec = null; toast(L.qMicFail); }
+  }
 
   // Contexto compacto de ahora mismo, para las reglas y para Claude
   function nowContext() {
@@ -1349,7 +1376,8 @@
     else if (act === 'panal') { upsertEvent({ id: uid(), t: 'panal', ini: now, fin: null, p: b.dataset.p }); toast(b.dataset.p === 'caca' ? L.tPoo : L.tPee); }
     else if (act === 'nota') openEditor({ id: uid(), t: 'nota', ini: now, fin: null, n: '' }, true);
     else if (act === 'manual') openEditor({ id: uid(), t: 'toma', ini: now - 30 * MIN, fin: now - 15 * MIN, lado: 'I' }, true);
-    else if (act === 'ask') askAdvice();
+    else if (act === 'ask') { if (rec) rec.stop(); askAdvice(); }
+    else if (act === 'mic') toggleMic();
     else if (act === 'ask-save') { upsertEvent({ id: uid(), t: 'nota', ini: now, fin: null, n: `${ask.text} → ${ask.answer}` }); toast(L.qSaved); }
     else if (act === 'ai') askClaude();
     else if (act === 'ai-stop') { if (ai.ctl) ai.ctl.abort(); }
@@ -1579,7 +1607,7 @@ Referencias: a los 3 meses son normales 8–12 tomas/24 h, 14–17 h de sueño, 
   render();
   initDb();
   initSample();
-  setInterval(() => { if (modalRoot.firstChild) return; const ta = document.getElementById('q-text'); if (ta) ask.text = ta.value; if (api) pullApi(); else if (tab !== 'guia') render(); }, 30000);
+  setInterval(() => { if (modalRoot.firstChild || ask.listening) return; const ta = document.getElementById('q-text'); if (ta) ask.text = ta.value; if (api) pullApi(); else if (tab !== 'guia') render(); }, 30000);
   document.addEventListener('visibilitychange', () => { if (document.hidden || modalRoot.firstChild) return; if (api) pullApi(); else render(); });
 })();
 </script>
