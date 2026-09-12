@@ -4,12 +4,15 @@
   "description": "Registro de tomas, sueño y pañales de Aïna: app web + API Node + PostgreSQL",
   "type": "module",
   "main": "server.js",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.125.0",
     "express": "^4.21.2",
     "pg": "^8.13.1"
   },

@@ -6,12 +6,15 @@
 //   PUT  /api/dias/:fecha         -> fusiona el documento del día (evento a evento) y devuelve { ok, doc }
 //                                    (?replace=1 sustituye el día entero, para importaciones)
 //   DELETE /api/dias/:fecha       -> borra el día
+//   POST /api/consejo             -> { lang, texto, contexto } → { fuente: 'claude'|'reglas', texto? }
+//                                    (usa la API de Claude si hay ANTHROPIC_API_KEY; si no, la app responde con reglas)
 //
 // Variables de entorno: DATABASE_URL (obligatoria), APP_KEY (contraseña de la app,
-// muy recomendable), PORT (3000 por defecto).
+// muy recomendable), ANTHROPIC_API_KEY (opcional, para el consejo con Claude), PORT (3000).
 
 import express from 'express';
 import pg from 'pg';
+import Anthropic from '@anthropic-ai/sdk';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -125,6 +128,37 @@ app.delete('/api/dias/:fecha', async (req, res) => {
   if (!FECHA.test(req.params.fecha)) return res.status(400).json({ error: 'fecha inválida' });
   await pool.query('DELETE FROM dias WHERE fecha = $1', [req.params.fecha]);
   res.json({ ok: true });
+});
+
+// Consejo del momento: qué hacer ahora con lo que la madre describe + el contexto del día
+const anthropic = process.env.ANTHROPIC_API_KEY ? new Anthropic() : null;
+const CONSEJO_SYSTEM = {
+  es: `Eres una asesora de lactancia y sueño infantil, cercana y muy concreta. Ayudas a una madre que da pecho en exclusiva a su hija Aïna, de 3 meses. Te describe lo que la niña hace ahora mismo y tú le dices qué hacer en los próximos minutos.
+Responde en español, en segunda persona, máximo 90 palabras, sin títulos ni listas con viñetas: una frase de lectura (qué le pasa probablemente) y 2–3 pasos concretos en orden, con horas si ayudan. Referencias a los 3 meses: ventana de vigilia de 1 h – 2 h, señales de sueño (frotarse la cara, bostezar, mirada perdida, gruñir, tirarse de las orejas), señales de hambre (buscar, manos a la boca, chupar), siestas de un ciclo (30–45 min), tomas cada 2–3 h de día. Nunca propongas dejarla llorar ni quitar tomas de noche. Sin alarmismos; si algo requiere pediatra, dilo en una frase.`,
+  fr: `Tu es une conseillère en allaitement et sommeil du nourrisson, proche et très concrète. Tu aides une mère qui allaite exclusivement sa fille Aïna, 3 mois. Elle te décrit ce que fait le bébé maintenant et tu lui dis quoi faire dans les prochaines minutes.
+Réponds en français, à la deuxième personne, 90 mots maximum, sans titres ni listes à puces : une phrase de lecture (ce qui se passe probablement) puis 2–3 étapes concrètes dans l'ordre, avec des heures si utile. Repères à 3 mois : fenêtre d'éveil de 1 h à 2 h, signes de fatigue (se frotter le visage, bâiller, regard dans le vide, grogner, se tirer les oreilles), signes de faim (chercher le sein, mains à la bouche, succion), siestes d'un cycle (30–45 min), tétées toutes les 2–3 h le jour. Ne propose jamais de la laisser pleurer ni de supprimer des tétées de nuit. Sans alarmisme ; si quelque chose nécessite le pédiatre, dis-le en une phrase.`,
+};
+
+app.post('/api/consejo', async (req, res) => {
+  const { lang = 'es', texto = '', contexto = '' } = req.body || {};
+  if (!anthropic) return res.json({ fuente: 'reglas' });
+  const t = String(texto).slice(0, 1000), c = String(contexto).slice(0, 4000);
+  if (!t.trim()) return res.status(400).json({ error: 'falta el texto' });
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-opus-5',
+      max_tokens: 600,
+      system: [{ type: 'text', text: CONSEJO_SYSTEM[lang === 'fr' ? 'fr' : 'es'], cache_control: { type: 'ephemeral' } }],
+      output_config: { effort: 'low' },
+      messages: [{ role: 'user', content: `${lang === 'fr' ? 'Contexte du jour' : 'Contexto del día'}:\n${c}\n\n${lang === 'fr' ? 'Ce qu’elle fait maintenant' : 'Lo que hace ahora'}: ${t}` }],
+    });
+    if (response.stop_reason === 'refusal') return res.json({ fuente: 'reglas' });
+    const out = response.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+    res.json({ fuente: 'claude', texto: out });
+  } catch (e) {
+    console.error('consejo:', e && e.message);
+    res.json({ fuente: 'reglas' });
+  }
 });
 
 // App estática

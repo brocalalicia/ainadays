@@ -140,6 +140,16 @@
   .chip.panal { color: var(--panal); border-color: var(--panal-soft); background: var(--panal-soft); }
   .chip.ai-btn { background: var(--sueno-soft); border-color: var(--sueno-soft); color: var(--sueno-ink); }
 
+  /* Consejo */
+  .ask { background: var(--surface); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); margin-top: 14px; display: grid; gap: 10px; }
+  .ask h2 { font-family: var(--display); font-weight: 600; font-size: 18px; margin: 0; }
+  .ask textarea { font: inherit; font-size: 15px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); color: var(--text); width: 100%; min-height: 64px; resize: vertical; }
+  .ask .row2 { display: flex; gap: 8px; align-items: center; }
+  .ask .go { background: var(--sueno); color: #fff; border: 0; border-radius: 12px; padding: 11px 16px; font-weight: 700; }
+  .ask .go:disabled { opacity: .6; }
+  .ask .ans { border-left: 3px solid var(--sueno); padding: 4px 0 4px 12px; font-size: 15px; line-height: 1.5; display: grid; gap: 6px; }
+  .ask .ans p { margin: 0; }
+  .ask .src { font-size: 12px; color: var(--muted); }
   /* Sections */
   section.block { margin-top: 22px; }
   section.block h2 { font-family: var(--display); font-weight: 600; font-size: 19px; margin: 0 0 10px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
@@ -416,6 +426,9 @@
       cHeat: 'A qué horas come', cHeatSub: n => `tomas por hora del día, sumadas en ${n} días`,
       tTable: 'Tabla por día', thDay: 'Día', thFeedsD: 'Tomas día', thFeedsN: 'Tomas noche', thSleep: 'Sueño', thNaps: 'Siestas', thLongest: 'Tramo máx.', thBed: 'Acostada', thWake: 'Despierta',
       tipFeeds: 'tomas', tipHours: 'h', night: 'noche del', pending: 'noche en curso',
+      // Consejo
+      qTitle: '¿Qué está haciendo?', qPlaceholder: 'p. ej. juega en el parque, se frota la cara y grita un poco', qAsk: '¿Qué hago?', qThinking: 'Pensando…', qSaveNote: 'Guardar como nota', qSaved: 'Guardado como nota', qByClaude: 'Respuesta de Claude', qByRules: 'Respuesta de la app', qFail: 'No he podido responder; inténtalo de nuevo.',
+      qNeedText: 'Cuéntame qué está haciendo',
     },
     fr: {
       wd: ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'],
@@ -504,6 +517,9 @@
       cHeat: 'À quelles heures elle tète', cHeatSub: n => `tétées par heure de la journée, cumulées sur ${n} jours`,
       tTable: 'Tableau par jour', thDay: 'Jour', thFeedsD: 'Tétées jour', thFeedsN: 'Tétées nuit', thSleep: 'Sommeil', thNaps: 'Siestes', thLongest: 'Max. nuit', thBed: 'Couchée', thWake: 'Réveil',
       tipFeeds: 'tétées', tipHours: 'h', night: 'nuit du', pending: 'nuit en cours',
+      // Conseil
+      qTitle: 'Que fait-elle en ce moment ?', qPlaceholder: 'ex. elle joue sur le tapis, se frotte le visage et crie un peu', qAsk: 'Que faire ?', qThinking: 'Réflexion…', qSaveNote: 'Enregistrer comme note', qSaved: 'Enregistré comme note', qByClaude: 'Réponse de Claude', qByRules: 'Réponse de l’appli', qFail: 'Je n’ai pas pu répondre ; réessaie.',
+      qNeedText: 'Dis-moi ce qu’elle fait',
     },
   };
   let lang = 'es';
@@ -840,6 +856,12 @@
           <button class="chip" data-act="nota">${L.note}</button>
           <button class="chip" data-act="manual">${L.manual}</button>
         </div>
+      </div>
+      <div class="ask">
+        <h2>${L.qTitle}</h2>
+        <textarea id="q-text" placeholder="${L.qPlaceholder}">${esc(ask.text)}</textarea>
+        <div class="row2"><button class="go" data-act="ask" ${ask.state === 'loading' ? 'disabled' : ''}>${ask.state === 'loading' ? L.qThinking : L.qAsk}</button>${ask.answer ? `<button class="chip" data-act="ask-save">${L.qSaveNote}</button>` : ''}</div>
+        ${ask.answer ? `<div class="ans">${ask.answer.split(/\n\n+/).map(p => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('')}<div class="src">${ask.source === 'claude' ? L.qByClaude : L.qByRules} · ${ask.time}</div></div>` : ''}
       </div>
       <section class="block">
         <h2>${L.today} <span class="eyebrow">${fmtDay(today)}</span></h2>
@@ -1237,6 +1259,83 @@
   };
   function renderGuia() { main.innerHTML = GUIDE[lang]; }
 
+  // ---------- Consejo: «¿Qué está haciendo?» ----------
+  const ask = { text: '', answer: '', source: '', time: '', state: 'idle' };
+
+  // Contexto compacto de ahora mismo, para las reglas y para Claude
+  function nowContext() {
+    const now = Date.now(), evs = allEvents(), today = dayId(now);
+    const sleeping = activeOf('sueno'), feeding = activeOf('toma');
+    const lastSleep = [...evs].reverse().find(e => e.t === 'sueno' && e.fin != null);
+    const lastFeed = [...evs].reverse().find(e => e.t === 'toma' && e.fin != null);
+    const wake = morningWake(evs.filter(e => e.t === 'sueno'), dayStart(today));
+    const naps = evs.filter(e => e.t === 'sueno' && e.ini >= (wake ?? dayStart(today) + 7 * H) && e.fin != null);
+    const night = nightStats(evs, shiftDay(today, -1));
+    return {
+      now, sleeping: !!sleeping, feeding: !!feeding,
+      awakeMin: !sleeping && lastSleep ? (now - lastSleep.fin) / MIN : null,
+      lastNapMin: lastSleep ? (lastSleep.fin - lastSleep.ini) / MIN : null,
+      sinceFeedMin: lastFeed ? (now - lastFeed.fin) / MIN : null,
+      napsToday: naps.length,
+      nightFeeds: night ? night.feeds : null,
+      hour: new Date(now).getHours() + new Date(now).getMinutes() / 60,
+    };
+  }
+  function contextText(c) {
+    const fr = lang === 'fr';
+    const lines = [];
+    lines.push(`${fr ? 'Heure' : 'Hora'}: ${fmtTime(c.now)}`);
+    if (c.sleeping) lines.push(fr ? 'Elle dort en ce moment.' : 'Está durmiendo ahora mismo.');
+    else if (c.awakeMin != null) lines.push(`${fr ? 'Éveillée depuis' : 'Despierta desde hace'} ${fmtDur(c.awakeMin * MIN)}`);
+    if (c.lastNapMin != null) lines.push(`${fr ? 'Dernier sommeil' : 'Último sueño'}: ${fmtDur(c.lastNapMin * MIN)}`);
+    if (c.sinceFeedMin != null) lines.push(`${fr ? 'Dernière tétée il y a' : 'Última toma hace'} ${fmtDur(c.sinceFeedMin * MIN)}`);
+    lines.push(`${fr ? 'Siestes aujourd’hui' : 'Siestas hoy'}: ${c.napsToday}`);
+    if (c.nightFeeds != null) lines.push(`${fr ? 'Tétées la nuit dernière' : 'Tomas anoche'}: ${c.nightFeeds}`);
+    return lines.join('\n');
+  }
+
+  // Motor de reglas: funciona sin conexión y sin clave de Claude
+  function ruleAdvice(text, c) {
+    const t = text.toLowerCase();
+    const has = re => re.test(t);
+    const sleepy = has(/frota|toca la cara|tocarse la cara|se toca|bostez|mirada perdida|ojos|orejas|gru[ñn]|grit|lloriqu|queja|inquiet|arque|nerviosa|cansad|se frotte|bâill|regard|oreilles|grogn|crie|gémit|agit|fatigu/);
+    const hungry = has(/busca|chupa|mano en la boca|manos a la boca|abre la boca|lengua|hambre|pecho|teta|cherche|main.*bouche|succ|faim|sein|tète/);
+    const crying = has(/llora|llanto|pleure|pleurs|hurle/);
+    const content = has(/sonr|juega|jugando|tranquil|content|mira|balbuc|ríe|rie|sourit|joue|calme|regarde|babille|rit/);
+    const fr = lang === 'fr';
+    const awake = c.awakeMin ?? 0, feedAgo = c.sinceFeedMin ?? 999;
+    const napAt = c.awakeMin != null ? fmtTime(c.now + Math.max(0, 75 - awake) * MIN) : null;
+    const P = (es, f) => fr ? f : es;
+    if (c.sleeping) return P('Está durmiendo: déjala. Si se despierta antes de 40 min, prueba a volver a dormirla en el sitio (mano en el pecho, shhh) antes de sacarla. Cuando se despierte de verdad: toma primero, luego actividad.', 'Elle dort : laisse-la. Si elle se réveille avant 40 min, essaie de la rendormir sur place (main sur la poitrine, chhh) avant de la lever. Au vrai réveil : tétée d’abord, puis activité.');
+    if (awake > 120) return P(`Lleva ${fmtDur(awake * MIN)} despierta: está pasada de vueltas y por eso cuesta más. Baja luz y ruido ya, sin juego. ${feedAgo > 90 ? 'Ofrécele pecho en un sitio tranquilo y ' : ''}duérmela en brazos o portabebés con balanceo y sonido shhh. Si llora fuerte, no es hambre de estímulos: es sueño.`, `Éveillée depuis ${fmtDur(awake * MIN)} : elle est surstimulée, d’où la difficulté. Baisse lumière et bruit tout de suite, plus de jeu. ${feedAgo > 90 ? 'Propose le sein au calme et ' : ''}endors-la dans les bras ou en porte-bébé, balancement et chhh. Si elle pleure fort, ce n’est pas un besoin de stimulation : c’est du sommeil.`);
+    if (sleepy && awake >= 40) return P(`Señales de sueño con ${fmtDur(awake * MIN)} despierta: es el momento, no esperes a la ventana teórica. Sácala del juego, baja luz y ruido${feedAgo > 90 ? `, ofrécele pecho (lleva ${fmtDur(feedAgo * MIN)} sin tomar) y probablemente se duerma en él` : ''}. Si en 10–15 min no cae, en brazos o portabebés con balanceo suave.`, `Signes de fatigue après ${fmtDur(awake * MIN)} d’éveil : c’est le moment, n’attends pas la fenêtre théorique. Sors-la du jeu, baisse lumière et bruit${feedAgo > 90 ? `, propose le sein (dernière tétée il y a ${fmtDur(feedAgo * MIN)}) et elle s’endormira probablement dessus` : ''}. Si elle ne s’endort pas en 10–15 min, dans les bras ou en porte-bébé, balancement doux.`);
+    if (hungry || feedAgo > 150) return P(`Parece hambre${feedAgo < 999 ? ` (última toma hace ${fmtDur(feedAgo * MIN)})` : ''}: ofrécele pecho ahora, tranquila y sin prisa, los dos pechos si los acepta. ${awake >= 60 ? `Después, con ${fmtDur(awake * MIN)} despierta, lo siguiente será dormirla${napAt ? ` hacia las ${napAt}` : ''}.` : 'Después, un rato de actividad tranquila.'}`, `Ça ressemble à de la faim${feedAgo < 999 ? ` (dernière tétée il y a ${fmtDur(feedAgo * MIN)})` : ''} : propose le sein maintenant, au calme, les deux seins si elle accepte. ${awake >= 60 ? `Ensuite, après ${fmtDur(awake * MIN)} d’éveil, il faudra l’endormir${napAt ? ` vers ${napAt}` : ''}.` : 'Ensuite, un moment d’activité calme.'}`);
+    if (crying) return P(`Llora con ${fmtDur(awake * MIN)} despierta y ${feedAgo < 999 ? fmtDur(feedAgo * MIN) + ' desde la toma' : 'sin toma registrada'}. Repasa en este orden: pañal, ${feedAgo > 60 ? 'pecho, ' : ''}calor o frío, gases (a upa, espalda). Si nada lo calma y lleva más de 1 h despierta, es sueño: a oscuras, en brazos, shhh.`, `Elle pleure après ${fmtDur(awake * MIN)} d’éveil et ${feedAgo < 999 ? fmtDur(feedAgo * MIN) + ' depuis la tétée' : 'sans tétée enregistrée'}. Vérifie dans l’ordre : couche, ${feedAgo > 60 ? 'sein, ' : ''}chaud ou froid, gaz (contre l’épaule, dos). Si rien ne calme et qu’elle est éveillée depuis plus d’1 h, c’est du sommeil : dans le noir, dans les bras, chhh.`);
+    if (sleepy) return P(`Primeras señales de sueño pero solo lleva ${fmtDur(awake * MIN)} despierta: probablemente la siesta anterior (${c.lastNapMin != null ? fmtDur(c.lastNapMin * MIN) : '—'}) se le quedó corta. Baja el ritmo ya: luz suave, en brazos, y a dormir en cuanto bostece otra vez.`, `Premiers signes de fatigue mais seulement ${fmtDur(awake * MIN)} d’éveil : la sieste précédente (${c.lastNapMin != null ? fmtDur(c.lastNapMin * MIN) : '—'}) était sans doute trop courte. Ralentis dès maintenant : lumière douce, dans les bras, et dodo au prochain bâillement.`);
+    if (content && awake < 75) return P(`Está a gusto: aprovecha para actividad tranquila (suelo, mirarse, hablarle)${feedAgo > 90 ? ', y ofrécele pecho antes de que pida' : ''}. Empieza a calmarla${napAt ? ` sobre las ${napAt}` : ' dentro de 15–30 min'} o antes si bosteza o se frota la cara.`, `Elle est bien : profite pour une activité calme (au sol, se regarder, lui parler)${feedAgo > 90 ? ', et propose le sein avant qu’elle ne réclame' : ''}. Commence à la calmer${napAt ? ` vers ${napAt}` : ' dans 15–30 min'} ou avant si elle bâille ou se frotte le visage.`);
+    if (awake >= 75) return P(`Lleva ${fmtDur(awake * MIN)} despierta: aunque parezca contenta, está en la zona de dormirla. Baja luz y estímulos${feedAgo > 90 ? ', ofrécele pecho' : ''} y empieza el ritual de siesta ahora; si esperas a que se queje, costará más.`, `Éveillée depuis ${fmtDur(awake * MIN)} : même si elle semble contente, on est dans la zone du coucher. Baisse lumière et stimulations${feedAgo > 90 ? ', propose le sein' : ''} et lance le rituel de sieste maintenant ; si tu attends qu’elle se plaigne, ce sera plus dur.`);
+    return P(`Con ${fmtDur(awake * MIN)} despierta y ${feedAgo < 999 ? 'la última toma hace ' + fmtDur(feedAgo * MIN) : 'sin toma registrada'}: sigue con actividad tranquila${feedAgo > 90 ? ', ofrécele pecho' : ''} y vigila señales de sueño (bostezo, frotarse la cara, mirada perdida)${napAt ? `; la ventana buena para dormirla empieza hacia las ${napAt}` : ''}.`, `Après ${fmtDur(awake * MIN)} d’éveil et ${feedAgo < 999 ? 'une tétée il y a ' + fmtDur(feedAgo * MIN) : 'sans tétée enregistrée'} : continue une activité calme${feedAgo > 90 ? ', propose le sein' : ''} et guette les signes de fatigue (bâillement, se frotter le visage, regard dans le vide)${napAt ? ` ; la bonne fenêtre pour l’endormir commence vers ${napAt}` : ''}.`);
+  }
+
+  async function askAdvice() {
+    const ta = document.getElementById('q-text');
+    ask.text = ta ? ta.value.trim() : ask.text;
+    if (!ask.text) { toast(L.qNeedText); return; }
+    if (ask.state === 'loading') return;
+    const c = nowContext();
+    ask.state = 'loading'; render();
+    let answer = '', source = 'reglas';
+    if (api) {
+      try {
+        const r = await apiFetch('/api/consejo', { method: 'POST', body: JSON.stringify({ lang, texto: ask.text, contexto: contextText(c) }) });
+        if (r.ok) { const d = await r.json(); if (d.fuente === 'claude' && d.texto) { answer = d.texto; source = 'claude'; } }
+      } catch {}
+    }
+    if (!answer) answer = ruleAdvice(ask.text, c);
+    ask.answer = answer; ask.source = source; ask.time = fmtTime(Date.now()); ask.state = 'done';
+    render();
+  }
+
   // ---------- Acciones ----------
   main.addEventListener('click', ev => {
     const b = ev.target.closest('button'); if (!b) return;
@@ -1250,6 +1349,8 @@
     else if (act === 'panal') { upsertEvent({ id: uid(), t: 'panal', ini: now, fin: null, p: b.dataset.p }); toast(b.dataset.p === 'caca' ? L.tPoo : L.tPee); }
     else if (act === 'nota') openEditor({ id: uid(), t: 'nota', ini: now, fin: null, n: '' }, true);
     else if (act === 'manual') openEditor({ id: uid(), t: 'toma', ini: now - 30 * MIN, fin: now - 15 * MIN, lado: 'I' }, true);
+    else if (act === 'ask') askAdvice();
+    else if (act === 'ask-save') { upsertEvent({ id: uid(), t: 'nota', ini: now, fin: null, n: `${ask.text} → ${ask.answer}` }); toast(L.qSaved); }
     else if (act === 'ai') askClaude();
     else if (act === 'ai-stop') { if (ai.ctl) ai.ctl.abort(); }
   });
@@ -1478,7 +1579,7 @@ Referencias: a los 3 meses son normales 8–12 tomas/24 h, 14–17 h de sueño, 
   render();
   initDb();
   initSample();
-  setInterval(() => { if (modalRoot.firstChild) return; if (api) pullApi(); else if (tab !== 'guia') render(); }, 30000);
+  setInterval(() => { if (modalRoot.firstChild) return; const ta = document.getElementById('q-text'); if (ta) ask.text = ta.value; if (api) pullApi(); else if (tab !== 'guia') render(); }, 30000);
   document.addEventListener('visibilitychange', () => { if (document.hidden || modalRoot.firstChild) return; if (api) pullApi(); else render(); });
 })();
 </script>
