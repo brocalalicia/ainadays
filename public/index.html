@@ -1392,7 +1392,7 @@
     else if (act === 'stop-sueno') { const s = activeOf('sueno'); if (s) { upsertEvent({ ...s, fin: now }); toast(L.tSlept(fmtDur(now - s.ini))); } }
     else if (act === 'panal') { upsertEvent({ id: uid(), t: 'panal', ini: now, fin: null, p: b.dataset.p }); toast(b.dataset.p === 'caca' ? L.tPoo : L.tPee); }
     else if (act === 'nota') openEditor({ id: uid(), t: 'nota', ini: now, fin: null, n: '' }, true);
-    else if (act === 'manual') openEditor({ id: uid(), t: 'toma', ini: now - 30 * MIN, fin: now - 15 * MIN, lado: 'I' }, true);
+    else if (act === 'manual') openEditor({ id: uid(), t: 'toma', ini: now, fin: now + 10 * MIN, lado: 'I' }, true);
     else if (act === 'ask') { if (rec) rec.stop(); askAdvice(); }
     else if (act === 'mic') toggleMic();
     else if (act === 'ask-save') { const i = Number(b.dataset.i); const a = ask.turns[i]; const q = [...ask.turns.slice(0, i)].reverse().find(m => m.role === 'user'); if (a) { const shown = a.trad && (a.lang || 'es') !== lang ? a.trad : a.texto; upsertEvent({ id: uid(), t: 'nota', ini: now, fin: null, n: `${q ? q.texto + ' → ' : ''}${shown}` }); toast(L.qSaved); } }
@@ -1487,9 +1487,17 @@ Referencias: a los 3 meses son normales 8–12 tomas/24 h, 14–17 h de sueño, 
         </div></div>`;
     };
     draw();
+    let finTouched = false;
+    modalRoot.addEventListener('input', e => {
+      if (e.target.id === 'f-fin') finTouched = true;
+      if (e.target.id === 'f-ini' && draft.t === 'toma' && !finTouched) {
+        const ini = fromLocalInput(e.target.value), finEl = modalRoot.querySelector('#f-fin');
+        if (ini && finEl) finEl.value = toLocalInput(ini + 10 * MIN);
+      }
+    });
     modalRoot.onclick = e => {
       const seg = e.target.closest('.seg button');
-      if (seg) { const f = seg.closest('.seg').dataset.f; draft.ini = fromLocalInput(modalRoot.querySelector('#f-ini').value) ?? draft.ini; draft.n = modalRoot.querySelector('#f-n').value; draft[f] = seg.dataset.v; draw(); return; }
+      if (seg) { const f = seg.closest('.seg').dataset.f; draft.ini = fromLocalInput(modalRoot.querySelector('#f-ini').value) ?? draft.ini; draft.n = modalRoot.querySelector('#f-n').value; draft[f] = seg.dataset.v; if (f === 't' && draft.t === 'toma' && draft.fin == null) draft.fin = draft.ini + 10 * MIN; draw(); return; }
       const m = e.target.closest('[data-m]');
       if (!m) { if (e.target.classList.contains('modal')) close(); return; }
       if (m.dataset.m === 'cancel') return close();
