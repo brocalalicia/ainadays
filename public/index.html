@@ -459,7 +459,7 @@
       kNight2: 'Noche', nightNextSleeping: 'Durmiendo. Si se despierta, toma y de vuelta a dormir; registra la toma con los botones grandes.', nightNextAwake: 'Toma con luz mínima y sin hablar; en cuanto termine, a la cuna. Si no se duerme en 10 min, brazos y shhh, sin encender luces.',
       lateEvening: 'Ya es la hora de dormir: ritual ahora, luz baja, toma completa y a la cuna.',
       // InstAïna
-      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Todavía no hay foto de hoy. Manda una sonrisa a papá.', igCaption: 'Pie de foto (opcional)', igCaptionPh: 'p. ej. se ha reído con el sonajero', igPublish: 'Publicar', igPublishing: 'Subiendo…', igPublished: 'Publicada. Papá ya puede verla.', igDelete: 'Eliminar foto', igDeleted: 'Foto eliminada', igFail: 'No se pudo subir la foto. Inténtalo de nuevo.', igAlbum: 'InstAïna · álbum', igAlbumEmpty: 'Las fotos que mandes irán apareciendo aquí, día a día.', igOnlyOnline: 'InstAïna necesita conexión con el servidor.', qShowFr: 'Voir en français', qHide: 'Ocultar', qMic: 'Hablar', qMicStop: 'Escuchando… toca para parar', qMicFail: 'El micrófono no está disponible en este navegador',
+      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Todavía no hay foto de hoy. Manda una sonrisa a papá.', igCaption: 'Pie de foto (opcional)', igCaptionPh: 'p. ej. se ha reído con el sonajero', igPublish: 'Publicar', igPublishing: 'Subiendo…', igReading: 'Preparando la foto…', igPublished: 'Publicada. Papá ya puede verla.', igDelete: 'Eliminar foto', igDeleted: 'Foto eliminada', igFail: 'No se pudo subir la foto. Inténtalo de nuevo.', igAlbum: 'InstAïna · álbum', igAlbumEmpty: 'Las fotos que mandes irán apareciendo aquí, día a día.', igOnlyOnline: 'InstAïna necesita conexión con el servidor.', qShowFr: 'Voir en français', qHide: 'Ocultar', qMic: 'Hablar', qMicStop: 'Escuchando… toca para parar', qMicFail: 'El micrófono no está disponible en este navegador',
     },
     fr: {
       wd: ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'],
@@ -556,7 +556,7 @@
       kNight2: 'Nuit', nightNextSleeping: 'Elle dort. Si elle se réveille, tétée puis retour au dodo ; enregistre la tétée avec les grands boutons.', nightNextAwake: 'Tétée avec un minimum de lumière et sans parler ; dès la fin, au lit. Si elle ne se rendort pas en 10 min, dans les bras et chhh, sans allumer.',
       lateEvening: 'C’est déjà l’heure du coucher : rituel maintenant, lumière basse, tétée complète et au lit.',
       // InstAïna
-      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Pas encore de photo aujourd’hui. Envoie un sourire à papa.', igCaption: 'Légende (facultatif)', igCaptionPh: 'ex. elle a ri avec le hochet', igPublish: 'Publier', igPublishing: 'Envoi…', igPublished: 'Publiée. Papa peut la voir.', igDelete: 'Supprimer la photo', igDeleted: 'Photo supprimée', igFail: 'Impossible d’envoyer la photo. Réessaie.', igAlbum: 'InstAïna · album', igAlbumEmpty: 'Les photos que tu envoies apparaîtront ici, jour après jour.', igOnlyOnline: 'InstAïna a besoin de la connexion au serveur.', qShowFr: 'Ver en español', qHide: 'Masquer', qMic: 'Parler', qMicStop: 'À l’écoute… touche pour arrêter', qMicFail: 'Le micro n’est pas disponible dans ce navigateur',
+      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Pas encore de photo aujourd’hui. Envoie un sourire à papa.', igCaption: 'Légende (facultatif)', igCaptionPh: 'ex. elle a ri avec le hochet', igPublish: 'Publier', igPublishing: 'Envoi…', igReading: 'Préparation de la photo…', igPublished: 'Publiée. Papa peut la voir.', igDelete: 'Supprimer la photo', igDeleted: 'Photo supprimée', igFail: 'Impossible d’envoyer la photo. Réessaie.', igAlbum: 'InstAïna · album', igAlbumEmpty: 'Les photos que tu envoies apparaîtront ici, jour après jour.', igOnlyOnline: 'InstAïna a besoin de la connexion au serveur.', qShowFr: 'Ver en español', qHide: 'Masquer', qMic: 'Parler', qMicStop: 'À l’écoute… touche pour arrêter', qMicFail: 'Le micro n’est pas disponible dans ce navigateur',
     },
   };
   let lang = 'es';
@@ -1348,18 +1348,24 @@
         URL.revokeObjectURL(url);
         resolve(cv.toDataURL('image/jpeg', 0.82));
       };
-      im.onerror = reject; im.src = url;
+      im.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode')); }; im.src = url;
     });
   }
+  // El selector de archivos vive en la página (en iOS Safari, uno creado al vuelo se pierde antes de avisar)
+  const photoInput = document.createElement('input');
+  photoInput.type = 'file'; photoInput.accept = 'image/*'; photoInput.hidden = true; photoInput.id = 'ig-file';
+  document.body.appendChild(photoInput);
+  photoInput.addEventListener('change', async () => {
+    const f = photoInput.files && photoInput.files[0];
+    photoInput.value = '';
+    if (!f) return;
+    toast(L.igReading);
+    let data; try { data = await shrinkImage(f); } catch { toast(L.igFail); return; }
+    openPhotoSheet({ data });
+  });
   function pickPhoto() {
     if (!api) { toast(L.igOnlyOnline); return; }
-    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
-    inp.onchange = async () => {
-      const f = inp.files && inp.files[0]; if (!f) return;
-      let data; try { data = await shrinkImage(f); } catch { toast(L.igFail); return; }
-      openPhotoSheet({ data });
-    };
-    inp.click();
+    photoInput.click();
   }
   function openPhotoSheet(ph) {
     // ph: { data } para publicar una nueva, o { id, nota, ts } para ver/eliminar una existente
