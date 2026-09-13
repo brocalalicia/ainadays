@@ -439,7 +439,11 @@
       tipFeeds: 'tomas', tipHours: 'h', night: 'noche del', pending: 'noche en curso',
       // Consejo
       qTitle: 'Baby Help', qPlaceholder: 'p. ej. juega en el parque, se frota la cara y grita un poco… o precisa algo', qAsk: 'Enviar', qNew: 'Nueva conversación', qThinking: 'Pensando…', qSaveNote: 'Guardar', qSaved: 'Guardado como nota', qByClaude: 'Respuesta de Claude', qByRules: 'Respuesta de la app', qFail: 'No he podido responder; inténtalo de nuevo.',
-      qNeedText: 'Cuéntame qué está haciendo', qShowFr: 'Voir en français', qHide: 'Ocultar', qMic: 'Hablar', qMicStop: 'Escuchando… toca para parar', qMicFail: 'El micrófono no está disponible en este navegador',
+      qNeedText: 'Cuéntame qué está haciendo',
+      nightSleepHint: 'Es de noche. Si se despierta: toma con luz mínima, sin hablar ni jugar, y de vuelta a dormir. Pañal solo si hace falta.',
+      nightAwakeHint: 'Es de noche: no cuenta como ventana de vigilia. Toma tranquila con luz mínima, sin estímulos, y a dormir otra vez en cuanto suelte el pecho.',
+      kNight2: 'Noche', nightNextSleeping: 'Durmiendo. Si se despierta, toma y de vuelta a dormir; registra la toma con los botones grandes.', nightNextAwake: 'Toma con luz mínima y sin hablar; en cuanto termine, a la cuna. Si no se duerme en 10 min, brazos y shhh, sin encender luces.',
+      lateEvening: 'Ya es la hora de dormir: ritual ahora, luz baja, toma completa y a la cuna.', qShowFr: 'Voir en français', qHide: 'Ocultar', qMic: 'Hablar', qMicStop: 'Escuchando… toca para parar', qMicFail: 'El micrófono no está disponible en este navegador',
     },
     fr: {
       wd: ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'],
@@ -530,7 +534,11 @@
       tipFeeds: 'tétées', tipHours: 'h', night: 'nuit du', pending: 'nuit en cours',
       // Conseil
       qTitle: 'Baby Help', qPlaceholder: 'ex. elle joue sur le tapis, se frotte le visage et crie un peu… ou précise quelque chose', qAsk: 'Envoyer', qNew: 'Nouvelle conversation', qThinking: 'Réflexion…', qSaveNote: 'Enregistrer', qSaved: 'Enregistré comme note', qByClaude: 'Réponse de Claude', qByRules: 'Réponse de l’appli', qFail: 'Je n’ai pas pu répondre ; réessaie.',
-      qNeedText: 'Dis-moi ce qu’elle fait', qShowFr: 'Ver en español', qHide: 'Masquer', qMic: 'Parler', qMicStop: 'À l’écoute… touche pour arrêter', qMicFail: 'Le micro n’est pas disponible dans ce navigateur',
+      qNeedText: 'Dis-moi ce qu’elle fait',
+      nightSleepHint: 'C’est la nuit. Si elle se réveille : tétée avec un minimum de lumière, sans parler ni jouer, puis retour au lit. Couche seulement si nécessaire.',
+      nightAwakeHint: 'C’est la nuit : ça ne compte pas comme fenêtre d’éveil. Tétée calme, lumière minimale, sans stimulation, et retour au dodo dès qu’elle lâche le sein.',
+      kNight2: 'Nuit', nightNextSleeping: 'Elle dort. Si elle se réveille, tétée puis retour au dodo ; enregistre la tétée avec les grands boutons.', nightNextAwake: 'Tétée avec un minimum de lumière et sans parler ; dès la fin, au lit. Si elle ne se rendort pas en 10 min, dans les bras et chhh, sans allumer.',
+      lateEvening: 'C’est déjà l’heure du coucher : rituel maintenant, lumière basse, tétée complète et au lit.', qShowFr: 'Ver en español', qHide: 'Masquer', qMic: 'Parler', qMicStop: 'À l’écoute… touche pour arrêter', qMicFail: 'Le micro n’est pas disponible dans ce navigateur',
     },
   };
   let lang = 'es';
@@ -560,6 +568,8 @@
 
   // Ventana de vigilia orientativa a los 3 meses (minutos)
   const WAKE_OK = 75, WAKE_WARN = 105, WAKE_MAX = 120;
+  // Noche: de 19:30 a 07:00 no hay ventanas de vigilia, solo toma y vuelta a dormir
+  const isNight = ms => { const d = new Date(ms); const h = d.getHours() + d.getMinutes() / 60; return h >= 19.5 || h < 7; };
 
   // ---------- Estado ----------
   let days = {};          // id -> { fecha, ev: [...] }
@@ -731,12 +741,14 @@
     }
     // Siguiente paso
     let next = null;
-    if (wake) {
+    if (isNight(now)) next = { k: L.kNight2, what: napping ? L.nightNextSleeping : L.nightNextAwake };
+    else if (wake) {
       const lastEnd = napDone.length ? napDone[napDone.length - 1].fin : wake;
       const target = Math.max(s + 19 * H, Math.min(s + 20.5 * H, lastEnd + 105 * MIN));
       if (napping) next = { k: L.kNow, what: L.nowNap };
       else if (now < target && now > s + 16 * H) next = { k: L.kTonight, what: L.tonightAt(fmtTime(target - 25 * MIN), fmtTime(target), fmtTime(target - 90 * MIN)) };
-      else if (now < s + 16 * H) next = { k: L.kTonight, what: L.tonightGoal };
+      else if (now >= target) next = { k: L.kTonight, what: L.lateEvening };
+      else next = { k: L.kTonight, what: L.tonightGoal };
     }
     return { rows, notes, next };
   }
@@ -793,10 +805,15 @@
     const lastToma = [...evs].reverse().find(e => e.t === 'toma' && e.fin != null);
 
     let statusHTML;
+    const night = isNight(now);
     if (sueno) {
       statusHTML = `<div class="eyebrow">${L.sleeping}</div>
         <div class="big">${fmtDur(now - sueno.ini)}<small>${L.since(fmtTime(sueno.ini))}</small></div>
-        <div class="hint">${now - sueno.ini < 40 * MIN ? L.hintShortNap : L.hintGoodNap}</div>`;
+        <div class="hint">${night ? L.nightSleepHint : now - sueno.ini < 40 * MIN ? L.hintShortNap : L.hintGoodNap}</div>`;
+    } else if (lastSleep && night) {
+      statusHTML = `<div class="eyebrow">${L.awake}</div>
+        <div class="big">${fmtDur(now - lastSleep.fin)}<small>${L.since(fmtTime(lastSleep.fin))}</small></div>
+        <div class="hint">${L.nightAwakeHint}</div>`;
     } else if (lastSleep) {
       const awake = now - lastSleep.fin, m = awake / MIN;
       const cls = m < WAKE_OK ? '' : m < WAKE_WARN ? 'warn' : 'bad';
@@ -823,11 +840,11 @@
       : `<div class="row one"><button class="btn-big sueno" data-act="start-sueno"><span class="lbl">${L.fellAsleep}</span><span class="sub">${L.startCount}</span></button></div>`;
 
     const st = dayStats(evs, today);
-    const night = nightStats(evs, shiftDay(today, -1));
+    const lastN = nightStats(evs, shiftDay(today, -1));
     const statsHTML = `<div class="stats">
       <div class="stat"><div class="v">${st.tomas}<small> · ${fmtDur(st.tomaMin)}</small></div><div class="k">${L.feedsToday}</div></div>
       <div class="stat"><div class="v">${fmtHours(st.sueno)}<small> ${L.h}</small></div><div class="k">${L.sleepToday(st.siestas)}</div></div>
-      <div class="stat"><div class="v">${night ? (night.feeds + `<small> ${L.feedsUnit}</small>`) : '—'}</div><div class="k">${L.lastNight} · ${night ? L.longestMax(fmtDur(night.longest)) : L.noData}</div></div>
+      <div class="stat"><div class="v">${lastN ? (lastN.feeds + `<small> ${L.feedsUnit}</small>`) : '—'}</div><div class="k">${L.lastNight} · ${lastN ? L.longestMax(fmtDur(lastN.longest)) : L.noData}</div></div>
     </div>`;
 
     const ins = dayInsights(evs, today);
@@ -1324,7 +1341,7 @@
   function contextText(c) {
     const fr = lang === 'fr';
     const lines = [];
-    lines.push(`${fr ? 'Heure' : 'Hora'}: ${fmtTime(c.now)}`);
+    lines.push(`${fr ? 'Heure' : 'Hora'}: ${fmtTime(c.now)}${isNight(c.now) ? (fr ? ' (nuit : pas de fenêtre d’éveil, tétée et retour au dodo)' : ' (noche: no hay ventana de vigilia, toma y vuelta a dormir)') : ''}`);
     if (c.sleeping) lines.push(fr ? 'Elle dort en ce moment.' : 'Está durmiendo ahora mismo.');
     else if (c.awakeMin != null) lines.push(`${fr ? 'Éveillée depuis' : 'Despierta desde hace'} ${fmtDur(c.awakeMin * MIN)}`);
     if (c.lastNapMin != null) lines.push(`${fr ? 'Dernier sommeil' : 'Último sueño'}: ${fmtDur(c.lastNapMin * MIN)}`);
@@ -1346,6 +1363,7 @@
     const awake = c.awakeMin ?? 0, feedAgo = c.sinceFeedMin ?? 999;
     const napAt = c.awakeMin != null ? fmtTime(c.now + Math.max(0, 75 - awake) * MIN) : null;
     const P = (es, f) => fr ? f : es;
+    if (isNight(c.now) && !c.sleeping) return P(`Es de noche: no cuenta como ventana de vigilia. ${hungry || feedAgo > 90 ? 'Toma' : 'Si busca, toma'} con luz mínima, sin hablar ni jugar${crying ? ', y si llora al soltar el pecho, brazos pegada a ti con shhh, sin encender luces' : ''}. Pañal solo si hay caca o está empapado, y antes de la toma. En cuanto se relaje, a la cuna aunque no esté dormida del todo.`, `C’est la nuit : ça ne compte pas comme fenêtre d’éveil. ${hungry || feedAgo > 90 ? 'Tétée' : 'Si elle cherche, tétée'} avec un minimum de lumière, sans parler ni jouer${crying ? ', et si elle pleure en lâchant le sein, dans les bras contre toi avec chhh, sans allumer' : ''}. Couche seulement s’il y a du caca ou si elle est trempée, et avant la tétée. Dès qu’elle se détend, au lit même pas tout à fait endormie.`);
     if (c.sleeping) return P('Está durmiendo: déjala. Si se despierta antes de 40 min, prueba a volver a dormirla en el sitio (mano en el pecho, shhh) antes de sacarla. Cuando se despierte de verdad: toma primero, luego actividad.', 'Elle dort : laisse-la. Si elle se réveille avant 40 min, essaie de la rendormir sur place (main sur la poitrine, chhh) avant de la lever. Au vrai réveil : tétée d’abord, puis activité.');
     if (awake > 120) return P(`Lleva ${fmtDur(awake * MIN)} despierta: está pasada de vueltas y por eso cuesta más. Baja luz y ruido ya, sin juego. ${feedAgo > 90 ? 'Ofrécele pecho en un sitio tranquilo y ' : ''}duérmela en brazos o portabebés con balanceo y sonido shhh. Si llora fuerte, no es hambre de estímulos: es sueño.`, `Éveillée depuis ${fmtDur(awake * MIN)} : elle est surstimulée, d’où la difficulté. Baisse lumière et bruit tout de suite, plus de jeu. ${feedAgo > 90 ? 'Propose le sein au calme et ' : ''}endors-la dans les bras ou en porte-bébé, balancement et chhh. Si elle pleure fort, ce n’est pas un besoin de stimulation : c’est du sommeil.`);
     if (sleepy && awake >= 40) return P(`Señales de sueño con ${fmtDur(awake * MIN)} despierta: es el momento, no esperes a la ventana teórica. Sácala del juego, baja luz y ruido${feedAgo > 90 ? `, ofrécele pecho (lleva ${fmtDur(feedAgo * MIN)} sin tomar) y probablemente se duerma en él` : ''}. Si en 10–15 min no cae, en brazos o portabebés con balanceo suave.`, `Signes de fatigue après ${fmtDur(awake * MIN)} d’éveil : c’est le moment, n’attends pas la fenêtre théorique. Sors-la du jeu, baisse lumière et bruit${feedAgo > 90 ? `, propose le sein (dernière tétée il y a ${fmtDur(feedAgo * MIN)}) et elle s’endormira probablement dessus` : ''}. Si elle ne s’endort pas en 10–15 min, dans les bras ou en porte-bébé, balancement doux.`);
