@@ -6,6 +6,10 @@
 //   PUT  /api/dias/:fecha         -> fusiona el documento del día (evento a evento) y devuelve { ok, doc }
 //                                    (?replace=1 sustituye el día entero, para importaciones)
 //   DELETE /api/dias/:fecha       -> borra el día
+//   GET  /api/momentos?desde=ISO  -> { momentos: [{ id, ts, nota, bytes }] }   (InstAïna)
+//   GET  /api/momentos/:id/img    -> la imagen (JPEG)
+//   POST /api/momentos            -> { nota, data: 'data:image/jpeg;base64,...' } → { ok, id }
+//   DELETE /api/momentos/:id
 //   POST /api/consejo             -> { lang, contexto, mensajes: [{role, texto}] } → { fuente: 'claude'|'reglas', texto?, traduccion? }
 //                                    (usa la API de Claude si hay ANTHROPIC_API_KEY; si no, la app responde con reglas)
 //
@@ -42,12 +46,23 @@ async function migrate() {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
     );
   `);
+  // InstAïna: fotos del día (comprimidas en el móvil, ~200 KB cada una)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS momentos (
+      id         BIGSERIAL PRIMARY KEY,
+      ts         TIMESTAMPTZ NOT NULL DEFAULT now(),
+      nota       TEXT NOT NULL DEFAULT '',
+      mime       TEXT NOT NULL DEFAULT 'image/jpeg',
+      img        BYTEA NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS momentos_ts ON momentos (ts DESC);
+  `);
 }
 
 const FECHA = /^\d{4}-\d{2}-\d{2}$/;
 const app = express();
 app.disable('x-powered-by');
-app.use(express.json({ limit: '512kb' }));
+app.use(express.json({ limit: '3mb' }));
 
 // Autenticación: cabecera "Authorization: Bearer <APP_KEY>". Sin APP_KEY, abierto.
 app.use('/api', (req, res, next) => {
@@ -127,6 +142,39 @@ app.put('/api/dias/:fecha', async (req, res) => {
 app.delete('/api/dias/:fecha', async (req, res) => {
   if (!FECHA.test(req.params.fecha)) return res.status(400).json({ error: 'fecha inválida' });
   await pool.query('DELETE FROM dias WHERE fecha = $1', [req.params.fecha]);
+  res.json({ ok: true });
+});
+
+// ---------- InstAïna ----------
+app.get('/api/momentos', async (req, res) => {
+  const desde = req.query.desde ? new Date(String(req.query.desde)) : new Date(Date.now() - 35 * 86400000);
+  const { rows } = await pool.query(
+    `SELECT id, ts, nota, octet_length(img) AS bytes FROM momentos WHERE ts >= $1 ORDER BY ts DESC LIMIT 200`,
+    [isNaN(desde) ? new Date(0) : desde],
+  );
+  res.json({ momentos: rows });
+});
+
+app.get('/api/momentos/:id/img', async (req, res) => {
+  const { rows } = await pool.query('SELECT mime, img FROM momentos WHERE id = $1', [req.params.id]);
+  if (!rows.length) return res.status(404).end();
+  res.setHeader('Content-Type', rows[0].mime);
+  res.setHeader('Cache-Control', 'private, max-age=31536000, immutable');
+  res.send(rows[0].img);
+});
+
+app.post('/api/momentos', async (req, res) => {
+  const { nota = '', data = '' } = req.body || {};
+  const m = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/.exec(String(data));
+  if (!m) return res.status(400).json({ error: 'imagen inválida' });
+  const img = Buffer.from(m[2], 'base64');
+  if (img.length > 2 * 1024 * 1024) return res.status(413).json({ error: 'imagen demasiado grande (máx. 2 MB)' });
+  const { rows } = await pool.query('INSERT INTO momentos (nota, mime, img) VALUES ($1, $2, $3) RETURNING id, ts', [String(nota).slice(0, 300), m[1], img]);
+  res.json({ ok: true, id: rows[0].id, ts: rows[0].ts });
+});
+
+app.delete('/api/momentos/:id', async (req, res) => {
+  await pool.query('DELETE FROM momentos WHERE id = $1', [req.params.id]);
   res.json({ ok: true });
 });
 
