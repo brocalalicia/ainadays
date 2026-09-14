@@ -1,3 +1,26 @@
+  function startDictation(textareaId, onEnd) {
+    if (!SR) { toast(L.qMicFail); return; }
+    if (rec) { rec.stop(); return; }
+    const ta = document.getElementById(textareaId);
+    recBase = ta ? ta.value.trim() : '';
+    rec = new SR();
+    rec.lang = lang === 'fr' ? 'fr-FR' : 'es-ES';
+    rec.interimResults = true; rec.continuous = true;
+    rec.onresult = ev => {
+      let finalTxt = '', interim = '';
+      for (let i = 0; i < ev.results.length; i++) { const r = ev.results[i]; if (r.isFinal) finalTxt += r[0].transcript + ' '; else interim += r[0].transcript; }
+      const t = document.getElementById(textareaId); if (t) t.value = (recBase + ' ' + finalTxt + interim).trim();
+    };
+    rec.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast(L.qMicFail); };
+    rec.onend = () => { rec = null; onEnd && onEnd(); };
+    try { rec.start(); } catch { rec = null; toast(L.qMicFail); }
+  }
+  function toggleMic() {
+    if (rec) { rec.stop(); return; }
+    startDictation('q-text', () => { ask.listening = false; const t = document.getElementById('q-text'); if (t) ask.text = t.value; render(); });
+    ask.listening = true; render();
+  }
+
 <!doctype html>
 <html lang="es">
 <head>
@@ -323,6 +346,8 @@
   .field input, .field select, .field textarea { font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--text); width: 100%; }
   .seg { display: grid; grid-auto-flow: column; gap: 6px; }
   .seg button { border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 10px; font-weight: 700; }
+  .seg.big2 button { padding: 14px 10px; font-size: 17px; display: grid; gap: 2px; }
+  .seg.big2 button small { font-size: 12px; font-weight: 400; color: var(--muted); }
   .seg button[aria-pressed="true"] { background: var(--sueno-soft); border-color: var(--sueno); color: var(--sueno-ink); }
   .sheet .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
   .sheet .btns .primary { background: var(--sueno); color: #fff; border: 0; border-radius: 12px; padding: 13px; font-weight: 700; }
@@ -454,6 +479,11 @@
       // Consejo
       qTitle: 'Baby Help', qPlaceholder: 'p. ej. juega en el parque, se frota la cara y grita un poco… o precisa algo', qAsk: 'Enviar', qNew: 'Nueva conversación', qThinking: 'Pensando…', qSaveNote: 'Guardar', qSaved: 'Guardado como nota', qByClaude: 'Respuesta de Claude', qByRules: 'Respuesta de la app', qFail: 'No he podido responder; inténtalo de nuevo.',
       qNeedText: 'Cuéntame qué está haciendo',
+      // Tomas rápidas
+      fHow: '¿Cómo ha sido la toma?', fShort: 'Corta', fLong: 'Larga', fShortSub: '≈ 8 min', fLongSub: '≈ 20 min', fWhen: '¿Cuándo ha terminado?', fNow: 'Ahora', fAgo: n => `Hace ${n} min`, fAgoH: 'Hace 1 h', fSaved: (side, d) => `Toma ${side} ${d} guardada`, durShort: 'corta', durLong: 'larga', approx: '≈',
+      // Registro por voz
+      vBtn: '🎤 Registrar', vTitle: 'Registrar por voz', vHint: 'Di qué ha pasado, por ejemplo: «se acaba de dormir después de una toma corta y cambiarle el pañal»', vPh: 'o escríbelo aquí', vInterpret: 'Interpretar', vInterpreting: 'Interpretando…', vProposal: 'Voy a registrar esto:', vSave: 'Guardar', vNothing: 'No he entendido ningún registro. Prueba con «toma corta», «se ha dormido», «se ha despertado», «pañal con caca»…', vSavedN: n => `${n} registro${n === 1 ? '' : 's'} guardado${n === 1 ? '' : 's'}`, vFail: 'No se pudo interpretar; inténtalo de nuevo.',
+      evWake: 'Se despierta', evSleepStart: 'Se duerme', vAgo: n => n === 0 ? 'ahora' : `hace ${n} min`,
       nightSleepHint: 'Es de noche. Si se despierta: toma con luz mínima, sin hablar ni jugar, y de vuelta a dormir. Pañal solo si hace falta.',
       nightAwakeHint: 'Es de noche: no cuenta como ventana de vigilia. Toma tranquila con luz mínima, sin estímulos, y a dormir otra vez en cuanto suelte el pecho.',
       kNight2: 'Noche', nightNextSleeping: 'Durmiendo. Si se despierta, toma y de vuelta a dormir; registra la toma con los botones grandes.', nightNextAwake: 'Toma con luz mínima y sin hablar; en cuanto termine, a la cuna. Si no se duerme en 10 min, brazos y shhh, sin encender luces.',
@@ -551,6 +581,11 @@
       // Conseil
       qTitle: 'Baby Help', qPlaceholder: 'ex. elle joue sur le tapis, se frotte le visage et crie un peu… ou précise quelque chose', qAsk: 'Envoyer', qNew: 'Nouvelle conversation', qThinking: 'Réflexion…', qSaveNote: 'Enregistrer', qSaved: 'Enregistré comme note', qByClaude: 'Réponse de Claude', qByRules: 'Réponse de l’appli', qFail: 'Je n’ai pas pu répondre ; réessaie.',
       qNeedText: 'Dis-moi ce qu’elle fait',
+      // Tétées rapides
+      fHow: 'Comment était la tétée ?', fShort: 'Courte', fLong: 'Longue', fShortSub: '≈ 8 min', fLongSub: '≈ 20 min', fWhen: 'Quand s’est-elle terminée ?', fNow: 'Maintenant', fAgo: n => `Il y a ${n} min`, fAgoH: 'Il y a 1 h', fSaved: (side, d) => `Tétée ${side} ${d} enregistrée`, durShort: 'courte', durLong: 'longue', approx: '≈',
+      // Enregistrement vocal
+      vBtn: '🎤 Enregistrer', vTitle: 'Enregistrer à la voix', vHint: 'Dis ce qui s’est passé, par exemple : « elle vient de s’endormir après une tétée courte et un change »', vPh: 'ou écris-le ici', vInterpret: 'Interpréter', vInterpreting: 'Interprétation…', vProposal: 'Je vais enregistrer ceci :', vSave: 'Enregistrer', vNothing: 'Je n’ai reconnu aucun enregistrement. Essaie « tétée courte », « elle s’est endormie », « elle s’est réveillée », « couche avec caca »…', vSavedN: n => `${n} enregistrement${n === 1 ? '' : 's'} sauvegardé${n === 1 ? '' : 's'}`, vFail: 'Impossible d’interpréter ; réessaie.',
+      evWake: 'Réveil', evSleepStart: 'Endormie', vAgo: n => n === 0 ? 'maintenant' : `il y a ${n} min`,
       nightSleepHint: 'C’est la nuit. Si elle se réveille : tétée avec un minimum de lumière, sans parler ni jouer, puis retour au lit. Couche seulement si nécessaire.',
       nightAwakeHint: 'C’est la nuit : ça ne compte pas comme fenêtre d’éveil. Tétée calme, lumière minimale, sans stimulation, et retour au dodo dès qu’elle lâche le sein.',
       kNight2: 'Nuit', nightNextSleeping: 'Elle dort. Si elle se réveille, tétée puis retour au dodo ; enregistre la tétée avec les grands boutons.', nightNextAwake: 'Tétée avec un minimum de lumière et sans parler ; dès la fin, au lit. Si elle ne se rendort pas en 10 min, dans les bras et chhh, sans allumer.',
@@ -587,6 +622,7 @@
   // Ventana de vigilia orientativa a los 3 meses (minutos)
   const WAKE_OK = 75, WAKE_WARN = 105, WAKE_MAX = 120;
   // Noche: de 19:30 a 07:00 no hay ventanas de vigilia, solo toma y vuelta a dormir
+  const DUR_SHORT = 8, DUR_LONG = 20; // minutos, tomas aproximadas
   const isNight = ms => { const d = new Date(ms); const h = d.getHours() + d.getMinutes() / 60; return h >= 19.5 || h < 7; };
 
   // ---------- Estado ----------
@@ -849,10 +885,8 @@
       ? `<div class="last-row"><span>${L.lastFeed(fmtDur(now - lastToma.fin), fmtTime(lastToma.ini), L.sideShort[lastToma.lado] || '', fmtDur(lastToma.fin - lastToma.ini))}</span>${nextSide ? `<span>${L.nextSide(L.side[nextSide])}</span>` : ''}</div>`
       : '';
 
-    const tomaBtns = toma
-      ? `<div class="row one"><button class="btn-big toma live" data-act="stop-toma"><span class="lbl">${L.endFeed}</span><span class="sub">${L.side[toma.lado] || ''} · ${fmtDur(now - toma.ini)} · ${L.started(fmtTime(toma.ini))}</span></button></div>`
-      : `<div class="row"><button class="btn-big toma" data-act="start-toma" data-lado="I"><span class="lbl">${L.feedL}</span><span class="sub">${nextSide === 'I' ? L.yourTurn : L.startNow}</span></button>
-         <button class="btn-big toma" data-act="start-toma" data-lado="D"><span class="lbl">${L.feedR}</span><span class="sub">${nextSide === 'D' ? L.yourTurn : L.startNow}</span></button></div>`;
+    const tomaBtns = `<div class="row"><button class="btn-big toma" data-act="quick-toma" data-lado="I"><span class="lbl">${L.feedL}</span><span class="sub">${nextSide === 'I' ? L.yourTurn : L.fHow}</span></button>
+         <button class="btn-big toma" data-act="quick-toma" data-lado="D"><span class="lbl">${L.feedR}</span><span class="sub">${nextSide === 'D' ? L.yourTurn : L.fHow}</span></button></div>`;
     const suenoBtn = sueno
       ? `<div class="row one"><button class="btn-big sueno live" data-act="stop-sueno"><span class="lbl">${L.wokeUp}</span><span class="sub">${L.sleptSince(fmtTime(sueno.ini), fmtDur(now - sueno.ini))}</span></button></div>`
       : `<div class="row one"><button class="btn-big sueno" data-act="start-sueno"><span class="lbl">${L.fellAsleep}</span><span class="sub">${L.startCount}</span></button></div>`;
@@ -883,12 +917,12 @@
     const s = dayStart(today);
     const listEvs = evs.filter(e => e.ini >= s - 5 * H && (e.ini >= s || (e.fin ?? now) >= s)).reverse();
     const listHTML = listEvs.length ? `<div class="list">${listEvs.map(e => {
-      const desc = e.t === 'toma' ? `${L.evFeed} · ${L.side[e.lado] || ''}`
+      const desc = e.t === 'toma' ? `${L.evFeed} · ${L.side[e.lado] || ''}${e.dur ? ' · ' + (e.dur === 'larga' ? L.durLong : L.durShort) : ''}`
         : e.t === 'sueno' ? L.evSleep
         : e.t === 'panal' ? `${L.evDiaper} · ${e.p === 'caca' ? L.pooOnly : e.p === 'ambos' ? L.both : L.peeOnly}`
         : L.evNote;
       const dur = e.fin == null && (e.t === 'toma' || e.t === 'sueno') ? `<span class="live">${L.ongoing}</span>`
-        : e.t === 'toma' || e.t === 'sueno' ? fmtDur(e.fin - e.ini) : '';
+        : e.t === 'toma' || e.t === 'sueno' ? `${e.aprox ? L.approx + ' ' : ''}${fmtDur(e.fin - e.ini)}` : '';
       return `<button class="item" data-edit="${e.id}"><span class="t">${fmtTime(e.ini)}</span><span class="dot ${e.t}"></span><span>${desc}${e.n ? ` <span class="d">· ${esc(e.n)}</span>` : ''}</span><span class="d">${dur}</span></button>`;
     }).join('')}</div>` : `<div class="empty">${L.emptyToday}</div>`;
 
@@ -901,6 +935,7 @@
           <button class="chip panal" data-act="panal" data-p="caca">${L.poo}</button>
           <button class="chip" data-act="nota">${L.note}</button>
           <button class="chip" data-act="manual">${L.manual}</button>
+          <button class="chip" data-act="voice-log">${L.vBtn}</button>
           ${api ? `<button class="chip" data-act="ig-add">${L.igBtn}</button>` : ''}
         </div>
       </div>
@@ -1225,7 +1260,8 @@
 
       <h3>Cómo usar esta app cada día</h3>
       <ul>
-        <li>Pulsa <b>Toma · Izq/Der</b> al enganchar y <b>Terminar toma</b> al soltar. La app te dice qué pecho toca.</li>
+        <li>Pulsa <b>Toma · Izq/Der</b> cuando termine y di si fue <b>corta o larga</b>; no hace falta cronometrar. La app te dice qué pecho toca.</li>
+        <li><b>🎤 Registrar</b>: cuéntalo con tu voz («se acaba de dormir después de una toma corta y cambiarle el pañal») y la app crea los registros.</li>
         <li>Pulsa <b>Se ha dormido</b> / <b>Se ha despertado</b>. La barra de vigilia te avisa de cuándo dormirla.</li>
         <li>Se te ha pasado algo: <b>+ Añadir a mano</b>, o toca un registro para corregir la hora.</li>
         <li>El domingo mira <b>Semana</b> y elige <em>un</em> cambio para la semana siguiente. Uno solo.</li>
@@ -1308,7 +1344,8 @@
 
       <h3>Utiliser l’appli au quotidien</h3>
       <ul>
-        <li>Appuie sur <b>Tétée · G/D</b> à la mise au sein et <b>Terminer la tétée</b> à la fin. L’appli te dit quel sein est au tour.</li>
+        <li>Appuie sur <b>Tétée · G/D</b> à la fin et dis si elle était <b>courte ou longue</b> ; pas besoin de chronométrer. L’appli te dit quel sein est au tour.</li>
+        <li><b>🎤 Enregistrer</b> : raconte-le à la voix (« elle vient de s’endormir après une tétée courte et un change ») et l’appli crée les enregistrements.</li>
         <li>Appuie sur <b>Elle s’est endormie</b> / <b>Elle s’est réveillée</b>. La barre d’éveil te dit quand la coucher.</li>
         <li>Un oubli : <b>+ Ajouter à la main</b>, ou touche une ligne pour corriger l’heure.</li>
         <li>Le dimanche, regarde <b>Semaine</b> et choisis <em>un</em> changement pour la semaine suivante. Un seul.</li>
@@ -1316,6 +1353,117 @@
     </div>`,
   };
   function renderGuia() { main.innerHTML = GUIDE[lang]; }
+
+  // ---------- Toma rápida (dos toques): corta/larga + cuándo terminó ----------
+  function openQuickFeed(lado) {
+    const q = { dur: 'corta', ago: 0 };
+    const draw = () => {
+      modalRoot.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-label="${L.evFeed}"><div class="sheet">
+        <h3>${L.evFeed} · ${L.side[lado]}</h3>
+        <div class="field"><label>${L.fHow}</label><div class="seg big2">
+          <button aria-pressed="${q.dur === 'corta'}" data-q="dur" data-v="corta">${L.fShort}<small>${L.fShortSub}</small></button>
+          <button aria-pressed="${q.dur === 'larga'}" data-q="dur" data-v="larga">${L.fLong}<small>${L.fLongSub}</small></button></div></div>
+        <div class="field"><label>${L.fWhen}</label><div class="seg">
+          ${[[0, L.fNow], [15, L.fAgo(15)], [30, L.fAgo(30)], [60, L.fAgoH]].map(([m, t]) => `<button aria-pressed="${q.ago === m}" data-q="ago" data-v="${m}">${t}</button>`).join('')}</div></div>
+        <div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button><button class="primary" data-m="save">${L.save}</button></div>
+      </div></div>`;
+    };
+    draw();
+    const close = () => { modalRoot.innerHTML = ''; modalRoot.onclick = null; };
+    modalRoot.onclick = e => {
+      const qb = e.target.closest('[data-q]'); if (qb) { q[qb.dataset.q] = qb.dataset.q === 'ago' ? Number(qb.dataset.v) : qb.dataset.v; draw(); return; }
+      const m = e.target.closest('[data-m]');
+      if (!m) { if (e.target.classList.contains('modal')) close(); return; }
+      if (m.dataset.m === 'cancel') return close();
+      const fin = Date.now() - q.ago * MIN, mins = q.dur === 'larga' ? DUR_LONG : DUR_SHORT;
+      upsertEvent({ id: uid(), t: 'toma', ini: fin - mins * MIN, fin, lado, dur: q.dur, aprox: true });
+      close(); toast(L.fSaved(L.side[lado], q.dur === 'larga' ? L.durLong : L.durShort));
+    };
+  }
+
+  // ---------- Registro por voz ----------
+  // Reglas locales (sin Claude): reconoce toma / dormir / despertar / pañal en una frase
+  function parseLogRules(text) {
+    const t = text.toLowerCase(), ev = [];
+    const agoM = /hace\s+(\d+)\s*min|il y a\s+(\d+)\s*min/.exec(t); const agoH = /hace\s+(?:una|1)\s*hora|il y a\s+(?:une|1)\s*heure|hace media hora|il y a une demi-heure/.exec(t);
+    const base = agoM ? Number(agoM[1] || agoM[2]) : agoH ? (/media|demi/.test(agoH[0]) ? 30 : 60) : 0;
+    const hasFeed = /toma|tetée|tétée|pecho|sein|mam[óo]|tété/.test(t);
+    const hasSleep = /dormid|duerme|dormir|endormi|dort/.test(t) && !/despert|réveil/.test(t) || /se acaba de dormir|vient de s.endormir/.test(t);
+    const hasWake = /despert|réveill/.test(t);
+    const hasDiaper = /pañal|panal|couche|pip[ií]|caca/.test(t);
+    const lado = /izq|gauche/.test(t) ? 'I' : /der|droit/.test(t) ? 'D' : /ambos|los dos|deux/.test(t) ? 'A' : '';
+    const dur = /larga|longue/.test(t) ? 'larga' : /corta|courte/.test(t) ? 'corta' : '';
+    const panal = /caca/.test(t) ? (/pip/.test(t) ? 'ambos' : 'caca') : 'pipi';
+    // orden aproximado: pañal y toma antes del sueño
+    if (hasDiaper) ev.push({ tipo: 'panal', hace_min: base + (hasSleep ? 8 : 0), lado: '', duracion: '', panal, texto: '' });
+    if (hasFeed) ev.push({ tipo: 'toma', hace_min: base + (hasSleep ? 5 : 0), lado, duracion: dur, panal: '', texto: '' });
+    if (hasWake) ev.push({ tipo: 'despertar', hace_min: base, lado: '', duracion: '', panal: '', texto: '' });
+    if (hasSleep) ev.push({ tipo: 'sueno', hace_min: base, lado: '', duracion: '', panal: '', texto: '' });
+    return ev;
+  }
+  function describeProposed(e) {
+    const when = L.vAgo(e.hace_min);
+    if (e.tipo === 'toma') return `${L.evFeed}${e.lado ? ' · ' + L.side[e.lado] : ''}${e.duracion ? ' · ' + (e.duracion === 'larga' ? L.durLong : L.durShort) : ''} · ${when}`;
+    if (e.tipo === 'sueno') return `${L.evSleepStart} · ${when}`;
+    if (e.tipo === 'despertar') return `${L.evWake} · ${when}`;
+    if (e.tipo === 'panal') return `${L.evDiaper} · ${e.panal === 'caca' ? L.pooOnly : e.panal === 'ambos' ? L.both : L.peeOnly} · ${when}`;
+    return `${L.evNote} · ${e.texto}`;
+  }
+  function applyProposed(list) {
+    const now = Date.now(); let n = 0;
+    for (const e of list) {
+      const at = now - (e.hace_min || 0) * MIN;
+      if (e.tipo === 'toma') { const mins = e.duracion === 'larga' ? DUR_LONG : DUR_SHORT; upsertEvent({ id: uid(), t: 'toma', ini: at - mins * MIN, fin: at, lado: e.lado || 'A', dur: e.duracion || 'corta', aprox: true }); n++; }
+      else if (e.tipo === 'sueno') { const open = activeOf('sueno'); if (!open) { upsertEvent({ id: uid(), t: 'sueno', ini: at, fin: null }); n++; } }
+      else if (e.tipo === 'despertar') { const open = activeOf('sueno'); if (open && at > open.ini) { upsertEvent({ ...open, fin: at }); n++; } }
+      else if (e.tipo === 'panal') { upsertEvent({ id: uid(), t: 'panal', ini: at, fin: null, p: e.panal || 'pipi' }); n++; }
+      else if (e.tipo === 'nota' && e.texto) { upsertEvent({ id: uid(), t: 'nota', ini: at, fin: null, n: e.texto }); n++; }
+    }
+    return n;
+  }
+  function openVoiceLog() {
+    const st = { text: '', proposed: null, state: 'idle', listening: false };
+    const draw = () => {
+      modalRoot.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-label="${L.vTitle}"><div class="sheet">
+        <h3>${L.vTitle}</h3>
+        <div class="src" style="font-size:13.5px;color:var(--muted)">${L.vHint}</div>
+        <textarea id="v-text" placeholder="${L.vPh}" style="font:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text);width:100%;min-height:64px">${esc(st.text)}</textarea>
+        <div class="row2" style="display:flex;gap:8px">${SR ? `<button class="mic${st.listening ? ' on' : ''}" data-m="mic">${st.listening ? L.qMicStop : L.qMic}</button>` : ''}<button class="primary" style="flex:1;border:0;border-radius:12px;padding:11px;font-weight:700;background:var(--sueno);color:#fff" data-m="interpret" ${st.state === 'loading' ? 'disabled' : ''}>${st.state === 'loading' ? L.vInterpreting : L.vInterpret}</button></div>
+        ${st.proposed ? (st.proposed.length ? `<div class="field"><label>${L.vProposal}</label><div class="list">${st.proposed.map((e, i) => `<label class="item" style="cursor:pointer;grid-template-columns:24px 1fr"><input type="checkbox" data-i="${i}" ${e.on ? 'checked' : ''}><span>${describeProposed(e)}</span></label>`).join('')}</div></div>
+          <div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button><button class="primary" data-m="save">${L.vSave}</button></div>` : `<div class="empty">${L.vNothing}</div><div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button></div>`) : `<div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button></div>`}
+      </div></div>`;
+      const ta = modalRoot.querySelector('#v-text');
+      ta.addEventListener('input', () => { st.text = ta.value; });
+    };
+    draw();
+    const close = () => { if (rec) rec.stop(); modalRoot.innerHTML = ''; modalRoot.onclick = null; };
+    modalRoot.onclick = async e => {
+      const cb = e.target.closest('input[type=checkbox]'); if (cb) { st.proposed[Number(cb.dataset.i)].on = cb.checked; return; }
+      const m = e.target.closest('[data-m]');
+      if (!m) { if (e.target.classList.contains('modal')) close(); return; }
+      if (m.dataset.m === 'cancel') return close();
+      if (m.dataset.m === 'mic') { startDictation('v-text', () => { st.listening = false; st.text = modalRoot.querySelector('#v-text').value; draw(); }); st.listening = true; draw(); return; }
+      if (m.dataset.m === 'interpret') {
+        if (rec) rec.stop();
+        st.text = modalRoot.querySelector('#v-text').value.trim();
+        if (!st.text) { toast(L.qNeedText); return; }
+        st.state = 'loading'; draw();
+        let list = null;
+        if (api) {
+          try {
+            const r = await apiFetch('/api/interpretar', { method: 'POST', body: JSON.stringify({ lang, texto: st.text, ahora: new Date().toString().slice(0, 24) }) });
+            if (r.ok) { const d = await r.json(); if (d.fuente === 'claude' && Array.isArray(d.eventos)) list = d.eventos; }
+          } catch {}
+        }
+        if (!list) list = parseLogRules(st.text);
+        st.proposed = list.map(x => ({ ...x, on: true })); st.state = 'done'; draw(); return;
+      }
+      if (m.dataset.m === 'save') {
+        const n = applyProposed(st.proposed.filter(x => x.on));
+        close(); toast(L.vSavedN(n));
+      }
+    };
+  }
 
   // ---------- InstAïna ----------
   let momentos = [];           // [{ id, ts, nota }], más reciente primero
@@ -1515,6 +1663,8 @@
     else if (act === 'panal') { upsertEvent({ id: uid(), t: 'panal', ini: now, fin: null, p: b.dataset.p }); toast(b.dataset.p === 'caca' ? L.tPoo : L.tPee); }
     else if (act === 'nota') openEditor({ id: uid(), t: 'nota', ini: now, fin: null, n: '' }, true);
     else if (act === 'manual') openEditor({ id: uid(), t: 'toma', ini: now, fin: now + 10 * MIN, lado: 'I' }, true);
+    else if (act === 'quick-toma') openQuickFeed(b.dataset.lado);
+    else if (act === 'voice-log') openVoiceLog();
     else if (act === 'ig-add') pickPhoto();
     else if (act === 'ask') { if (rec) rec.stop(); askAdvice(); }
     else if (act === 'mic') toggleMic();

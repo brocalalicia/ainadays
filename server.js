@@ -10,6 +10,7 @@
 //   GET  /api/momentos/:id/img    -> la imagen (JPEG)
 //   POST /api/momentos            -> { nota, data: 'data:image/jpeg;base64,...' } → { ok, id }
 //   DELETE /api/momentos/:id
+//   POST /api/interpretar         -> { lang, texto, ahora } → { fuente, eventos: [...], resumen }   (registro por voz)
 //   POST /api/consejo             -> { lang, contexto, mensajes: [{role, texto}] } → { fuente: 'claude'|'reglas', texto?, traduccion? }
 //                                    (usa la API de Claude si hay ANTHROPIC_API_KEY; si no, la app responde con reglas)
 //
@@ -176,6 +177,56 @@ app.post('/api/momentos', async (req, res) => {
 app.delete('/api/momentos/:id', async (req, res) => {
   await pool.query('DELETE FROM momentos WHERE id = $1', [req.params.id]);
   res.json({ ok: true });
+});
+
+// Registro por voz: convierte una frase en eventos estructurados
+const INTERPRETAR_SCHEMA = {
+  type: 'object',
+  properties: {
+    eventos: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          tipo: { type: 'string', enum: ['toma', 'sueno', 'despertar', 'panal', 'nota'] },
+          hace_min: { type: 'integer', description: 'Minutos transcurridos desde que el evento terminó (toma), empezó (sueno), ocurrió (despertar, panal, nota). 0 = ahora mismo.' },
+          lado: { type: 'string', enum: ['I', 'D', 'A', ''], description: 'Solo tomas: I izquierdo, D derecho, A ambos, vacío si no se dice' },
+          duracion: { type: 'string', enum: ['corta', 'larga', ''], description: 'Solo tomas; vacío si no se dice' },
+          panal: { type: 'string', enum: ['pipi', 'caca', 'ambos', ''], description: 'Solo pañal; pipi por defecto si no se dice' },
+          texto: { type: 'string', description: 'Solo notas: el texto de la nota' },
+        },
+        required: ['tipo', 'hace_min', 'lado', 'duracion', 'panal', 'texto'],
+        additionalProperties: false,
+      },
+    },
+    resumen: { type: 'string', description: 'Una línea que resume lo registrado, en el idioma de la madre' },
+  },
+  required: ['eventos', 'resumen'],
+  additionalProperties: false,
+};
+const INTERPRETAR_SYSTEM = `Conviertes frases de una madre (en español o francés) sobre su bebé Aïna en registros para una app de tomas, sueño y pañales. Devuelve solo los eventos que la frase afirma que han ocurrido, en orden cronológico (el más antiguo primero), estimando hace_min con sentido común: "se acaba de dormir" = 0; "después de una toma" = la toma terminó unos 5 minutos antes de dormirse; "hace media hora" = 30. Una toma es un evento único aunque sean los dos pechos (lado A). "Se ha despertado" es tipo despertar. "Cambiar el pañal" es tipo panal (pipi salvo que se diga caca). Lo que no encaje en toma/sueno/despertar/panal va como nota. No inventes eventos que no se mencionan.`;
+
+app.post('/api/interpretar', async (req, res) => {
+  const { lang = 'es', texto = '', ahora = '' } = req.body || {};
+  if (!anthropic) return res.json({ fuente: 'reglas' });
+  const t = String(texto).slice(0, 800);
+  if (!t.trim()) return res.status(400).json({ error: 'falta el texto' });
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-opus-5',
+      max_tokens: 800,
+      system: [{ type: 'text', text: INTERPRETAR_SYSTEM, cache_control: { type: 'ephemeral' } }],
+      output_config: { effort: 'low', format: { type: 'json_schema', schema: INTERPRETAR_SCHEMA } },
+      messages: [{ role: 'user', content: `Idioma de la madre: ${lang === 'fr' ? 'francés' : 'español'}. Hora actual: ${String(ahora).slice(0, 40)}.\nFrase: ${t}` }],
+    });
+    if (response.stop_reason === 'refusal') return res.json({ fuente: 'reglas' });
+    const out = response.content.filter(b => b.type === 'text').map(b => b.text).join('').trim();
+    const parsed = JSON.parse(out);
+    res.json({ fuente: 'claude', ...parsed });
+  } catch (e) {
+    console.error('interpretar:', e && e.message);
+    res.json({ fuente: 'reglas' });
+  }
 });
 
 // Consejo del momento: qué hacer ahora con lo que la madre describe + el contexto del día
