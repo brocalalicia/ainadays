@@ -1,0 +1,97 @@
+{
+  "name": "InstAïna → WhatsApp (Côme)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "instaina",
+        "options": {}
+      },
+      "id": "a1",
+      "name": "Foto publicada (webhook)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "instaina-foto"
+    },
+    {
+      "parameters": {
+        "content": "## InstAïna → WhatsApp\n\n1. La app AïnaDays llama a este webhook cada vez que se publica una foto: `{ id, ts, nota, url }` (url = enlace firmado a la imagen).\n2. El nodo WhatsApp la envía a Côme como imagen con el pie como texto.\n\n**Pendiente de configurar:**\n- Credencial *WhatsApp Business Cloud* (Meta): token + Phone Number ID.\n- Número de Côme en el nodo WhatsApp (formato internacional, sin +, p. ej. 33612345678).\n- Activar el flujo (Active) y copiar la URL de producción del webhook en Coolify → app ainadays → `N8N_WEBHOOK_URL`.",
+        "height": 320,
+        "width": 460
+      },
+      "id": "a0",
+      "name": "Léeme",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -380
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $json.body || $json;\nconst d = new Date(b.ts);\nconst hora = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' });\nconst caption = (b.nota && b.nota.trim()) ? `${b.nota.trim()} 💛 (${hora})` : `Aïna te manda una sonrisa 💛 (${hora})`;\nreturn [{ json: { url: b.url, caption, id: b.id } }];"
+      },
+      "id": "a2",
+      "name": "Preparar mensaje",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "",
+        "recipientPhoneNumber": "",
+        "messageType": "image",
+        "mediaPath": "useMediaLink",
+        "mediaLink": "={{ $json.url }}",
+        "additionalFields": {
+          "mediaCaption": "={{ $json.caption }}"
+        }
+      },
+      "id": "a3",
+      "name": "Enviar por WhatsApp",
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        520,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Foto publicada (webhook)": {
+      "main": [
+        [
+          {
+            "node": "Preparar mensaje",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar mensaje": {
+      "main": [
+        [
+          {
+            "node": "Enviar por WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

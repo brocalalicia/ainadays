@@ -15,11 +15,13 @@
 //                                    (usa la API de Claude si hay ANTHROPIC_API_KEY; si no, la app responde con reglas)
 //
 // Variables de entorno: DATABASE_URL (obligatoria), APP_KEY (contraseña de la app,
-// muy recomendable), ANTHROPIC_API_KEY (opcional, para el consejo con Claude), PORT (3000).
+// muy recomendable), ANTHROPIC_API_KEY (opcional, para el consejo con Claude), PORT (3000),
+// N8N_WEBHOOK_URL (opcional: cada foto de InstAïna se envía ahí, p. ej. para WhatsApp), PUBLIC_URL.
 
 import express from 'express';
 import pg from 'pg';
 import Anthropic from '@anthropic-ai/sdk';
+import crypto from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -28,6 +30,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3000);
 const APP_KEY = (process.env.APP_KEY || '').trim();
 const DATABASE_URL = process.env.DATABASE_URL;
+const PUBLIC_URL = (process.env.PUBLIC_URL || 'https://ainadays.aliciabrocal.cloud').replace(/\/$/, '');
+const N8N_WEBHOOK_URL = (process.env.N8N_WEBHOOK_URL || '').trim();
 
 if (!DATABASE_URL) {
   console.error('Falta DATABASE_URL (p. ej. postgres://usuario:clave@host:5432/ainadays)');
@@ -65,10 +69,16 @@ const app = express();
 app.disable('x-powered-by');
 app.use(express.json({ limit: '3mb' }));
 
+// Enlace firmado a una foto (para WhatsApp / n8n): /api/momentos/:id/img?s=<firma>
+const signImg = id => crypto.createHmac('sha256', APP_KEY || 'sin-clave').update('img:' + id).digest('hex').slice(0, 32);
+const imgLink = id => `${PUBLIC_URL}/api/momentos/${id}/img?s=${signImg(id)}`;
+
 // Autenticación: cabecera "Authorization: Bearer <APP_KEY>". Sin APP_KEY, abierto.
 app.use('/api', (req, res, next) => {
   if (req.path === '/health') return next();
   if (!APP_KEY) return next();
+  const m = /^\/momentos\/(\d+)\/img$/.exec(req.path);
+  if (m && typeof req.query.s === 'string' && req.query.s.length === 32 && crypto.timingSafeEqual(Buffer.from(req.query.s), Buffer.from(signImg(m[1])))) return next();
   const h = req.get('authorization') || '';
   const key = h.startsWith('Bearer ') ? h.slice(7).trim() : '';
   if (key && key === APP_KEY) return next();
@@ -157,6 +167,7 @@ app.get('/api/momentos', async (req, res) => {
 });
 
 app.get('/api/momentos/:id/img', async (req, res) => {
+  if (!/^\d+$/.test(req.params.id)) return res.status(400).end();
   const { rows } = await pool.query('SELECT mime, img FROM momentos WHERE id = $1', [req.params.id]);
   if (!rows.length) return res.status(404).end();
   res.setHeader('Content-Type', rows[0].mime);
@@ -172,6 +183,13 @@ app.post('/api/momentos', async (req, res) => {
   if (img.length > 2 * 1024 * 1024) return res.status(413).json({ error: 'imagen demasiado grande (máx. 2 MB)' });
   const { rows } = await pool.query('INSERT INTO momentos (nota, mime, img) VALUES ($1, $2, $3) RETURNING id, ts', [String(nota).slice(0, 300), m[1], img]);
   res.json({ ok: true, id: rows[0].id, ts: rows[0].ts });
+  // Aviso a n8n (sin bloquear la respuesta): { id, ts, nota, url } — url es un enlace firmado a la imagen
+  if (N8N_WEBHOOK_URL) {
+    fetch(N8N_WEBHOOK_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: rows[0].id, ts: rows[0].ts, nota: String(nota).slice(0, 300), url: imgLink(rows[0].id), bytes: img.length }),
+    }).then(r => { if (!r.ok) console.error('n8n webhook:', r.status); }).catch(e => console.error('n8n webhook:', e.message));
+  }
 });
 
 app.delete('/api/momentos/:id', async (req, res) => {
