@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## InstAïna → WhatsApp, cada día a las 19:30\n\n1. El disparador horario se ejecuta a las 19:30 (Europe/Madrid).\n2. Pide a la app las fotos de hoy (`GET /api/momentos?desde=…&hasta=…`, con la contraseña de la app).\n3. Envía a Côme una plantilla `instaina_sonrisa` por cada foto, con la imagen de cabecera y el pie + hora como variable. Si no hay fotos, no hace nada.\n\n**Configurar una sola vez:**\n- *Credentials → Header Auth* «AïnaDays»: nombre `Authorization`, valor `Bearer <contraseña de la app>`. Ponla en el nodo «Fotos de hoy».\n- *Credentials → Header Auth* «Meta WhatsApp»: nombre `Authorization`, valor `Bearer <token permanente de Meta>`. Ponla en el nodo «Enviar plantilla WhatsApp».\n- Nodo **Ajustes**: `phone_number_id` y `to` (móvil de Côme, 33612345678).\n- Plantilla `instaina_sonrisa` aprobada en WhatsApp Manager (cabecera Imagen, cuerpo `Aïna te manda una sonrisa 💛 {{1}}`).\n- Activar el flujo.",
+        "content": "## InstAïna → WhatsApp, cada día a las 19:30\n\n1. El disparador horario se ejecuta a las 19:30 (Europe/Madrid).\n2. Pide a la app las fotos de hoy (`GET /api/momentos?desde=…&hasta=…`, con la contraseña de la app).\n3. Envía a Côme una plantilla `instaina_sonrisa` por cada foto, con la imagen de cabecera y el pie + hora como variable. Si no hay fotos, no hace nada.\n\n**Configurar una sola vez:**\n- *Credentials → Header Auth* «AïnaDays»: nombre `Authorization`, valor `Bearer <contraseña de la app>`. Ponla en el nodo «Fotos de hoy».\n- *Credentials → Header Auth* «Meta WhatsApp»: nombre `Authorization`, valor `Bearer <token permanente de Meta>`. Ponla en el nodo «Enviar plantilla WhatsApp».\n- Nodo **Ajustes**: `phone_number_id` y `to` (uno o varios móviles separados por coma, p. ej. 33612345678,34612345678; todos verificados en Meta).\n- Plantilla `instaina_sonrisa` aprobada en WhatsApp Manager (cabecera Imagen, cuerpo `Aïna te manda una sonrisa 💛 {{1}}`).\n- Activar el flujo.",
         "height": 460,
         "width": 560
       },
@@ -55,7 +55,7 @@
             {
               "id": "s2",
               "name": "to",
-              "value": "33612345678",
+              "value": "33612345678,34612345678",
               "type": "string"
             },
             {
@@ -102,7 +102,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const cfg = $('Ajustes').first().json;\nconst fotos = ($input.first().json.momentos || []).slice().sort((a, b) => new Date(a.ts) - new Date(b.ts));\nreturn fotos.map(f => {\n  const hora = new Date(f.ts).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' });\n  const nota = (f.nota || '').trim().replace(/\\s+/g, ' ');\n  return { json: { url: f.url, variable: nota ? `${nota} (${hora})` : `(${hora})`, phone_number_id: cfg.phone_number_id, to: cfg.to, template: cfg.template, lang: cfg.lang } };\n});"
+        "jsCode": "const cfg = $('Ajustes').first().json;\nconst destinos = String(cfg.to).split(/[,\\s;]+/).map(s => s.replace(/\\D/g, '')).filter(Boolean);\nconst fotos = ($input.first().json.momentos || []).slice().sort((a, b) => new Date(a.ts) - new Date(b.ts));\nconst out = [];\nfor (const f of fotos) {\n  const hora = new Date(f.ts).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' });\n  const nota = (f.nota || '').trim().replace(/\\s+/g, ' ');\n  const variable = nota ? `${nota} (${hora})` : `(${hora})`;\n  for (const to of destinos) out.push({ json: { url: f.url, variable, phone_number_id: cfg.phone_number_id, to, template: cfg.template, lang: cfg.lang } });\n}\nreturn out;"
       },
       "id": "a4",
       "name": "Una por foto",
