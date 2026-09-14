@@ -161,10 +161,10 @@
   .ask .row2 { display: flex; gap: 8px; align-items: center; }
   .ask .go { background: var(--sueno); color: #fff; border: 0; border-radius: 12px; padding: 11px 16px; font-weight: 700; }
   .ask .go:disabled { opacity: .6; }
-  .ask .mic { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 10px 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
-  .ask .mic::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--muted); }
-  .ask .mic.on { background: var(--toma-soft); border-color: var(--toma); color: var(--toma-ink); }
-  .ask .mic.on::before { background: var(--bad); animation: pulse 1s infinite; }
+  .mic { border: 1px solid var(--panal); background: var(--panal-soft); color: var(--panal); border-radius: 12px; padding: 10px 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 7px; }
+  .mic::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--panal); }
+  .mic.on { background: var(--bad); border-color: var(--bad); color: #fff; }
+  .mic.on::before { background: #fff; animation: pulse 1s infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
   .chat { display: grid; gap: 8px; }
   .bub { max-width: 92%; padding: 9px 12px; border-radius: 14px; font-size: 15px; line-height: 1.5; display: grid; gap: 6px; }
