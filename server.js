@@ -6,7 +6,7 @@
 //   PUT  /api/dias/:fecha         -> fusiona el documento del día (evento a evento) y devuelve { ok, doc }
 //                                    (?replace=1 sustituye el día entero, para importaciones)
 //   DELETE /api/dias/:fecha       -> borra el día
-//   GET  /api/momentos?desde=ISO  -> { momentos: [{ id, ts, nota, bytes }] }   (InstAïna)
+//   GET  /api/momentos?desde=ISO&hasta=ISO -> { momentos: [{ id, ts, nota, bytes, url }] }   (InstAïna; url = enlace firmado)
 //   GET  /api/momentos/:id/img    -> la imagen (JPEG)
 //   POST /api/momentos            -> { nota, data: 'data:image/jpeg;base64,...' } → { ok, id }
 //   DELETE /api/momentos/:id
@@ -16,7 +16,7 @@
 //
 // Variables de entorno: DATABASE_URL (obligatoria), APP_KEY (contraseña de la app,
 // muy recomendable), ANTHROPIC_API_KEY (opcional, para el consejo con Claude), PORT (3000),
-// N8N_WEBHOOK_URL (opcional: cada foto de InstAïna se envía ahí, p. ej. para WhatsApp), PUBLIC_URL.
+// PUBLIC_URL (dirección pública, para los enlaces firmados de las fotos).
 
 import express from 'express';
 import pg from 'pg';
@@ -31,7 +31,6 @@ const PORT = Number(process.env.PORT || 3000);
 const APP_KEY = (process.env.APP_KEY || '').trim();
 const DATABASE_URL = process.env.DATABASE_URL;
 const PUBLIC_URL = (process.env.PUBLIC_URL || 'https://ainadays.aliciabrocal.cloud').replace(/\/$/, '');
-const N8N_WEBHOOK_URL = (process.env.N8N_WEBHOOK_URL || '').trim();
 
 if (!DATABASE_URL) {
   console.error('Falta DATABASE_URL (p. ej. postgres://usuario:clave@host:5432/ainadays)');
@@ -159,11 +158,13 @@ app.delete('/api/dias/:fecha', async (req, res) => {
 // ---------- InstAïna ----------
 app.get('/api/momentos', async (req, res) => {
   const desde = req.query.desde ? new Date(String(req.query.desde)) : new Date(Date.now() - 35 * 86400000);
+  const hasta = req.query.hasta ? new Date(String(req.query.hasta)) : null;
   const { rows } = await pool.query(
-    `SELECT id, ts, nota, octet_length(img) AS bytes FROM momentos WHERE ts >= $1 ORDER BY ts DESC LIMIT 200`,
-    [isNaN(desde) ? new Date(0) : desde],
+    `SELECT id, ts, nota, octet_length(img) AS bytes FROM momentos WHERE ts >= $1 AND ($2::timestamptz IS NULL OR ts < $2) ORDER BY ts DESC LIMIT 200`,
+    [isNaN(desde) ? new Date(0) : desde, hasta && !isNaN(hasta) ? hasta : null],
   );
-  res.json({ momentos: rows });
+  // url: enlace firmado a la imagen (sin contraseña), para n8n / WhatsApp
+  res.json({ momentos: rows.map(r => ({ ...r, url: imgLink(r.id) })) });
 });
 
 app.get('/api/momentos/:id/img', async (req, res) => {
@@ -182,14 +183,7 @@ app.post('/api/momentos', async (req, res) => {
   const img = Buffer.from(m[2], 'base64');
   if (img.length > 2 * 1024 * 1024) return res.status(413).json({ error: 'imagen demasiado grande (máx. 2 MB)' });
   const { rows } = await pool.query('INSERT INTO momentos (nota, mime, img) VALUES ($1, $2, $3) RETURNING id, ts', [String(nota).slice(0, 300), m[1], img]);
-  res.json({ ok: true, id: rows[0].id, ts: rows[0].ts });
-  // Aviso a n8n (sin bloquear la respuesta): { id, ts, nota, url } — url es un enlace firmado a la imagen
-  if (N8N_WEBHOOK_URL) {
-    fetch(N8N_WEBHOOK_URL, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: rows[0].id, ts: rows[0].ts, nota: String(nota).slice(0, 300), url: imgLink(rows[0].id), bytes: img.length }),
-    }).then(r => { if (!r.ok) console.error('n8n webhook:', r.status); }).catch(e => console.error('n8n webhook:', e.message));
-  }
+  res.json({ ok: true, id: rows[0].id, ts: rows[0].ts, url: imgLink(rows[0].id) });
 });
 
 app.delete('/api/momentos/:id', async (req, res) => {

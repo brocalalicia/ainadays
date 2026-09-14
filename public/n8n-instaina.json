@@ -1,11 +1,11 @@
 {
-  "name": "InstAïna → WhatsApp (Côme)",
+  "name": "InstAïna → WhatsApp (resumen del día)",
   "nodes": [
     {
       "parameters": {
-        "content": "## InstAïna → WhatsApp (plantilla)\n\nLa app llama al webhook con `{ id, ts, nota, url }` y este flujo envía a Côme la **plantilla** `instaina_sonrisa` con la foto de cabecera y el pie como variable. Al ser plantilla, llega aunque Côme no haya escrito al número en 24 h.\n\n**Configurar una sola vez:**\n1. En *WhatsApp Manager → Plantillas de mensaje* crea `instaina_sonrisa` (categoría *Utilidad*, idioma *Español*): cabecera **Imagen**, cuerpo `Aïna te manda una sonrisa 💛 {{1}}`. Espera a que esté *Aprobada*.\n2. En n8n → *Credentials* → **Header Auth**: nombre `Authorization`, valor `Bearer <token permanente de Meta>`. Selecciónala en el nodo «Enviar plantilla WhatsApp».\n3. En el nodo **Ajustes** pon `phone_number_id` (WhatsApp → API Setup) y `to` (móvil de Côme, formato 33612345678).\n4. Activa el flujo. La URL de producción del webhook ya está en Coolify (`N8N_WEBHOOK_URL`).",
-        "height": 420,
-        "width": 520
+        "content": "## InstAïna → WhatsApp, cada día a las 19:30\n\n1. El disparador horario se ejecuta a las 19:30 (Europe/Madrid).\n2. Pide a la app las fotos de hoy (`GET /api/momentos?desde=…&hasta=…`, con la contraseña de la app).\n3. Envía a Côme una plantilla `instaina_sonrisa` por cada foto, con la imagen de cabecera y el pie + hora como variable. Si no hay fotos, no hace nada.\n\n**Configurar una sola vez:**\n- *Credentials → Header Auth* «AïnaDays»: nombre `Authorization`, valor `Bearer <contraseña de la app>`. Ponla en el nodo «Fotos de hoy».\n- *Credentials → Header Auth* «Meta WhatsApp»: nombre `Authorization`, valor `Bearer <token permanente de Meta>`. Ponla en el nodo «Enviar plantilla WhatsApp».\n- Nodo **Ajustes**: `phone_number_id` y `to` (móvil de Côme, 33612345678).\n- Plantilla `instaina_sonrisa` aprobada en WhatsApp Manager (cabecera Imagen, cuerpo `Aïna te manda una sonrisa 💛 {{1}}`).\n- Activar el flujo.",
+        "height": 460,
+        "width": 560
       },
       "id": "a0",
       "name": "Léeme",
@@ -13,29 +13,39 @@
       "typeVersion": 1,
       "position": [
         -60,
-        -480
+        -520
       ]
     },
     {
       "parameters": {
-        "httpMethod": "POST",
-        "path": "instaina",
-        "options": {}
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "30 19 * * *"
+            }
+          ]
+        }
       },
       "id": "a1",
-      "name": "Foto publicada (webhook)",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
+      "name": "Cada día a las 19:30",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
       "position": [
         0,
         0
-      ],
-      "webhookId": "instaina-foto"
+      ]
     },
     {
       "parameters": {
         "assignments": {
           "assignments": [
+            {
+              "id": "s0",
+              "name": "api_base",
+              "value": "https://ainadays.aliciabrocal.cloud",
+              "type": "string"
+            },
             {
               "id": "s1",
               "name": "phone_number_id",
@@ -62,7 +72,7 @@
             }
           ]
         },
-        "includeOtherFields": true,
+        "includeOtherFields": false,
         "options": {}
       },
       "id": "a2",
@@ -76,14 +86,30 @@
     },
     {
       "parameters": {
-        "jsCode": "const b = $json.body || $json;\nconst d = new Date(b.ts);\nconst hora = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' });\nconst nota = (b.nota || '').trim().replace(/\\s+/g, ' ');\n// {{1}} de la plantilla: el pie de foto y la hora (nunca vacío, Meta lo exige)\nconst variable = nota ? `${nota} (${hora})` : `(${hora})`;\nreturn [{ json: { url: b.url, variable, phone_number_id: $json.phone_number_id, to: $json.to, template: $json.template, lang: $json.lang } }];"
+        "url": "={{ $json.api_base }}/api/momentos?desde={{ encodeURIComponent($now.setZone('Europe/Madrid').startOf('day').toISO()) }}&hasta={{ encodeURIComponent($now.setZone('Europe/Madrid').endOf('day').toISO()) }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
       },
       "id": "a3",
-      "name": "Preparar mensaje",
+      "name": "Fotos de hoy",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const cfg = $('Ajustes').first().json;\nconst fotos = ($input.first().json.momentos || []).slice().sort((a, b) => new Date(a.ts) - new Date(b.ts));\nreturn fotos.map(f => {\n  const hora = new Date(f.ts).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' });\n  const nota = (f.nota || '').trim().replace(/\\s+/g, ' ');\n  return { json: { url: f.url, variable: nota ? `${nota} (${hora})` : `(${hora})`, phone_number_id: cfg.phone_number_id, to: cfg.to, template: cfg.template, lang: cfg.lang } };\n});"
+      },
+      "id": "a4",
+      "name": "Una por foto",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        480,
+        720,
         0
       ]
     },
@@ -96,20 +122,27 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ messaging_product: 'whatsapp', to: $json.to, type: 'template', template: { name: $json.template, language: { code: $json.lang }, components: [ { type: 'header', parameters: [ { type: 'image', image: { link: $json.url } } ] }, { type: 'body', parameters: [ { type: 'text', text: $json.variable } ] } ] } }) }}",
-        "options": {}
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 1500
+            }
+          }
+        }
       },
-      "id": "a4",
+      "id": "a5",
       "name": "Enviar plantilla WhatsApp",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        720,
+        960,
         0
       ]
     }
   ],
   "connections": {
-    "Foto publicada (webhook)": {
+    "Cada día a las 19:30": {
       "main": [
         [
           {
@@ -124,14 +157,25 @@
       "main": [
         [
           {
-            "node": "Preparar mensaje",
+            "node": "Fotos de hoy",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Preparar mensaje": {
+    "Fotos de hoy": {
+      "main": [
+        [
+          {
+            "node": "Una por foto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Una por foto": {
       "main": [
         [
           {
@@ -144,6 +188,7 @@
     }
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "timezone": "Europe/Madrid"
   }
 }
