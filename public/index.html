@@ -1,26 +1,3 @@
-  function startDictation(textareaId, onEnd) {
-    if (!SR) { toast(L.qMicFail); return; }
-    if (rec) { rec.stop(); return; }
-    const ta = document.getElementById(textareaId);
-    recBase = ta ? ta.value.trim() : '';
-    rec = new SR();
-    rec.lang = lang === 'fr' ? 'fr-FR' : 'es-ES';
-    rec.interimResults = true; rec.continuous = true;
-    rec.onresult = ev => {
-      let finalTxt = '', interim = '';
-      for (let i = 0; i < ev.results.length; i++) { const r = ev.results[i]; if (r.isFinal) finalTxt += r[0].transcript + ' '; else interim += r[0].transcript; }
-      const t = document.getElementById(textareaId); if (t) t.value = (recBase + ' ' + finalTxt + interim).trim();
-    };
-    rec.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast(L.qMicFail); };
-    rec.onend = () => { rec = null; onEnd && onEnd(); };
-    try { rec.start(); } catch { rec = null; toast(L.qMicFail); }
-  }
-  function toggleMic() {
-    if (rec) { rec.stop(); return; }
-    startDictation('q-text', () => { ask.listening = false; const t = document.getElementById('q-text'); if (t) ask.text = t.value; render(); });
-    ask.listening = true; render();
-  }
-
 <!doctype html>
 <html lang="es">
 <head>
@@ -1550,23 +1527,27 @@
   // Dictado por voz con el reconocimiento del navegador (Chrome, Safari iOS 14.5+; requiere HTTPS)
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
   let rec = null, recBase = '';
-  function toggleMic() {
+  function startDictation(textareaId, onEnd) {
     if (!SR) { toast(L.qMicFail); return; }
     if (rec) { rec.stop(); return; }
-    const ta = document.getElementById('q-text');
-    recBase = ta ? ta.value.trim() : ask.text;
+    const ta = document.getElementById(textareaId);
+    recBase = ta ? ta.value.trim() : '';
     rec = new SR();
     rec.lang = lang === 'fr' ? 'fr-FR' : 'es-ES';
     rec.interimResults = true; rec.continuous = true;
     rec.onresult = ev => {
       let finalTxt = '', interim = '';
       for (let i = 0; i < ev.results.length; i++) { const r = ev.results[i]; if (r.isFinal) finalTxt += r[0].transcript + ' '; else interim += r[0].transcript; }
-      ask.text = (recBase + ' ' + finalTxt + interim).trim();
-      const t = document.getElementById('q-text'); if (t) t.value = ask.text;
+      const t = document.getElementById(textareaId); if (t) t.value = (recBase + ' ' + finalTxt + interim).trim();
     };
     rec.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast(L.qMicFail); };
-    rec.onend = () => { rec = null; ask.listening = false; const t = document.getElementById('q-text'); if (t) ask.text = t.value; render(); };
-    try { rec.start(); ask.listening = true; render(); } catch { rec = null; toast(L.qMicFail); }
+    rec.onend = () => { rec = null; onEnd && onEnd(); };
+    try { rec.start(); } catch { rec = null; toast(L.qMicFail); }
+  }
+  function toggleMic() {
+    if (rec) { rec.stop(); return; }
+    startDictation('q-text', () => { ask.listening = false; const t = document.getElementById('q-text'); if (t) ask.text = t.value; render(); });
+    ask.listening = true; render();
   }
 
   // Contexto compacto de ahora mismo, para las reglas y para Claude
