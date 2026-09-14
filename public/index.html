@@ -417,7 +417,7 @@
       winLongWhat: d => `Una de ${d}. A los 3 meses, más de 2 h suele acabar en llanto y siesta corta.`, winLongTodo: 'La próxima, empieza a dormirla en cuanto la barra de arriba se ponga ámbar.',
       winShortWhat: (a, b) => `Entre ${a} y ${b}: dentro de lo esperable. La corta viene tras una siesta breve.`, winShortTodo: 'Tras un ciclo corto aguanta menos despierta: no la fuerces a alargar.',
       winOkWhat: (a, b) => `Entre ${a} y ${b}: justo en su rango (1–2 h).`, winOkTodo: 'Buen ajuste, sigue igual.',
-      diapWhat: (n, enough, pooDays) => `${n} mojado${n === 1 ? '' : 's'} hasta ahora${enough ? ': ya en el mínimo diario (5–6), se alimenta bien.' : '; el mínimo diario son 5–6.'}${pooDays >= 3 ? ` Sin caca desde hace ${pooDays} días.` : ''}`,
+      diapWhat: (n, enough) => `Hoy ${n} mojado${n === 1 ? '' : 's'}${enough ? ' (ya en el mínimo diario de 5–6).' : ' (el mínimo diario son 5–6).'}`,
       diapTodoPoo: 'Con lactancia exclusiva es normal hasta 7–10 días si está tranquila y el pipí va bien.', diapTodoOk: 'Nada que vigilar.', diapTodoMore: 'Lo normal es llegar de sobra al final del día.',
       nowNap: 'Cuando se despierte: toma primero; luego 1 h 15 – 1 h 45 de ventana hasta la siguiente siesta o la noche.',
       tonightAt: (r, t, last) => `Ritual sobre las ${r}, dormida hacia las ${t}. Última siesta acabada antes de las ${last}.`,
@@ -461,6 +461,19 @@
       // Registro por voz
       vBtn: '🎤 Registrar', vTitle: 'Registrar por voz', vHint: 'Di qué ha pasado, por ejemplo: «se acaba de dormir después de una toma corta y cambiarle el pañal»', vPh: 'o escríbelo aquí', vInterpret: 'Interpretar', vInterpreting: 'Interpretando…', vProposal: 'Voy a registrar esto:', vSave: 'Guardar', vNothing: 'No he entendido ningún registro. Prueba con «toma corta», «se ha dormido», «se ha despertado», «pañal con caca»…', vSavedN: n => `${n} registro${n === 1 ? '' : 's'} guardado${n === 1 ? '' : 's'}`, vFail: 'No se pudo interpretar; inténtalo de nuevo.',
       evWake: 'Se despierta', evSleepStart: 'Se duerme', vAgo: n => n === 0 ? 'ahora' : `hace ${n} min`,
+      // Caca
+      pTitle: 'Caca', pCons: 'Consistencia', pLiq: 'Líquida', pSoft: 'Blanda', pHard: 'Dura', pColor: 'Color', pYellow: 'Amarilla', pGreen: 'Verde', pOther: 'Otro (blanca, negra, con sangre…)', pSkip: 'Guardar sin detalles',
+      cons: { liq: 'líquida', blanda: 'blanda', dura: 'dura' }, cols: { amar: 'amarilla', verde: 'verde', otro: 'otro color' },
+      // Análisis de pañales (5 días)
+      st5: n => `Últimos ${n} días`, stPoo: (n, d) => `${n} caca${n === 1 ? '' : 's'} en ${d} día${d === 1 ? '' : 's'}`, stNone: d => `sin caca en ${d} días`, stLast: t => `última ${t}`, stWet: x => `${x} pipís/día`, stAvg: x => `(${x} al día)`,
+      stOkFreq: 'Ritmo normal para lactancia exclusiva: puede ir desde varias al día hasta una cada 7–10 días, siempre que sean blandas.',
+      stLongGap: d => `${d} días sin caca. Con pecho exclusivo es normal hasta 7–10 días si está tranquila, la barriga blanda y moja pañales. No hace falta estimular ni dar agua.`,
+      stVeryLongGap: d => `${d} días sin caca. Sigue siendo posible en lactancia exclusiva, pero coméntalo con el pediatra si además está molesta, la barriga dura o rechaza el pecho.`,
+      stHard: 'Ha habido caca dura. En lactancia exclusiva es raro: si se repite, coméntalo con el pediatra.',
+      stGreen: 'Varias cacas verdes. Suele ser por tomas cortas (más leche del principio, más azucarada): deja que vacíe bien un pecho antes de cambiar. Si además hay mocos o fiebre, pediatra.',
+      stOther: 'Has anotado un color inusual. Caca blanca, gris, negra o con sangre: consulta hoy con el pediatra.',
+      stLowWet: 'Según lo anotado, menos de 4 pañales mojados al día. Si registras todos los cambios, es el dato que más importa: ofrécele el pecho más a menudo y, si sigue así mañana, pediatra. Si no los anotas todos, ignora este aviso.',
+      stWetOk: 'Pañales mojados suficientes: se alimenta bien.',
       nightSleepHint: 'Es de noche. Si se despierta: toma con luz mínima, sin hablar ni jugar, y de vuelta a dormir. Pañal solo si hace falta.',
       nightAwakeHint: 'Es de noche: no cuenta como ventana de vigilia. Toma tranquila con luz mínima, sin estímulos, y a dormir otra vez en cuanto suelte el pecho.',
       kNight2: 'Noche', nightNextSleeping: 'Durmiendo. Si se despierta, toma y de vuelta a dormir; registra la toma con los botones grandes.', nightNextAwake: 'Toma con luz mínima y sin hablar; en cuanto termine, a la cuna. Si no se duerme en 10 min, brazos y shhh, sin encender luces.',
@@ -519,7 +532,7 @@
       winLongWhat: d => `Une de ${d}. À 3 mois, plus de 2 h finit souvent en pleurs et sieste courte.`, winLongTodo: 'La prochaine fois, commence à l’endormir dès que la barre du haut passe à l’orange.',
       winShortWhat: (a, b) => `Entre ${a} et ${b} : dans la norme. La courte suit une sieste brève.`, winShortTodo: 'Après un cycle court elle tient moins longtemps éveillée : ne force pas.',
       winOkWhat: (a, b) => `Entre ${a} et ${b} : pile dans sa plage (1–2 h).`, winOkTodo: 'Bon réglage, continue ainsi.',
-      diapWhat: (n, enough, pooDays) => `${n} mouillée${n === 1 ? '' : 's'} pour l’instant${enough ? ' : déjà au minimum quotidien (5–6), elle se nourrit bien.' : ' ; le minimum quotidien est de 5–6.'}${pooDays >= 3 ? ` Pas de caca depuis ${pooDays} jours.` : ''}`,
+      diapWhat: (n, enough) => `Aujourd’hui ${n} mouillée${n === 1 ? '' : 's'}${enough ? ' (déjà au minimum quotidien de 5–6).' : ' (le minimum quotidien est de 5–6).'}`,
       diapTodoPoo: 'En allaitement exclusif c’est normal jusqu’à 7–10 jours si elle est sereine et que le pipi va bien.', diapTodoOk: 'Rien à surveiller.', diapTodoMore: 'En général on dépasse largement en fin de journée.',
       nowNap: 'À son réveil : tétée d’abord ; puis 1 h 15 – 1 h 45 de fenêtre jusqu’à la sieste suivante ou la nuit.',
       tonightAt: (r, t, last) => `Rituel vers ${r}, endormie vers ${t}. Dernière sieste terminée avant ${last}.`,
@@ -563,6 +576,19 @@
       // Enregistrement vocal
       vBtn: '🎤 Enregistrer', vTitle: 'Enregistrer à la voix', vHint: 'Dis ce qui s’est passé, par exemple : « elle vient de s’endormir après une tétée courte et un change »', vPh: 'ou écris-le ici', vInterpret: 'Interpréter', vInterpreting: 'Interprétation…', vProposal: 'Je vais enregistrer ceci :', vSave: 'Enregistrer', vNothing: 'Je n’ai reconnu aucun enregistrement. Essaie « tétée courte », « elle s’est endormie », « elle s’est réveillée », « couche avec caca »…', vSavedN: n => `${n} enregistrement${n === 1 ? '' : 's'} sauvegardé${n === 1 ? '' : 's'}`, vFail: 'Impossible d’interpréter ; réessaie.',
       evWake: 'Réveil', evSleepStart: 'Endormie', vAgo: n => n === 0 ? 'maintenant' : `il y a ${n} min`,
+      // Caca
+      pTitle: 'Caca', pCons: 'Consistance', pLiq: 'Liquide', pSoft: 'Molle', pHard: 'Dure', pColor: 'Couleur', pYellow: 'Jaune', pGreen: 'Verte', pOther: 'Autre (blanche, noire, avec du sang…)', pSkip: 'Enregistrer sans détails',
+      cons: { liq: 'liquide', blanda: 'molle', dura: 'dure' }, cols: { amar: 'jaune', verde: 'verte', otro: 'autre couleur' },
+      // Analyse des couches (5 jours)
+      st5: n => `${n} derniers jours`, stPoo: (n, d) => `${n} caca${n === 1 ? '' : 's'} en ${d} jour${d === 1 ? '' : 's'}`, stNone: d => `pas de caca depuis ${d} jours`, stLast: t => `dernier ${t}`, stWet: x => `${x} pipis/jour`, stAvg: x => `(${x} par jour)`,
+      stOkFreq: 'Rythme normal en allaitement exclusif : de plusieurs par jour à une tous les 7–10 jours, tant qu’elles sont molles.',
+      stLongGap: d => `${d} jours sans caca. Au sein exclusif c’est normal jusqu’à 7–10 jours si elle est sereine, le ventre souple et les couches mouillées. Pas besoin de stimuler ni de donner de l’eau.`,
+      stVeryLongGap: d => `${d} jours sans caca. Toujours possible en allaitement exclusif, mais parles-en au pédiatre si en plus elle est gênée, le ventre dur ou refuse le sein.`,
+      stHard: 'Il y a eu un caca dur. En allaitement exclusif c’est rare : si ça se répète, parles-en au pédiatre.',
+      stGreen: 'Plusieurs cacas verts. Souvent dû à des tétées courtes (plus de lait de début, plus sucré) : laisse-la bien vider un sein avant de changer. Si en plus il y a du nez qui coule ou de la fièvre, pédiatre.',
+      stOther: 'Tu as noté une couleur inhabituelle. Caca blanc, gris, noir ou avec du sang : consulte le pédiatre aujourd’hui.',
+      stLowWet: 'D’après ce qui est noté, moins de 4 couches mouillées par jour. Si tu enregistres tous les changes, c’est la donnée la plus importante : propose le sein plus souvent et, si ça continue demain, pédiatre. Sinon, ignore cet avis.',
+      stWetOk: 'Assez de couches mouillées : elle se nourrit bien.',
       nightSleepHint: 'C’est la nuit. Si elle se réveille : tétée avec un minimum de lumière, sans parler ni jouer, puis retour au lit. Couche seulement si nécessaire.',
       nightAwakeHint: 'C’est la nuit : ça ne compte pas comme fenêtre d’éveil. Tétée calme, lumière minimale, sans stimulation, et retour au dodo dès qu’elle lâche le sein.',
       kNight2: 'Nuit', nightNextSleeping: 'Elle dort. Si elle se réveille, tétée puis retour au dodo ; enregistre la tétée avec les grands boutons.', nightNextAwake: 'Tétée avec un minimum de lumière et sans parler ; dès la fin, au lit. Si elle ne se rendort pas en 10 min, dans les bras et chhh, sans allumer.',
@@ -765,10 +791,34 @@
       else if (mn < 50 * MIN && windows.length >= 2) notes.push({ k: L.kWindows, what: L.winShortWhat(fmtDur(mn), fmtDur(mx)), todo: L.winShortTodo });
       else notes.push({ k: L.kWindows, what: L.winOkWhat(fmtDur(mn), fmtDur(mx)), todo: L.winOkTodo });
     }
-    // Pañales
-    if (diapers.length) {
-      const enough = diapers.length >= 5;
-      notes.push({ k: L.kDiapers, what: L.diapWhat(diapers.length, enough, pooDays), todo: pooDays >= 3 ? L.diapTodoPoo : enough ? L.diapTodoOk : L.diapTodoMore });
+    // Pañales: hoy + análisis de los últimos 5 días
+    {
+      const D5 = 5, from5 = s - (D5 - 1) * DAY;
+      const all5 = evs.filter(e => e.t === 'panal' && e.ini >= from5 && e.ini < s + DAY);
+      const poos5 = all5.filter(e => e.p === 'caca' || e.p === 'ambos');
+      const daysWithData = new Set(evs.filter(e => e.ini >= from5 && e.ini < s + DAY).map(e => dayId(e.ini))).size;
+      const fullDays = Math.max(1, daysWithData - 1); // el día de hoy está a medias
+      const wetPerDay = fullDays ? all5.filter(e => e.ini < s && e.p !== 'caca').length / fullDays : null;
+      if (diapers.length || poos5.length || daysWithData >= 2) {
+        const parts = [];
+        if (diapers.length) parts.push(L.diapWhat(diapers.length, diapers.length >= 5, null));
+        const hist = [];
+        hist.push(poos5.length ? `${L.stPoo(poos5.length, Math.min(D5, Math.max(1, daysWithData)))}${poos5.length >= 2 ? ' ' + L.stAvg((poos5.length / Math.max(1, daysWithData)).toFixed(1).replace('.', ',')) : ''}` : (pooDays != null ? L.stNone(pooDays) : L.stNone(Math.max(1, daysWithData))));
+        if (lastPoo) hist.push(L.stLast(now - lastPoo.ini < DAY ? fmtTime(lastPoo.ini) : L.daysAgo(pooDays)));
+        if (wetPerDay != null && daysWithData >= 2) hist.push(L.stWet(wetPerDay.toFixed(1).replace('.', ',')));
+        parts.push(`${L.st5(D5)}: ${hist.join(' · ')}.`);
+        // interpretación, de más a menos urgente
+        const gap = lastPoo ? (now - lastPoo.ini) / DAY : (daysWithData >= 2 ? daysWithData : 0);
+        let todo;
+        if (poos5.some(e => e.col === 'otro')) todo = L.stOther;
+        else if (wetPerDay != null && daysWithData >= 3 && wetPerDay < 4) todo = L.stLowWet;
+        else if (poos5.some(e => e.c === 'dura')) todo = L.stHard;
+        else if (poos5.filter(e => e.col === 'verde').length >= 2) todo = L.stGreen;
+        else if (gap >= 7) todo = L.stVeryLongGap(Math.floor(gap));
+        else if (gap >= 3) todo = L.stLongGap(Math.floor(gap));
+        else todo = L.stOkFreq + (wetPerDay != null && daysWithData >= 3 && wetPerDay >= 5 ? ' ' + L.stWetOk : '');
+        notes.push({ k: L.kDiapers, what: parts.join(' '), todo });
+      }
     }
     // Siguiente paso
     let next = null;
@@ -896,7 +946,7 @@
     const listHTML = listEvs.length ? `<div class="list">${listEvs.map(e => {
       const desc = e.t === 'toma' ? `${L.evFeed} · ${L.side[e.lado] || ''}${e.dur ? ' · ' + (e.dur === 'larga' ? L.durLong : L.durShort) : ''}`
         : e.t === 'sueno' ? L.evSleep
-        : e.t === 'panal' ? `${L.evDiaper} · ${e.p === 'caca' ? L.pooOnly : e.p === 'ambos' ? L.both : L.peeOnly}`
+        : e.t === 'panal' ? `${L.evDiaper} · ${e.p === 'caca' ? L.pooOnly : e.p === 'ambos' ? L.both : L.peeOnly}${e.c ? ' · ' + L.cons[e.c] : ''}${e.col ? ' · ' + L.cols[e.col] : ''}`
         : L.evNote;
       const dur = e.fin == null && (e.t === 'toma' || e.t === 'sueno') ? `<span class="live">${L.ongoing}</span>`
         : e.t === 'toma' || e.t === 'sueno' ? `${e.aprox ? L.approx + ' ' : ''}${fmtDur(e.fin - e.ini)}` : '';
@@ -1358,6 +1408,32 @@
     };
   }
 
+  // ---------- Caca con detalles (opcional) ----------
+  function openPooSheet() {
+    const q = { c: '', col: '' };
+    const draw = () => {
+      modalRoot.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-label="${L.pTitle}"><div class="sheet">
+        <h3>${L.pTitle}</h3>
+        <div class="field"><label>${L.pCons}</label><div class="seg">
+          ${[['liq', L.pLiq], ['blanda', L.pSoft], ['dura', L.pHard]].map(([v, t]) => `<button aria-pressed="${q.c === v}" data-q="c" data-v="${v}">${t}</button>`).join('')}</div></div>
+        <div class="field"><label>${L.pColor}</label><div class="seg">
+          ${[['amar', L.pYellow], ['verde', L.pGreen], ['otro', L.pOther.split(' (')[0]]].map(([v, t]) => `<button aria-pressed="${q.col === v}" data-q="col" data-v="${v}">${t}</button>`).join('')}</div>
+          ${q.col === 'otro' ? `<div class="src" style="font-size:12.5px;color:var(--muted)">${L.pOther}</div>` : ''}</div>
+        <div class="btns"><button class="ghost" data-m="skip">${L.pSkip}</button><button class="primary" data-m="save">${L.save}</button></div>
+      </div></div>`;
+    };
+    draw();
+    const close = () => { modalRoot.innerHTML = ''; modalRoot.onclick = null; };
+    modalRoot.onclick = e => {
+      const qb = e.target.closest('[data-q]'); if (qb) { q[qb.dataset.q] = q[qb.dataset.q] === qb.dataset.v ? '' : qb.dataset.v; draw(); return; }
+      const m = e.target.closest('[data-m]');
+      if (!m) { if (e.target.classList.contains('modal')) close(); return; }
+      const ev = { id: uid(), t: 'panal', ini: Date.now(), fin: null, p: 'caca' };
+      if (m.dataset.m === 'save') { if (q.c) ev.c = q.c; if (q.col) ev.col = q.col; }
+      upsertEvent(ev); close(); toast(L.tPoo);
+    };
+  }
+
   // ---------- Registro por voz ----------
   // Reglas locales (sin Claude): reconoce toma / dormir / despertar / pañal en una frase
   function parseLogRules(text) {
@@ -1641,7 +1717,7 @@
     else if (act === 'stop-toma') { const t = activeOf('toma'); if (t) { upsertEvent({ ...t, fin: now }); toast(L.tFeedSaved(fmtDur(now - t.ini))); } }
     else if (act === 'start-sueno') { if (!activeOf('sueno')) upsertEvent({ id: uid(), t: 'sueno', ini: now, fin: null }); }
     else if (act === 'stop-sueno') { const s = activeOf('sueno'); if (s) { upsertEvent({ ...s, fin: now }); toast(L.tSlept(fmtDur(now - s.ini))); } }
-    else if (act === 'panal') { upsertEvent({ id: uid(), t: 'panal', ini: now, fin: null, p: b.dataset.p }); toast(b.dataset.p === 'caca' ? L.tPoo : L.tPee); }
+    else if (act === 'panal') { if (b.dataset.p === 'caca') openPooSheet(); else { upsertEvent({ id: uid(), t: 'panal', ini: now, fin: null, p: 'pipi' }); toast(L.tPee); } }
     else if (act === 'nota') openEditor({ id: uid(), t: 'nota', ini: now, fin: null, n: '' }, true);
     else if (act === 'manual') openEditor({ id: uid(), t: 'toma', ini: now, fin: now + 10 * MIN, lado: 'I' }, true);
     else if (act === 'quick-toma') openQuickFeed(b.dataset.lado);
