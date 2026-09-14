@@ -3,6 +3,21 @@
   "nodes": [
     {
       "parameters": {
+        "content": "## InstAïna → WhatsApp (plantilla)\n\nLa app llama al webhook con `{ id, ts, nota, url }` y este flujo envía a Côme la **plantilla** `instaina_sonrisa` con la foto de cabecera y el pie como variable. Al ser plantilla, llega aunque Côme no haya escrito al número en 24 h.\n\n**Configurar una sola vez:**\n1. En *WhatsApp Manager → Plantillas de mensaje* crea `instaina_sonrisa` (categoría *Utilidad*, idioma *Español*): cabecera **Imagen**, cuerpo `Aïna te manda una sonrisa 💛 {{1}}`. Espera a que esté *Aprobada*.\n2. En n8n → *Credentials* → **Header Auth**: nombre `Authorization`, valor `Bearer <token permanente de Meta>`. Selecciónala en el nodo «Enviar plantilla WhatsApp».\n3. En el nodo **Ajustes** pon `phone_number_id` (WhatsApp → API Setup) y `to` (móvil de Côme, formato 33612345678).\n4. Activa el flujo. La URL de producción del webhook ya está en Coolify (`N8N_WEBHOOK_URL`).",
+        "height": 420,
+        "width": 520
+      },
+      "id": "a0",
+      "name": "Léeme",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -480
+      ]
+    },
+    {
+      "parameters": {
         "httpMethod": "POST",
         "path": "instaina",
         "options": {}
@@ -19,56 +34,93 @@
     },
     {
       "parameters": {
-        "content": "## InstAïna → WhatsApp\n\n1. La app AïnaDays llama a este webhook cada vez que se publica una foto: `{ id, ts, nota, url }` (url = enlace firmado a la imagen).\n2. El nodo WhatsApp la envía a Côme como imagen con el pie como texto.\n\n**Pendiente de configurar:**\n- Credencial *WhatsApp Business Cloud* (Meta): token + Phone Number ID.\n- Número de Côme en el nodo WhatsApp (formato internacional, sin +, p. ej. 33612345678).\n- Activar el flujo (Active) y copiar la URL de producción del webhook en Coolify → app ainadays → `N8N_WEBHOOK_URL`.",
-        "height": 320,
-        "width": 460
-      },
-      "id": "a0",
-      "name": "Léeme",
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -40,
-        -380
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "const b = $json.body || $json;\nconst d = new Date(b.ts);\nconst hora = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' });\nconst caption = (b.nota && b.nota.trim()) ? `${b.nota.trim()} 💛 (${hora})` : `Aïna te manda una sonrisa 💛 (${hora})`;\nreturn [{ json: { url: b.url, caption, id: b.id } }];"
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "phone_number_id",
+              "value": "PON_AQUI_EL_PHONE_NUMBER_ID",
+              "type": "string"
+            },
+            {
+              "id": "s2",
+              "name": "to",
+              "value": "33612345678",
+              "type": "string"
+            },
+            {
+              "id": "s3",
+              "name": "template",
+              "value": "instaina_sonrisa",
+              "type": "string"
+            },
+            {
+              "id": "s4",
+              "name": "lang",
+              "value": "es",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
       },
       "id": "a2",
-      "name": "Preparar mensaje",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "name": "Ajustes",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
-        260,
+        240,
         0
       ]
     },
     {
       "parameters": {
-        "operation": "send",
-        "phoneNumberId": "",
-        "recipientPhoneNumber": "",
-        "messageType": "image",
-        "mediaPath": "useMediaLink",
-        "mediaLink": "={{ $json.url }}",
-        "additionalFields": {
-          "mediaCaption": "={{ $json.caption }}"
-        }
+        "jsCode": "const b = $json.body || $json;\nconst d = new Date(b.ts);\nconst hora = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' });\nconst nota = (b.nota || '').trim().replace(/\\s+/g, ' ');\n// {{1}} de la plantilla: el pie de foto y la hora (nunca vacío, Meta lo exige)\nconst variable = nota ? `${nota} (${hora})` : `(${hora})`;\nreturn [{ json: { url: b.url, variable, phone_number_id: $json.phone_number_id, to: $json.to, template: $json.template, lang: $json.lang } }];"
       },
       "id": "a3",
-      "name": "Enviar por WhatsApp",
-      "type": "n8n-nodes-base.whatsApp",
-      "typeVersion": 1,
+      "name": "Preparar mensaje",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        520,
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v21.0/{{ $json.phone_number_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ messaging_product: 'whatsapp', to: $json.to, type: 'template', template: { name: $json.template, language: { code: $json.lang }, components: [ { type: 'header', parameters: [ { type: 'image', image: { link: $json.url } } ] }, { type: 'body', parameters: [ { type: 'text', text: $json.variable } ] } ] } }) }}",
+        "options": {}
+      },
+      "id": "a4",
+      "name": "Enviar plantilla WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
         0
       ]
     }
   ],
   "connections": {
     "Foto publicada (webhook)": {
+      "main": [
+        [
+          {
+            "node": "Ajustes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ajustes": {
       "main": [
         [
           {
@@ -83,7 +135,7 @@
       "main": [
         [
           {
-            "node": "Enviar por WhatsApp",
+            "node": "Enviar plantilla WhatsApp",
             "type": "main",
             "index": 0
           }
