@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## InstAïna → WhatsApp, cada día a las 19:30\n\n1. El disparador horario se ejecuta a las 19:30 (Europe/Madrid).\n2. Pide a la app las fotos de hoy (`GET /api/momentos?desde=…&hasta=…`, con la contraseña de la app).\n3. Envía a Côme una plantilla `instaina_sonrisa` por cada foto, con la imagen de cabecera y el pie + hora como variable. Si no hay fotos, no hace nada.\n\n**Configurar una sola vez:**\n- *Credentials → Header Auth* «AïnaDays»: nombre `Authorization`, valor `Bearer <contraseña de la app>`. Ponla en el nodo «Fotos de hoy».\n- *Credentials → Header Auth* «Meta WhatsApp»: nombre `Authorization`, valor `Bearer <token permanente de Meta>`. Ponla en el nodo «Enviar plantilla WhatsApp».\n- Nodo **Ajustes**: `phone_number_id` y `to` (uno o varios móviles separados por coma, p. ej. 33612345678,34612345678; todos verificados en Meta).\n- Plantilla `instaina_sonrisa` aprobada en WhatsApp Manager (cabecera Imagen, cuerpo `Aïna te manda una sonrisa 💛 {{1}}`).\n- Activar el flujo.",
+        "content": "## InstAïna → WhatsApp, cada día a las 19:30\n\n1. El disparador horario se ejecuta a las 19:30 (Europe/Madrid).\n2. Pide a la app las fotos de hoy (`GET /api/momentos?desde=…&hasta=…`, con la contraseña de la app).\n3. Envía a Côme una plantilla `instaina_es` / `instaina_fr` por cada foto, con la imagen de cabecera y el pie + hora como variable. Si no hay fotos, no hace nada.\n\n**Configurar una sola vez:**\n- *Credentials → Header Auth* «AïnaDays»: nombre `Authorization`, valor `Bearer <contraseña de la app>`. Ponla en el nodo «Fotos de hoy».\n- *Credentials → Header Auth* «Meta WhatsApp»: nombre `Authorization`, valor `Bearer <token permanente de Meta>`. Ponla en el nodo «Enviar plantilla WhatsApp».\n- Nodo **Ajustes**: `phone_number_id`, `to_es` (móviles que reciben en español) y `to_fr` (en francés), separados por coma; todos verificados en Meta.\n- Plantillas `instaina_es` (español) e `instaina_fr` (francés) aprobadas en WhatsApp Manager, ambas con cabecera Imagen y una variable {{1}}.\n- Activar el flujo.",
         "height": 460,
         "width": 560
       },
@@ -54,20 +54,26 @@
             },
             {
               "id": "s2",
-              "name": "to",
-              "value": "33612345678,34612345678",
+              "name": "to_es",
+              "value": "34600111222,34600333444",
               "type": "string"
             },
             {
               "id": "s3",
-              "name": "template",
-              "value": "instaina_sonrisa",
+              "name": "to_fr",
+              "value": "33612345678,33698765432,33611223344",
               "type": "string"
             },
             {
               "id": "s4",
-              "name": "lang",
-              "value": "es",
+              "name": "template_es",
+              "value": "instaina_es",
+              "type": "string"
+            },
+            {
+              "id": "s5",
+              "name": "template_fr",
+              "value": "instaina_fr",
               "type": "string"
             }
           ]
@@ -102,7 +108,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const cfg = $('Ajustes').first().json;\nconst destinos = String(cfg.to).split(/[,\\s;]+/).map(s => s.replace(/\\D/g, '')).filter(Boolean);\nconst fotos = ($input.first().json.momentos || []).slice().sort((a, b) => new Date(a.ts) - new Date(b.ts));\nconst out = [];\nfor (const f of fotos) {\n  const hora = new Date(f.ts).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' });\n  const nota = (f.nota || '').trim().replace(/\\s+/g, ' ');\n  const variable = nota ? `${nota} (${hora})` : `(${hora})`;\n  for (const to of destinos) out.push({ json: { url: f.url, variable, phone_number_id: cfg.phone_number_id, to, template: cfg.template, lang: cfg.lang } });\n}\nreturn out;"
+        "jsCode": "const cfg = $('Ajustes').first().json;\nconst lista = v => String(v || '').split(/[,\\s;]+/).map(s => s.replace(/\\D/g, '')).filter(Boolean);\n// Cada grupo: números, plantilla e idioma\nconst grupos = [\n  { to: lista(cfg.to_es), template: cfg.template_es, lang: 'es', locale: 'es-ES' },\n  { to: lista(cfg.to_fr), template: cfg.template_fr, lang: 'fr', locale: 'fr-FR' },\n];\nconst fotos = ($input.first().json.momentos || []).slice().sort((a, b) => new Date(a.ts) - new Date(b.ts));\nconst out = [];\nfor (const f of fotos) {\n  const nota = (f.nota || '').trim().replace(/\\s+/g, ' ');\n  for (const g of grupos) {\n    const hora = new Date(f.ts).toLocaleTimeString(g.locale, { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' });\n    const variable = nota ? `${nota} (${hora})` : `(${hora})`;\n    for (const to of g.to) out.push({ json: { url: f.url, variable, phone_number_id: cfg.phone_number_id, to, template: g.template, lang: g.lang } });\n  }\n}\nreturn out;"
       },
       "id": "a4",
       "name": "Una por foto",
