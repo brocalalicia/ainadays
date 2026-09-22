@@ -184,6 +184,11 @@
   .tl { display: grid; gap: 3px; }
   .tl-bar { position: relative; height: 46px; border-radius: 8px; background: var(--surface-2); overflow: hidden; }
   .tl-bar.small { height: 30px; }
+  .tl-bar.solo { height: 26px; }
+  .tl-bar.solo .ev-sueno { top: 3px; bottom: 3px; height: auto; }
+  .tl-bar.feeds { height: 14px; margin-top: 3px; }
+  .tl-bar.feeds .ev-toma { top: 2px; bottom: 2px; width: 3px; }
+  .wrow .tl { gap: 0; }
   .tl-bar .night { position: absolute; top: 0; bottom: 0; background: var(--night); }
   .tl-bar .gl { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--c-grid); opacity: .7; }
   .tl-bar .gl.h6 { opacity: 1; }
@@ -1082,11 +1087,12 @@
     let grid = '';
     for (let h = 3; h < 24; h += 3) grid += `<div class="gl${h % 6 === 0 ? ' h6' : ''}" style="left:${h / 24 * 100}%"></div>`;
     const cl = clipToWindow(evs, from, to);
-    const sleeps = cl.filter(e => e.t === 'sueno').map(e => `<div class="ev-sueno${e.fin == null ? ' live' : ''}" style="left:${pct(e.a)}%;width:${Math.max(0.3, pct(e.b) - pct(e.a))}%" data-tip="${esc(desc(e))}"></div>`).join('');
-    const tomas = cl.filter(e => e.t === 'toma').map(e => `<div class="ev-toma" style="left:${pct(e.a)}%" data-tip="${esc(desc(e))}"></div><div class="hit" style="left:${pct(e.a)}%" data-tip="${esc(desc(e))}"></div>`).join('');
-    const panales = cl.filter(e => e.t === 'panal').map(e => `<div class="ev-panal" style="left:${pct(e.ini)}%" data-tip="${esc(desc(e))}"></div><div class="hit" style="left:${pct(e.ini)}%" data-tip="${esc(desc(e))}"></div>`).join('');
+    const solo = opts.only;
+    const sleeps = (solo && solo !== 'sueno' ? [] : cl.filter(e => e.t === 'sueno')).map(e => `<div class="ev-sueno${e.fin == null ? ' live' : ''}" style="left:${pct(e.a)}%;width:${Math.max(0.3, pct(e.b) - pct(e.a))}%" data-tip="${esc(desc(e))}"></div>`).join('');
+    const tomas = (solo && solo !== 'toma' ? [] : cl.filter(e => e.t === 'toma')).map(e => `<div class="ev-toma" style="left:${pct(e.a)}%" data-tip="${esc(desc(e))}"></div><div class="hit" style="left:${pct(e.a)}%" data-tip="${esc(desc(e))}"></div>`).join('');
+    const panales = (solo ? [] : cl.filter(e => e.t === 'panal')).map(e => `<div class="ev-panal" style="left:${pct(e.ini)}%" data-tip="${esc(desc(e))}"></div><div class="hit" style="left:${pct(e.ini)}%" data-tip="${esc(desc(e))}"></div>`).join('');
     const nowLine = now >= from && now < to ? `<div class="now" style="left:${pct(now)}%"></div>` : '';
-    const bar = `<div class="tl-bar${small ? ' small' : ''}" role="img" aria-label="${L.tlLabel(fmtDay(dayId(from + H)))}">
+    const bar = `<div class="tl-bar${small ? ' small' : ''}${opts.cls ? ' ' + opts.cls : ''}" role="img" aria-label="${L.tlLabel(fmtDay(dayId(from + H)))}">
       ${fondo}${grid}
       ${sleeps}${tomas}${panales}
       ${nowLine}</div>`;
@@ -1225,7 +1231,8 @@
       const d = new Date(dayStart(id));
       return `<div class="wrow${id === today ? ' today' : ''}">
         <div class="dl"><b>${WDs(d)}</b>${weekAxis === 'night' ? d.getDate() + '→' + new Date(dayStart(id) + DAY).getDate() : d.getDate() + ' ' + L.mo[d.getMonth()]}</div>
-        <div>${timelineHTML(evs, from, { hours: false, small: true })}
+        <div>${timelineHTML(evs, from, { hours: false, small: true, only: 'sueno', cls: 'solo' })}
+          ${timelineHTML(evs, from, { hours: false, small: true, only: 'toma', cls: 'feeds' })}
           <div class="wstats">${cl.length ? `<span><b>${tomas}</b> ${L.wFeeds}</span><span><b>${fmtHours(sueno)} ${L.h}</b> ${L.wSleep}</span>${n && n.finished ? `<span>${L.wNight} <b>${n.feeds}</b> ${L.wFeeds}, ${L.wMax} <b>${fmtDur(n.longest)}</b></span>` : ''}` : `<span>${L.noRecords}</span>`}</div>
         </div></div>`;
     }).join('');
@@ -1275,7 +1282,7 @@
         <h2>${L.last7}</h2>
         <div class="filters"><button data-axis="night" aria-pressed="${weekAxis === 'night'}">${L.axisNight}</button><button data-axis="day" aria-pressed="${weekAxis === 'day'}">${L.axisDay}</button><span style="align-self:center;font-size:12.5px;color:var(--muted);margin-left:4px">${weekAxis === 'night' ? L.axisNightSub : L.axisDaySub}</span></div>
         <div class="week">${eje}${rows}${eje}</div>
-        <div class="tl-legend" style="margin-top:8px"><span class="l-sueno">${L.legend.sueno}</span><span class="l-toma">${L.legend.toma}</span><span class="l-panal">${L.legend.panal}</span></div>
+        <div class="tl-legend" style="margin-top:8px"><span class="l-sueno">${L.legend.sueno}</span><span class="l-toma">${L.legend.toma}</span></div>
       </section>
       <section class="block">
         <h2>${L.weekReading}</h2>
