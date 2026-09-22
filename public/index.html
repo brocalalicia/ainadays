@@ -237,6 +237,11 @@
 
   /* Daily reading */
   .ins-h { margin: 14px 0 8px; }
+  .kpi .ks { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+  .kpi .d2 { display: grid; gap: 1px; margin-top: 5px; }
+  .kpi .kd { font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .kpi .kd.up { color: var(--ok); font-weight: 700; }
+  .kpi .kd.down { color: var(--bad); font-weight: 700; }
   .ins-list { display: grid; gap: 8px; }
   .ins { background: var(--surface); border-radius: 14px; padding: 11px 14px; box-shadow: var(--shadow); display: grid; grid-template-columns: 78px 1fr; grid-template-rows: auto auto; column-gap: 12px; row-gap: 4px; font-size: 14.5px; line-height: 1.45; }
   .ins-k { grid-row: 1 / span 2; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--sueno); padding-top: 3px; }
@@ -397,6 +402,8 @@
       emptyToday: 'Todavía no hay nada registrado hoy. Pulsa un botón grande cuando empiece una toma o un sueño; se puede corregir después tocando el registro.',
       evFeed: 'Toma', evSleep: 'Sueño', evDiaper: 'Pañal', evNote: 'Nota', pooOnly: 'caca', peeOnly: 'pipí', both: 'pipí y caca', ongoing: 'en curso',
       reading: 'Lectura de hoy', means: 'Qué significa',
+      kpiSoFar: h => `Hoy hasta las ${h}`, kpiFeeds: 'Tomas', kpiSleep: 'Sueño', kpiNaps: 'Siestas', kpiNightF: 'Anoche', kpiNightSub: d => `tramo máx. ${d}`,
+      vsY: 'ayer', vs7: 'media 7 d', vsSame: 'a esta hora', kpiNoData: 'sin comparación',
       emptyReading: 'Registra el despertar, las tomas y las siestas de hoy y aquí aparecerá la lectura del día.',
       rWake: 'Despierta para el día a las', rFeeds: 'Tomas de día', rGap: d => `hueco máx. ${d}`, rNaps: 'Siestas', rOngoing: '(en curso)',
       rWindows: 'Ventanas de vigilia', rDiapers: 'Pañales', rWet: n => `${n} mojado${n === 1 ? '' : 's'}`, rPoo: n => `${n} con caca`,
@@ -516,6 +523,8 @@
       emptyToday: 'Rien d’enregistré aujourd’hui. Appuie sur un grand bouton au début d’une tétée ou d’un sommeil ; tu pourras corriger ensuite en touchant la ligne.',
       evFeed: 'Tétée', evSleep: 'Sommeil', evDiaper: 'Couche', evNote: 'Note', pooOnly: 'caca', peeOnly: 'pipi', both: 'pipi et caca', ongoing: 'en cours',
       reading: 'Lecture du jour', means: 'Ce que ça veut dire',
+      kpiSoFar: h => `Aujourd’hui jusqu’à ${h}`, kpiFeeds: 'Tétées', kpiSleep: 'Sommeil', kpiNaps: 'Siestes', kpiNightF: 'Cette nuit', kpiNightSub: d => `max. ${d}`,
+      vsY: 'hier', vs7: 'moy. 7 j', vsSame: 'à cette heure', kpiNoData: 'pas de comparaison',
       emptyReading: 'Enregistre le réveil, les tétées et les siestes du jour : la lecture apparaîtra ici.',
       rWake: 'Réveil de la journée à', rFeeds: 'Tétées de jour', rGap: d => `écart max. ${d}`, rNaps: 'Siestes', rOngoing: '(en cours)',
       rWindows: 'Fenêtres d’éveil', rDiapers: 'Couches', rWet: n => `${n} mouillée${n === 1 ? '' : 's'}`, rPoo: n => `${n} avec caca`,
@@ -731,6 +740,31 @@
     return wake;
   }
 
+  // Lo que lleva un día a esta misma hora (para comparar hoy con ayer y con la media)
+  function dayUntil(evs, id, elapsedMs) {
+    const s = dayStart(id), end = s + elapsedMs;
+    const tomas = evs.filter(e => e.t === 'toma' && e.ini >= s && e.ini < end).length;
+    const sueno = evs.filter(e => e.t === 'sueno').reduce((acc, e) => {
+      const fin = e.fin ?? Date.now(), a = Math.max(e.ini, s), b = Math.min(fin, end);
+      return acc + (b > a ? b - a : 0);
+    }, 0);
+    const siestas = evs.filter(e => e.t === 'sueno' && e.ini >= s + 7 * H && e.ini < end).length;
+    const has = evs.some(e => e.ini >= s && e.ini < s + DAY);
+    return { tomas, sueno, siestas, has };
+  }
+  // Compara el valor de hoy con ayer y con la media de los 7 días anteriores
+  function kpi(label, hoy, ayer, media, fmt, upGood, sub) {
+    const linea = (v, etiqueta) => {
+      if (v == null || hoy == null) return `<span class="kd">${etiqueta} —</span>`;
+      const d = hoy - v, cero = Math.abs(d) < (fmt === fmtHours ? 0.05 : 0.05);
+      const cls = cero ? '' : (d > 0) === upGood ? 'up' : 'down';
+      return `<span class="kd ${cls}">${etiqueta} ${cero ? '=' : (d > 0 ? '+' : '−') + fmt(Math.abs(d))}</span>`;
+    };
+    return `<div class="kpi"><div class="l">${label}</div><div class="v">${hoy == null ? '—' : fmt(hoy)}</div>
+      ${sub ? `<div class="ks">${sub}</div>` : ''}
+      <div class="d2">${linea(ayer, L.vsY)}${linea(media, L.vs7)}</div></div>`;
+  }
+
   // Lectura del día: filas de datos + interpretación
   function dayInsights(evs, today) {
     const now = Date.now(), s = dayStart(today);
@@ -842,7 +876,24 @@
       else if (now >= target) next = { k: L.kTonight, what: L.lateEvening };
       else next = { k: L.kTonight, what: L.tonightGoal };
     }
-    return { rows, notes, next };
+    // --- KPIs: hoy a esta hora vs ayer a esta hora y vs media de 7 días ---
+    const elapsed = now - s;
+    const hoyU = dayUntil(evs, today, elapsed);
+    const ayerU = dayUntil(evs, shiftDay(today, -1), elapsed);
+    const prev = [];
+    for (let i = 1; i <= 7; i++) { const d = dayUntil(evs, shiftDay(today, -i), elapsed); if (d.has) prev.push(d); }
+    const mean = f => prev.length ? prev.reduce((a, d) => a + f(d), 0) / prev.length : null;
+    const nightsPrev = [];
+    for (let i = 1; i <= 7; i++) { const n = nightStats(evs, shiftDay(today, -1 - i)); if (n && n.finished) nightsPrev.push(n); }
+    const meanN = f => nightsPrev.length ? nightsPrev.reduce((a, n) => a + f(n), 0) / nightsPrev.length : null;
+    const num = x => x == null ? '—' : (Math.round(x * 10) / 10).toString().replace('.', ',');
+    const kpis = `<div class="eyebrow ins-h">${L.kpiSoFar(fmtTime(now))} · ${L.vsSame}</div><div class="kpis">
+      ${kpi(L.kpiFeeds, hoyU.tomas, ayerU.has ? ayerU.tomas : null, mean(d => d.tomas), num, true)}
+      ${kpi(L.kpiSleep, hoyU.sueno / H, ayerU.has ? ayerU.sueno / H : null, mean(d => d.sueno / H) , x => num(x) + ' ' + L.h, true)}
+      ${kpi(L.kpiNaps, hoyU.siestas, ayerU.has ? ayerU.siestas : null, mean(d => d.siestas), num, true)}
+      ${night ? kpi(L.kpiNightF, night.feeds, nightsPrev.length ? nightsPrev[0].feeds : null, meanN(n => n.feeds), num, false, L.kpiNightSub(fmtDur(night.longest))) : ''}
+    </div>`;
+    return { rows, notes, next, kpis };
   }
 
   // Resumen en texto plano para pedir una lectura a Claude
@@ -945,7 +996,8 @@
         <div class="chips">${ai.state === 'loading' ? `<button class="chip" data-act="ai-stop">${L.aiStop}</button>` : `<button class="chip ai-btn" data-act="ai">${ai.text ? L.aiAgain : L.aiAsk}</button>`}</div>
       </div>` : '';
     const insightsHTML = `<section class="block"><h2>${L.reading}</h2>
-      ${ins.rows.length ? `<div class="read">${ins.rows.map(([k, v]) => `<div class="row"><span>${k}</span><b>${v}</b></div>`).join('')}</div>` : ''}
+      ${ins.kpis || ''}
+      ${ins.rows.length ? `<div class="eyebrow ins-h">${L.today}</div><div class="read">${ins.rows.map(([k, v]) => `<div class="row"><span>${k}</span><b>${v}</b></div>`).join('')}</div>` : ''}
       ${ins.notes.length ? `<div class="eyebrow ins-h">${L.means}</div><div class="ins-list">${ins.notes.map(n => `<div class="ins"><div class="ins-k">${n.k}</div><div class="ins-w">${n.what}</div><div class="ins-t">${n.todo}</div></div>`).join('')}</div>` : ''}
       ${ins.next ? `<div class="next"><div class="ins-k">${ins.next.k}</div><div>${ins.next.what}</div></div>` : ''}
       ${!ins.rows.length && !ins.notes.length ? `<div class="empty">${L.emptyReading}</div>` : ''}
