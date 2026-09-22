@@ -435,7 +435,7 @@
       emptyToday: 'Todavía no hay nada registrado hoy. Pulsa un botón grande cuando empiece una toma o un sueño; se puede corregir después tocando el registro.',
       evFeed: 'Toma', evSleep: 'Sueño', evDiaper: 'Pañal', evNote: 'Nota', pooOnly: 'caca', peeOnly: 'pipí', both: 'pipí y caca', ongoing: 'en curso',
       reading: 'Lectura de hoy', means: 'Qué significa',
-      kpiSoFar: h => `Hoy hasta las ${h}`, kpiFeedsD: 'Tomas día', kpiFeedsN: 'Tomas noche', kpiSleepN: 'Sueño noche', kpiNaps: 'Siestas', kpiSubNow: 'a esta hora', kpiSubNight: 'noche pasada', kpiNapsSub: h => `${h} h en total`, kpiStretchSub: d => `tramo máx. ${d}`,
+      kpiSoFar: h => `Hoy hasta las ${h}`, kpiFeedsD: 'Tomas día', kpiFeedsN: 'Tomas noche', kpiSleepN: 'Sueño noche', kpiNaps: 'Siestas', kpiSubNow: 'a esta hora', kpiSubNight: 'de esta noche', kpiNapsSub: h => `${h} h en total`, kpiStretchSub: d => `tramo máx. ${d}`,
       vsY: 'ayer', vs7: 'media 7 d', vsSame: 'a esta hora', kpiNoData: 'sin comparación',
       emptyReading: 'Registra el despertar, las tomas y las siestas de hoy y aquí aparecerá la lectura del día.',
       rWake: 'Despierta para el día a las', rFeeds: 'Tomas de día', rGap: d => `hueco máx. ${d}`, rNaps: 'Siestas', rOngoing: '(en curso)',
@@ -466,7 +466,7 @@
       aiThinking: 'Pensando… (puede tardar medio minuto)', aiWriting: 'Escribiendo…',
       aiNotGranted: 'Sin permiso para preguntar a Claude desde esta página.', aiRate: 'Demasiadas peticiones seguidas; prueba en un rato.', aiFail: 'No se pudo obtener la lectura. Inténtalo de nuevo.',
       aiLang: 'Escribe en español',
-      last7: 'Últimos 7 días', wSleepTitle: 'Sueño por día', wFeedsTitle: 'Tomas por día', axisNight: 'Noche centrada', axisDay: '00–24 h', axisNightSub: 'cada fila: de las 19:30 a las 19:30 del día siguiente', axisDaySub: 'cada fila: de medianoche a medianoche', noRecords: 'sin registros', wFeeds: 'tomas', wSleep: 'sueño', wNight: 'noche:', wMax: 'máx.',
+      last7: 'Últimos 7 días', wSleepTitle: 'Sueño por día', wFeedsTitle: 'Tomas por día', axisNight: 'Noche centrada', axisDay: '00–24 h', axisNightSub: 'cada fila: de las 19:30 de la víspera a las 19:30', axisDaySub: 'cada fila: de medianoche a medianoche', noRecords: 'sin registros', wFeeds: 'tomas', wSleep: 'sueño', wNight: 'noche:', wMax: 'máx.',
       weekReading: 'Lectura de la semana',
       weekEmpty: 'Con 3–4 días registrados aparecerá aquí una lectura: hora habitual de despertar y de acostarse, tomas de día y de noche, y el tramo nocturno más largo. Registra unos días sin cambiar nada; primero entender, luego ajustar.',
       wkWake: 'Despierta por la mañana sobre las', wkBed: 'Se duerme por la noche sobre las', varies: d => `(varía ${d})`,
@@ -583,7 +583,7 @@
       emptyToday: 'Rien d’enregistré aujourd’hui. Appuie sur un grand bouton au début d’une tétée ou d’un sommeil ; tu pourras corriger ensuite en touchant la ligne.',
       evFeed: 'Tétée', evSleep: 'Sommeil', evDiaper: 'Couche', evNote: 'Note', pooOnly: 'caca', peeOnly: 'pipi', both: 'pipi et caca', ongoing: 'en cours',
       reading: 'Lecture du jour', means: 'Ce que ça veut dire',
-      kpiSoFar: h => `Aujourd’hui jusqu’à ${h}`, kpiFeedsD: 'Tétées jour', kpiFeedsN: 'Tétées nuit', kpiSleepN: 'Sommeil nuit', kpiNaps: 'Siestes', kpiSubNow: 'à cette heure', kpiSubNight: 'nuit dernière', kpiNapsSub: h => `${h} h au total`, kpiStretchSub: d => `max. ${d}`,
+      kpiSoFar: h => `Aujourd’hui jusqu’à ${h}`, kpiFeedsD: 'Tétées jour', kpiFeedsN: 'Tétées nuit', kpiSleepN: 'Sommeil nuit', kpiNaps: 'Siestes', kpiSubNow: 'à cette heure', kpiSubNight: 'de cette nuit', kpiNapsSub: h => `${h} h au total`, kpiStretchSub: d => `max. ${d}`,
       vsY: 'hier', vs7: 'moy. 7 j', vsSame: 'à cette heure', kpiNoData: 'pas de comparaison',
       emptyReading: 'Enregistre le réveil, les tétées et les siestes du jour : la lecture apparaîtra ici.',
       rWake: 'Réveil de la journée à', rFeeds: 'Tétées de jour', rGap: d => `écart max. ${d}`, rNaps: 'Siestes', rOngoing: '(en cours)',
@@ -614,7 +614,7 @@
       aiThinking: 'Réflexion… (peut prendre une trentaine de secondes)', aiWriting: 'Rédaction…',
       aiNotGranted: 'Pas d’autorisation pour interroger Claude depuis cette page.', aiRate: 'Trop de demandes d’affilée ; réessaie dans un moment.', aiFail: 'Impossible d’obtenir la lecture. Réessaie.',
       aiLang: 'Écris en français',
-      last7: '7 derniers jours', wSleepTitle: 'Sommeil par jour', wFeedsTitle: 'Tétées par jour', axisNight: 'Nuit centrée', axisDay: '0–24 h', axisNightSub: 'chaque ligne : de 19 h 30 à 19 h 30 le lendemain', axisDaySub: 'chaque ligne : de minuit à minuit', noRecords: 'aucun enregistrement', wFeeds: 'tétées', wSleep: 'sommeil', wNight: 'nuit :', wMax: 'max.',
+      last7: '7 derniers jours', wSleepTitle: 'Sommeil par jour', wFeedsTitle: 'Tétées par jour', axisNight: 'Nuit centrée', axisDay: '0–24 h', axisNightSub: 'chaque ligne : de 19 h 30 la veille à 19 h 30', axisDaySub: 'chaque ligne : de minuit à minuit', noRecords: 'aucun enregistrement', wFeeds: 'tétées', wSleep: 'sommeil', wNight: 'nuit :', wMax: 'max.',
       weekReading: 'Lecture de la semaine',
       weekEmpty: 'Après 3–4 jours enregistrés, une lecture apparaîtra ici : heure habituelle de réveil et de coucher, tétées de jour et de nuit, et plus longue période nocturne. Enregistre quelques jours sans rien changer ; comprendre d’abord, ajuster ensuite.',
       wkWake: 'Réveil le matin vers', wkBed: 'Endormie le soir vers', varies: d => `(varie de ${d})`,
@@ -731,9 +731,10 @@
   const WAKE_OK = 75, WAKE_WARN = 105, WAKE_MAX = 120;
   // Noche: de 19:30 a 07:00 no hay ventanas de vigilia, solo toma y vuelta a dormir
   const DUR_SHORT = 8, DUR_LONG = 20; // minutos, tomas aproximadas
-  // La vista de «hoy» va de las 19:30 a las 19:30 del día siguiente
-  const WIN_H = 19.5;
-  const winStart = (ms = Date.now()) => { const t = dayStart(dayId(ms)) + WIN_H * H; return ms >= t ? t : t - DAY; };
+  // El día de Aïna va de las 19:30 a las 19:30: la tarde del 22 ya cuenta como el 23
+  const WIN_H = 19.5, WIN_OFF = (24 - WIN_H) * H;
+  const dayOf = (ms = Date.now()) => dayId(ms + WIN_OFF);  // a qué día lógico pertenece un instante
+  const winStart = id => dayStart(id) - WIN_OFF;           // ese día empieza a las 19:30 de la víspera
   // Rangos orientativos por etapa (semanas cumplidas). El texto de cada etapa está en I18N.stages
   const ETAPAS = [
     { to: 2,  tomas: [8, 12], sueno: [14, 18], siestas: [4, 8], tramo: [2, 4],  desp: [3, 6], vent: '40–60 min' },
@@ -910,6 +911,7 @@
   // Lectura del día: filas de datos + interpretación
   function dayInsights(evs, today) {
     const now = Date.now(), s = dayStart(today);
+    const w0 = winStart(today), w1 = w0 + DAY;   // la ventana 19:30 → 19:30 de este día
     const rows = [], notes = [];
     const sleeps = evs.filter(e => e.t === 'sueno');
     const napping = !!activeOf('sueno');
@@ -917,7 +919,7 @@
     const dayFrom = wake ?? s + 7 * H;
     if (wake) rows.push([L.rWake, fmtTime(wake)]);
 
-    const dayFeeds = evs.filter(e => e.t === 'toma' && e.ini >= dayFrom && e.ini < s + DAY);
+    const dayFeeds = evs.filter(e => e.t === 'toma' && e.ini >= dayFrom && e.ini < w1);
     let maxGap = 0;
     for (let i = 1; i < dayFeeds.length; i++) maxGap = Math.max(maxGap, dayFeeds[i].ini - dayFeeds[i - 1].ini);
     const lastFeed = dayFeeds[dayFeeds.length - 1];
@@ -931,7 +933,7 @@
     for (const n of naps) { if (prevEnd != null && n.ini > prevEnd) windows.push(n.ini - prevEnd); prevEnd = n.fin; }
     if (windows.length) rows.push([L.rWindows, windows.map(fmtDur).join(' · ')]);
 
-    const diapers = evs.filter(e => e.t === 'panal' && e.ini >= s && e.ini < s + DAY);
+    const diapers = evs.filter(e => e.t === 'panal' && e.ini >= w0 && e.ini < w1);
     const poo = diapers.filter(e => e.p === 'caca' || e.p === 'ambos').length;
     if (diapers.length) rows.push([L.rDiapers, `${L.rWet(diapers.length)}${poo ? `, ${L.rPoo(poo)}` : ''}`]);
     const lastPoo = [...evs].reverse().find(e => e.t === 'panal' && (e.p === 'caca' || e.p === 'ambos'));
@@ -977,14 +979,14 @@
     }
     // Pañales: hoy + análisis de los últimos 5 días
     {
-      const D5 = 5, from5 = s - (D5 - 1) * DAY;
-      const all5 = evs.filter(e => e.t === 'panal' && e.ini >= from5 && e.ini < s + DAY);
+      const D5 = 5, from5 = w0 - (D5 - 1) * DAY;
+      const all5 = evs.filter(e => e.t === 'panal' && e.ini >= from5 && e.ini < w1);
       const poos5 = all5.filter(e => e.p === 'caca' || e.p === 'ambos');
-      const daysWithData = new Set(evs.filter(e => e.ini >= from5 && e.ini < s + DAY).map(e => dayId(e.ini))).size;
+      const daysWithData = new Set(evs.filter(e => e.ini >= from5 && e.ini < w1).map(e => dayOf(e.ini))).size;
       const fullDays = Math.max(1, daysWithData - 1); // el día de hoy está a medias
       // Pipís: solo de día (07–20 h), porque de noche se cambia poco o nada; por eso no cuentan
       const isDaytime = ms => { const h = new Date(ms).getHours(); return h >= 7 && h < 20; };
-      const wetPerDay = fullDays ? all5.filter(e => e.ini < s && e.p !== 'caca' && isDaytime(e.ini)).length / fullDays : null;
+      const wetPerDay = fullDays ? all5.filter(e => e.ini < w0 && e.p !== 'caca' && isDaytime(e.ini)).length / fullDays : null;
       if (diapers.length || poos5.length || daysWithData >= 2) {
         const parts = [];
         const wetTodayDay = diapers.filter(e => e.p !== 'caca' && isDaytime(e.ini)).length;
@@ -1042,12 +1044,12 @@
 
   // Resumen en texto plano para pedir una lectura a Claude
   function daySummaryText(evs, today) {
-    const s = dayStart(today), from = s - 5 * H, now = Date.now();
+    const s = dayStart(today), from = winStart(today), to = from + DAY, now = Date.now();
     const Ln = e => e.t === 'toma' ? `${fmtTime(e.ini)} ${L.evFeed.toLowerCase()}${e.lado ? ' ' + L.side[e.lado] : ''}${e.fin ? ' ' + fmtDur(e.fin - e.ini) : ' (' + L.ongoing + ')'}`
       : e.t === 'sueno' ? `${fmtTime(e.ini)}–${e.fin ? fmtTime(e.fin) : '…'} ${L.evSleep.toLowerCase()} ${fmtDur((e.fin ?? now) - e.ini)}${e.fin ? '' : ' (' + L.ongoing + ')'}`
       : e.t === 'panal' ? `${fmtTime(e.ini)} ${L.evDiaper.toLowerCase()} ${e.p === 'caca' ? L.pooOnly : e.p === 'ambos' ? L.both : L.peeOnly}`
       : `${fmtTime(e.ini)} ${L.evNote.toLowerCase()}`;
-    return evs.filter(e => e.ini >= from && e.ini < s + DAY).map(e => `${e.ini < s ? '(-1) ' : ''}${Ln(e)}${e.n ? ` — ${e.n}` : ''}`).join('\n');
+    return evs.filter(e => e.ini >= from && e.ini < to).map(e => `${e.ini < s ? '(-1) ' : ''}${Ln(e)}${e.n ? ` — ${e.n}` : ''}`).join('\n');
   }
 
   // ---------- Render ----------
@@ -1093,7 +1095,7 @@
     const tomas = (solo && solo !== 'toma' ? [] : cl.filter(e => e.t === 'toma')).map(e => `<div class="ev-toma" style="left:${pct(e.a)}%" data-tip="${esc(desc(e))}"></div><div class="hit" style="left:${pct(e.a)}%" data-tip="${esc(desc(e))}"></div>`).join('');
     const panales = (solo ? [] : cl.filter(e => e.t === 'panal')).map(e => `<div class="ev-panal" style="left:${pct(e.ini)}%" data-tip="${esc(desc(e))}"></div><div class="hit" style="left:${pct(e.ini)}%" data-tip="${esc(desc(e))}"></div>`).join('');
     const nowLine = now >= from && now < to ? `<div class="now" style="left:${pct(now)}%"></div>` : '';
-    const bar = `<div class="tl-bar${small ? ' small' : ''}${opts.cls ? ' ' + opts.cls : ''}" role="img" aria-label="${L.tlLabel(fmtDay(dayId(from + H)))}">
+    const bar = `<div class="tl-bar${small ? ' small' : ''}${opts.cls ? ' ' + opts.cls : ''}" role="img" aria-label="${L.tlLabel(fmtDay(dayOf(from + H)))}">
       ${fondo}${grid}
       ${sleeps}${tomas}${panales}
       ${nowLine}</div>`;
@@ -1112,7 +1114,7 @@
   }
 
   function renderHoy() {
-    const now = Date.now(), evs = allEvents(), today = dayId(now);
+    const now = Date.now(), evs = allEvents(), today = dayOf(now);
     const toma = activeOf('toma'), sueno = activeOf('sueno');
     const lastSleep = [...evs].reverse().find(e => e.t === 'sueno' && e.fin != null);
     const lastToma = [...evs].reverse().find(e => e.t === 'toma' && e.fin != null);
@@ -1166,7 +1168,7 @@
       ${aiBlock ? `<div class="read" style="margin-top:10px">${aiBlock}</div>` : ''}
     </section>`;
 
-    const w0 = winStart(), w1 = w0 + DAY;
+    const w0 = winStart(today), w1 = w0 + DAY;
     const listEvs = evs.filter(e => e.ini >= w0 && e.ini < w1).reverse();
     const listHTML = listEvs.length ? `<div class="list">${listEvs.map(e => {
       const desc = e.t === 'toma' ? `${L.evFeed} · ${L.side[e.lado] || ''}${e.dur ? ' · ' + (e.dur === 'larga' ? L.durLong : L.durShort) : ''}`
@@ -1208,8 +1210,8 @@
         ${ask.turns.length ? `<button class="newc" data-act="ask-new">${L.qNew}</button>` : ''}
       </div>
       <section class="block">
-        <h2>${L.today} <span class="eyebrow">${fmtDay(dayId(winStart() + H))} · ${fmtTime(winStart())} → ${fmtTime(winStart())}</span></h2>
-        ${timelineHTML(evs, winStart())}
+        <h2>${L.today} <span class="eyebrow">${fmtDay(today)} · ${fmtTime(w0)} → ${fmtTime(w0)}</span></h2>
+        ${timelineHTML(evs, w0)}
         <div class="tl-legend" style="margin-top:6px"><span class="l-sueno">${L.legend.sueno}</span><span class="l-toma">${L.legend.toma}</span><span class="l-panal">${L.legend.panal}</span></div>
       </section>
       ${insightsHTML}
@@ -1220,42 +1222,43 @@
   }
 
   function renderSemana() {
-    const now = Date.now(), evs = allEvents(), today = dayId(now);
-    const originH = weekAxis === 'night' ? WIN_H : 0;   // 19:00 → 19:00 deja la noche entera en una fila
+    const now = Date.now(), evs = allEvents(), today = dayOf(now);
+    // en modo noche, la fila del día D empieza a las 19:30 de la víspera y deja la noche entera dentro
+    const desde = id => weekAxis === 'night' ? winStart(id) : dayStart(id);
     const ids = []; for (let i = 6; i >= 0; i--) ids.push(shiftDay(today, -i));
     // Una fila por día con una sola barra: 'sueno' o 'toma'
     const filaHTML = (id, tipo) => {
-      const from = dayStart(id) + originH * H, to = from + DAY;
+      const from = desde(id), to = from + DAY;
       const cl = clipToWindow(evs, from, to);
-      const n = nightStats(evs, id);
+      const n = nightStats(evs, shiftDay(id, -1));   // la noche que acaba la mañana de D
       const d = new Date(dayStart(id));
       const bar = timelineHTML(evs, from, { hours: false, small: true, only: tipo, cls: tipo === 'sueno' ? 'solo' : 'feeds solo-feeds' });
       let stats;
       if (!cl.length) stats = `<span>${L.noRecords}</span>`;
       else if (tipo === 'sueno') {
         const sueno = cl.filter(e => e.t === 'sueno').reduce((a, e) => a + (e.b - e.a), 0);
-        const nocturno = clipSum(evs, dayStart(id) + 19 * H, dayStart(id) + 32 * H, 'sueno');
+        const nocturno = clipSum(evs, dayStart(id) - 5 * H, dayStart(id) + 8 * H, 'sueno');
         stats = `<span><b>${fmtHours(sueno)} ${L.h}</b> ${L.wSleep}</span>${n && n.finished ? `<span>${L.wNight} <b>${fmtHours(nocturno)} ${L.h}</b>, ${L.wMax} <b>${fmtDur(n.longest)}</b></span>` : ''}`;
       } else {
         const tomas = cl.filter(e => e.t === 'toma').length;
         stats = `<span><b>${tomas}</b> ${L.wFeeds}</span>${n && n.finished ? `<span>${L.wNight} <b>${n.feeds}</b> ${L.wFeeds}</span>` : ''}`;
       }
       return `<div class="wrow${id === today ? ' today' : ''}">
-        <div class="dl"><b>${WDs(d)}</b>${weekAxis === 'night' ? d.getDate() + '→' + new Date(dayStart(id) + DAY).getDate() : d.getDate() + ' ' + L.mo[d.getMonth()]}</div>
+        <div class="dl"><b>${WDs(d)}</b>${d.getDate()} ${L.mo[d.getMonth()]}</div>
         <div>${bar}<div class="wstats">${stats}</div></div></div>`;
     };
     const rowsSueno = ids.map(id => filaHTML(id, 'sueno')).join('');
     const rowsTomas = ids.map(id => filaHTML(id, 'toma')).join('');
-    const eje = `<div class="wrow"><div class="dl"></div><div>${axisHTML(dayStart(today) + originH * H)}</div></div>`;
+    const eje = `<div class="wrow"><div class="dl"></div><div>${axisHTML(desde(today))}</div></div>`;
 
     const withData = ids.filter(id => clipToDay(evs, id).length > 0 && id !== today);
-    const nights = ids.map(id => nightStats(evs, id)).filter(n => n && n.finished);
+    const nights = ids.map(id => nightStats(evs, shiftDay(id, -1))).filter(n => n && n.finished);
     const wakes = [], beds = [];
     for (const id of ids) {
       const s = dayStart(id);
       const w = morningWake(evs.filter(e => e.t === 'sueno'), s);
       if (w != null) wakes.push(minutesOfDay(w));
-      const n = nightStats(evs, id); if (n && n.bedtime) beds.push(minutesOfDay(n.bedtime));
+      const n = nightStats(evs, shiftDay(id, -1)); if (n && n.bedtime) beds.push(minutesOfDay(n.bedtime));
     }
     const avg = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
     const avgTomas = avg(withData.map(id => dayStats(evs, id).tomas));
@@ -1313,26 +1316,26 @@
   try { panelRange = Number(localStorage.getItem('ainadays.range')) || 14; } catch {}
   const clipSum = (evs, a, b, t) => evs.filter(e => e.t === t).reduce((acc, e) => { const fin = e.fin ?? Date.now(); const x = Math.max(e.ini, a), y = Math.min(fin, b); return acc + (y > x ? y - x : 0); }, 0);
 
-  // Una fila por día: día D (07–20 h) + noche que empieza la tarde de D (19–08 h)
+  // Una fila por día lógico D: la noche que acaba la mañana de D (19–08 h) + el día D (07–20 h)
   function panelRows(evs, ids) {
     const now = Date.now();
     return ids.map(id => {
       const s = dayStart(id);
       const feedsD = evs.filter(e => e.t === 'toma' && e.ini >= s + 7 * H && e.ini < s + 20 * H).length;
-      const feedsN = evs.filter(e => e.t === 'toma' && e.ini >= s + 20 * H && e.ini < s + 31 * H).length;
+      const feedsN = evs.filter(e => e.t === 'toma' && e.ini >= s - 4 * H && e.ini < s + 7 * H).length;
       const naps = clipSum(evs, s + 8 * H, s + 19 * H, 'sueno');
       const napsN = evs.filter(e => e.t === 'sueno' && e.fin != null && e.ini >= s + 8 * H && e.ini < s + 19 * H).length;
-      const nightSleep = clipSum(evs, s + 19 * H, s + 32 * H, 'sueno');
-      const n = nightStats(evs, id);
-      const wake = morningWake(evs.filter(e => e.t === 'sueno'), s + DAY);
-      const has = clipToDay(evs, id).length > 0;
-      const hours = evs.filter(e => e.t === 'toma' && e.ini >= s && e.ini < s + DAY).map(e => new Date(e.ini).getHours());
-      return { id, has, feedsD, feedsN, naps, napsN, nightSleep, longest: n && (n.bedtime || n.feeds) ? n.longest : null, nightDone: !!(n && n.finished && (n.bedtime || n.feeds)), bed: n && n.bedtime ? minutesOfDay(n.bedtime) : null, wake: wake != null ? minutesOfDay(wake) : null, hours, future: s > now };
+      const nightSleep = clipSum(evs, s - 5 * H, s + 8 * H, 'sueno');
+      const n = nightStats(evs, shiftDay(id, -1));
+      const wake = morningWake(evs.filter(e => e.t === 'sueno'), s);
+      const has = evs.some(e => e.ini >= s - WIN_OFF && e.ini < s - WIN_OFF + DAY);
+      const hours = evs.filter(e => e.t === 'toma' && e.ini >= s - WIN_OFF && e.ini < s - WIN_OFF + DAY).map(e => new Date(e.ini).getHours());
+      return { id, has, feedsD, feedsN, naps, napsN, nightSleep, longest: n && (n.bedtime || n.feeds) ? n.longest : null, nightDone: !!(n && n.finished && (n.bedtime || n.feeds)), bed: n && n.bedtime ? minutesOfDay(n.bedtime) : null, wake: wake != null ? minutesOfDay(wake) : null, hours, future: s - WIN_OFF > now };
     });
   }
 
   function renderPanel() {
-    const evs = allEvents(), today = dayId(Date.now());
+    const evs = allEvents(), today = dayOf(Date.now());
     const ids = []; for (let i = panelRange - 1; i >= 0; i--) ids.push(shiftDay(today, -i));
     const rows = panelRows(evs, ids);
     const prevIds = []; for (let i = 2 * panelRange - 1; i >= panelRange; i--) prevIds.push(shiftDay(today, -i));
@@ -1657,7 +1660,7 @@
   // Edad y etapa: dónde está, qué le pasa ahora y qué viene
   function etapaHTML() {
     const i = etapaIdx(), r = ETAPAS[i], t = L.stages[i], sig = L.stages[i];
-    const evs = allEvents(), today = dayId(Date.now());
+    const evs = allEvents(), today = dayOf(Date.now());
     const ids = []; for (let k = 7; k >= 1; k--) ids.push(shiftDay(today, -k));
     const rs = panelRows(evs, ids).filter(x => x.has && x.nightDone);
     const avg = f => rs.length ? rs.reduce((a, x) => a + f(x), 0) / rs.length : null;
@@ -1921,8 +1924,8 @@
 
   // ---------- Consejo: «¿Qué está haciendo?» ----------
   const ask = { text: '', turns: [], day: '', state: 'idle', listening: false };
-  try { const saved = JSON.parse(localStorage.getItem('ainadays.chat') || 'null'); if (saved && saved.day === dayId(Date.now())) { ask.turns = saved.turns || []; ask.day = saved.day; } } catch {}
-  function saveChat() { try { localStorage.setItem('ainadays.chat', JSON.stringify({ day: dayId(Date.now()), turns: ask.turns })); } catch {} }
+  try { const saved = JSON.parse(localStorage.getItem('ainadays.chat') || 'null'); if (saved && saved.day === dayOf(Date.now())) { ask.turns = saved.turns || []; ask.day = saved.day; } } catch {}
+  function saveChat() { try { localStorage.setItem('ainadays.chat', JSON.stringify({ day: dayOf(Date.now()), turns: ask.turns })); } catch {} }
 
   // Dictado por voz con el reconocimiento del navegador (Chrome, Safari iOS 14.5+; requiere HTTPS)
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
@@ -1996,7 +1999,7 @@
 
   // Contexto compacto de ahora mismo, para las reglas y para Claude
   function nowContext() {
-    const now = Date.now(), evs = allEvents(), today = dayId(now);
+    const now = Date.now(), evs = allEvents(), today = dayOf(now);
     const sleeping = activeOf('sueno'), feeding = activeOf('toma');
     const lastSleep = [...evs].reverse().find(e => e.t === 'sueno' && e.fin != null);
     const lastFeed = [...evs].reverse().find(e => e.t === 'toma' && e.fin != null);
@@ -2055,7 +2058,7 @@
     ask.text = ta ? ta.value.trim() : ask.text;
     if (!ask.text) { toast(L.qNeedText); return; }
     if (ask.state === 'loading') return;
-    if (ask.day !== dayId(Date.now())) { ask.turns = []; ask.day = dayId(Date.now()); }
+    if (ask.day !== dayOf(Date.now())) { ask.turns = []; ask.day = dayOf(Date.now()); }
     const c = nowContext();
     const q = ask.text;
     ask.turns.push({ role: 'user', texto: q, time: fmtTime(Date.now()) });
@@ -2119,7 +2122,7 @@
   const ai = { state: 'idle', text: '', error: '', ctl: null };
   async function askClaude() {
     if (!sampleFn || ai.state === 'loading') return;
-    const today = dayId(Date.now()), evs = allEvents();
+    const today = dayOf(Date.now()), evs = allEvents();
     const ins = dayInsights(evs, today);
     const prompt = `Eres una asesora de lactancia y sueño infantil, cercana y concreta. Una madre da pecho en exclusiva a su hija Aïna, de 3 meses, y registra tomas, sueños y pañales en una app. Hoy es ${fmtDay(today)} y son las ${fmtTime(Date.now())}.
 
