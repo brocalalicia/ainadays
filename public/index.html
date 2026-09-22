@@ -484,23 +484,94 @@
       tFull: 'Base de datos llena: borra días antiguos', tNoSync: 'No se pudo sincronizar, guardado en el móvil',
       // Edad y etapa
       stTitle: 'Edad y etapa', stBorn: 'Nacida el', stAge: (w, t) => `${w} semanas · ${t}`,
-      stHow: 'Cómo va Aïna', stNow: 'Qué pasa ahora', stNext: 'Lo que viene',
+      stHow: 'Cómo va Aïna', stNow: 'Qué pasa ahora', stWhy: 'Por qué pasa', stBrain: 'Qué pasa en su cerebro', stDoing: 'Qué está empezando a hacer', stNext: 'El mes que viene',
+      stLme: 'Rangos de lactancia materna exclusiva: un bebé de pecho mama más a menudo y se despierta más de noche que las tablas generales.',
       stNeed: 'Con 3 o 4 días registrados aquí verás su comparación con lo esperable a su edad.',
       stHers: 'Suya', stExp: 'Esperable', stOk: 'en rango', stUp: 'por encima', stDown: 'por debajo',
       stFeeds: 'Tomas / 24 h', stSleep: 'Sueño / 24 h', stNaps: 'Siestas al día', stStretch: 'Tramo nocturno máx.', stWakes: 'Despertares de noche', stWin: 'Ventana de vigilia',
-      stFoot: 'Rangos orientativos para su edad; quien confirma que va bien es tu pediatra.',
+      stFoot: 'Rangos orientativos para lactancia materna exclusiva a su edad; quien confirma que va bien es tu pediatra.',
       stChange: 'Cambiar fecha',
       stages: [
-        { n: 'Recién nacida', now: ['Come a demanda día y noche, sin distinguir uno de otro.', 'Duerme a ratos cortos; lo normal es despertarse cada 2–3 h para mamar.', 'Lo que de verdad importa ahora: pañales mojados y que recupere el peso del nacimiento.'], next: 'Hacia las 3 semanas, el primer estirón: pedirá pecho casi sin parar un par de días.' },
-        { n: 'Primer mes y medio', now: ['Estirones alrededor de las 3 y las 6 semanas: dos o tres días de pedir sin parar.', 'El llanto alcanza su pico hacia las 6 semanas; después baja solo.', 'Aparece la sonrisa social: la primera de verdad, no por gases.'], next: 'Entre las 6 y las 10 semanas empieza a distinguir el día de la noche y el primer tramo largo se alarga.' },
-        { n: 'Empieza a distinguir día y noche', now: ['Su cuerpo ya fabrica melatonina: el sueño se organiza y la noche empieza a alargarse.', 'Aguanta despierta 1 h – 1 h 30 y luego necesita dormir.', 'Las siestas siguen siendo cortas e irregulares; es normal.'], next: 'Hacia los 3 meses, tomas de día más cortas y distraídas, y noches algo más largas.' },
-        { n: '3 meses', now: ['«Bache de los 3 meses»: mama más rápido y se distrae con todo; parece que come menos y compensa de noche.', 'Descubre sus manos: se las lleva a la boca y babea (no es que estén saliendo dientes).', 'Las ventanas de vigilia se alargan hasta 1 h 30 – 2 h.'], next: 'Entre las 14 y las 19 semanas llegan a la vez el gran cambio de sueño de los 4 meses y un salto de desarrollo.' },
-        { n: 'Cambio de sueño de los 4 meses', now: ['Su sueño madura: ahora tiene ciclos como los de un adulto y al terminar cada uno se despierta del todo. Más despertares nocturnos, justo cuando parecía que mejoraba.', 'Las siestas se cortan en 30–45 min (un ciclo). No es un retroceso: es permanente y se reorganiza en unas semanas.', 'Salto de desarrollo (semanas 14–19): más brazos, peor humor al atardecer, sueño inquieto.', 'Mama muy rápido: 5–10 minutos pueden ser una toma completa.', 'Puede empezar a girarse: brazos libres para dormir.'], next: 'Hacia los 5 meses se asientan 3 siestas y el tramo nocturno vuelve a crecer.' },
-        { n: '4 meses y medio a 6 meses', now: ['Se asientan tres siestas y la noche se alarga de verdad.', 'Aguanta 1 h 30 – 2 h 30 despierta.', 'Se sienta con apoyo, agarra lo que quiere y se lo lleva a la boca.'], next: 'A los 6 meses empieza la alimentación complementaria; el pecho sigue siendo lo principal hasta el año.' },
-        { n: '6 a 8 meses', now: ['Empieza la comida sólida, pero el pecho sigue siendo el alimento principal.', 'Ansiedad de separación: llora cuando sales de la habitación. Es un avance, no un retroceso.', 'Gateo y primeros dientes pueden alterar el sueño unas semanas.'], next: 'Entre los 8 y los 10 meses, otro salto: se pone de pie y practica de noche.' },
-        { n: '8 a 10 meses', now: ['Se pone de pie en la cuna y practica a las 3 de la mañana. Pasará.', 'Dos siestas bien marcadas; la de la tarde empieza a acortarse.', 'Puede rechazar tomas de día por estar demasiado ocupada.'], next: 'Hacia el año, 2 siestas se convierten en una y el destete nocturno es posible si lo deseas.' },
-        { n: '10 a 13 meses', now: ['Primeros pasos; el sueño puede volverse irregular unas semanas.', 'Come de todo y mama menos veces, pero el pecho sigue aportando defensas y calorías.', 'Aguanta 3–4 h despierta entre siestas.'], next: 'Entre los 14 y los 18 meses pasará de dos siestas a una sola, al mediodía.' },
-        { n: 'Más de un año', now: ['Una o dos siestas, y noches largas con algún despertar puntual.', 'El pecho sigue siendo válido mientras a las dos os vaya bien.'], next: 'A partir de aquí los cambios son más lentos y menos bruscos.' },
+        {
+          n: 'Recién nacida',
+          now: ['Come a demanda día y noche, sin distinguir uno de otro.', 'Duerme a ratos cortos repartidos por igual en las 24 h.', 'Lo que de verdad importa ahora: pañales mojados y que recupere el peso del nacimiento.'],
+          why: 'Su estómago es del tamaño de una nuez y la leche materna se digiere en 60–90 minutos, así que no puede aguantar mucho entre tomas. Además cada succión es el mensaje que le dice a tu pecho cuánta leche fabricar: las tomas frecuentes de estas semanas son justo las que montan tu producción para los meses siguientes.',
+          brain: ['Funciona casi todo con reflejos: búsqueda, succión, Moro.', 'Pasa la mitad del sueño en fase activa, que es cuando se construyen las conexiones nuevas.', 'No sabe calmarse sola: tus brazos, tu olor y tu latido son literalmente su regulador.'],
+          doing: ['Enfoca a 20–30 cm, justo la distancia de tu cara mientras mama.', 'Se gira hacia tu voz.', 'Agarra con fuerza lo que le pongas en la mano.'],
+          next: 'Hacia las 3 semanas llega el primer estirón, dos o tres días pidiendo sin parar (no es que te falte leche, es que está encargando más). Y el llanto empieza a subir hacia su pico de las 6 semanas.'
+        },
+        {
+          n: 'Primer mes y medio',
+          now: ['Estirones alrededor de las 3 y las 6 semanas: dos o tres días de pedir sin parar.', 'El llanto alcanza su pico hacia las 6 semanas y después baja solo.', 'Aparece la sonrisa social: la primera de verdad, no por gases.'],
+          why: 'El estirón es la forma que tiene de subir tu producción: mama más a menudo durante 48–72 h, tu pecho responde fabricando más y todo se estabiliza. El llanto de las tardes tampoco es hambre ni cólico; es una curva normal del desarrollo que sube hasta las 6 semanas y luego baja sola.',
+          brain: ['Se dispara el número de conexiones nuevas: por eso el llanto tiene un pico y luego cede.', 'Empieza a asociar tu cara con la calma y con la comida.', 'Su sistema nervioso se satura al final del día: menos luz y menos estímulo por la tarde le ayudan de verdad.'],
+          doing: ['Sonríe al verte, hacia las 6 semanas.', 'Sostiene la cabeza unos segundos boca abajo.', 'Sigue con la mirada un objeto que se mueve despacio.'],
+          next: 'Entre las 6 y las 10 semanas su cuerpo empieza a fabricar melatonina propia, distingue el día de la noche y aparece el primer tramo largo de sueño nocturno.'
+        },
+        {
+          n: 'Empieza a distinguir día y noche',
+          now: ['Su cuerpo ya fabrica melatonina: el sueño se organiza y la noche empieza a alargarse.', 'Aguanta despierta 1 h – 1 h 30 y luego necesita dormir.', 'Las siestas siguen siendo cortas e irregulares; es normal.', 'La leche de la madrugada lleva más melatonina y triptófano: mamar de noche también la ayuda a dormir.'],
+          why: 'Hasta ahora usaba la melatonina que le llegaba por tu leche; ahora la fabrica ella y su reloj interno se engancha a la luz. Por eso la noche se alarga sola: no es algo que haya que enseñarle, es una hormona que aparece. Luz natural nada más despertarse y penumbra a partir de la cena es lo que le pone el reloj en hora.',
+          brain: ['Se pone en marcha el reloj circadiano: ya diferencia el día de la noche.', 'Empieza a anticipar: se calma al reconocer la postura de mamar.', 'Cada vez más ratos de alerta tranquila, que es cuando aprende.'],
+          doing: ['Sostiene la cabeza con bastante control boca abajo.', 'Hace ruiditos de vocales y contesta si le hablas.', 'Se queda mirando sus propias manos.'],
+          next: 'Hacia los 3 meses las tomas de día se hacen cortas y distraídas — mama en 5–10 minutos y parece que come menos — y lo compensa de noche. También notarás el pecho blando: tu producción se ha ajustado, no es que baje.'
+        },
+        {
+          n: '3 meses',
+          now: ['«Bache de los 3 meses»: mama más rápido y se distrae con todo; parece que come menos y compensa de noche.', 'Descubre sus manos: se las lleva a la boca y babea (no son los dientes).', 'Las ventanas de vigilia se alargan hasta 1 h 30 – 2 h.', 'El pecho ya no se nota lleno y desaparecen las subidas: tu producción se ha ajustado a ella.'],
+          why: 'Mama con mucha más eficacia: lo que antes le costaba 20 minutos ahora lo saca en 5–10. Parece que come menos, pero no es así. A la vez su vista ya alcanza toda la habitación y cualquier ruido la despega del pecho, así que las tomas de día se acortan y recupera de noche, cuando no hay nada que mirar.',
+          brain: ['Sale de los reflejos y entra en el movimiento voluntario: mira su mano y decide llevársela a la boca.', 'Ya distingue caras conocidas de desconocidas.', 'Empieza a anticipar lo que va a pasar: se calma al verte antes incluso de mamar.'],
+          doing: ['Junta las dos manos en el centro del cuerpo.', 'Boca abajo se apoya en los antebrazos y levanta el pecho.', 'Ríe a carcajadas y «conversa» con sonidos cuando le hablas.'],
+          next: 'Entre las semanas 14 y 19 llegan a la vez el cambio de sueño de los 4 meses y un salto de desarrollo. Espera más despertares de noche, siestas de 30–45 minutos y peor humor al atardecer. Es el mes más duro y es temporal.'
+        },
+        {
+          n: 'Cambio de sueño de los 4 meses',
+          now: ['Más despertares de noche, justo cuando parecía que mejoraba.', 'Las siestas se cortan en 30–45 min, que es un ciclo entero.', 'Mama muy rápido: 5–10 minutos pueden ser una toma completa.', 'Puede pedir más de noche que de día: a oscuras no hay distracciones y la prolactina está más alta.', 'Peor humor al final de la tarde y sueño inquieto: es el salto de desarrollo de las semanas 14–19.'],
+          why: 'Hasta ahora dormía en dos fases y caía directa al sueño profundo. Ahora su sueño se reorganiza en cuatro fases, como el de un adulto, con un despertar completo al final de cada ciclo de 30–45 minutos. Antes se volvía a dormir sin enterarse; ahora se despierta del todo y tiene que volver a dormirse, y busca lo mismo que la durmió. No es un retroceso ni algo que hayáis hecho mal: es un cambio permanente en cómo duerme, y tarda entre 2 y 6 semanas en recolocarse.',
+          brain: ['Su sueño pasa de 2 a 4 fases: ya tiene ciclos de adulto y se despierta del todo entre uno y otro.', 'Empieza a percibir transiciones suaves —cómo una cosa se convierte en otra— y eso la desborda.', 'Arranca la permanencia del objeto: nota que desapareces, y eso se paga en los despertares.', 'Su memoria dura más: recuerda cómo se durmió y reclama esas mismas condiciones a las 3 de la mañana.'],
+          doing: ['Se gira de boca abajo a boca arriba, y pronto al revés: brazos libres para dormir y fuera el arrullo.', 'Alcanza y agarra a propósito lo que quiere.', 'Se lo lleva todo a la boca para explorarlo, no porque salgan dientes.', 'Balbucea cadenas de sílabas y se escucha a sí misma.'],
+          next: 'Hacia las semanas 20–22 se asientan tres siestas (mañana, mediodía y una corta a última hora) y el tramo nocturno vuelve a crecer. Las tomas de día se ordenan solas al distraerse menos, y las de noche suelen bajar a 1–3. Si ahora duerme peor, este es justo el mes en que se recoloca.'
+        },
+        {
+          n: '4 meses y medio a 6 meses',
+          now: ['Se asientan tres siestas y la noche se alarga de verdad.', 'Aguanta 1 h 30 – 2 h 30 despierta.', 'Sigue mamando de noche: es normal y sigue siendo alimento, no un vicio.', 'Hasta los 6 meses el pecho es todo lo que necesita: ni agua ni cereales.'],
+          why: 'Sus ciclos de sueño ya son maduros y el reloj interno está montado, así que las siestas dejan de caer a cualquier hora y se agrupan en tres. Sigue necesitando mamar de madrugada porque la leche materna se digiere rápido y porque la prolactina sube de noche: esas tomas son las que sostienen tu producción.',
+          brain: ['Permanencia del objeto en marcha: busca con la mirada lo que se le cae.', 'Distingue emociones en tu cara y te copia el gesto.', 'Entiende causa y efecto: tira algo y se queda mirando qué pasa.'],
+          doing: ['Se sienta con apoyo y aguanta la cabeza firme.', 'Se pasa un objeto de una mano a la otra.', 'Se gira en las dos direcciones.', 'Protesta si le quitas algo: ya tiene intenciones propias.'],
+          next: 'A los 6 meses empieza la alimentación complementaria. El pecho sigue siendo el alimento principal hasta el año — la comida al principio es para explorar, no para sustituir tomas. Ofrécele siempre el pecho antes del plato.'
+        },
+        {
+          n: '6 a 8 meses',
+          now: ['Empieza la comida sólida, pero el pecho sigue siendo lo principal: primero pecho, luego plato.', 'Ansiedad de separación: llora cuando sales de la habitación. Es un avance, no un retroceso.', 'Gateo y primeros dientes pueden alterar el sueño unas semanas.', 'Puede mamar más de noche para compensar un día lleno de novedades.'],
+          why: 'La comida llega para complementar, no para sustituir: hasta el año el pecho aporta la mayor parte de las calorías, las grasas y las defensas. Si los sólidos desplazan tomas demasiado rápido, baja tu producción y ella acaba comiendo menos de lo que necesita. Por eso el orden importa.',
+          brain: ['Ya sabe que sigues existiendo aunque no te vea: por eso protesta cuando te vas.', 'Reconoce su nombre y se gira cuando la llamas.', 'Descubre que un gesto suyo provoca una respuesta tuya: empieza la comunicación de verdad.'],
+          doing: ['Se sienta sola sin apoyo.', 'Empieza a gatear o a arrastrarse.', 'Hacia los 8 meses coge cosas con la pinza, pulgar e índice.', 'Dice ba-ba, ma-ma, todavía sin significado.'],
+          next: 'Entre los 8 y los 10 meses llega otro salto — se pone de pie en la cuna y practica de madrugada — y las siestas se quedan en dos.'
+        },
+        {
+          n: '8 a 10 meses',
+          now: ['Se pone de pie en la cuna y practica a las 3 de la mañana. Pasará.', 'Dos siestas bien marcadas; la de la tarde empieza a acortarse.', 'Puede rechazar tomas de día por estar demasiado ocupada: ofrécele en un sitio tranquilo y a media luz.'],
+          why: 'Todo lo que aprende de día lo ensaya de noche: el cerebro consolida durante el sueño las habilidades motoras nuevas, y por eso te la encuentras de pie en la cuna de madrugada. No es que duerma peor, es que está practicando. Dura unas semanas.',
+          brain: ['Consolida durmiendo lo que ha aprendido despierta.', 'Entiende órdenes sencillas y el «no».', 'Señala para pedir y también solo para compartir contigo lo que ve.'],
+          doing: ['Se pone de pie agarrada y se desplaza de lado apoyándose.', 'Come con las manos trozos blandos.', 'Dice adiós con la mano y juega al cucú-tras.'],
+          next: 'Hacia el año las dos siestas se juntan y empieza a dejar la de la mañana. Es también la edad en que el destete nocturno se vuelve posible si te apetece; seguir también es una opción perfectamente válida.'
+        },
+        {
+          n: '10 a 13 meses',
+          now: ['Primeros pasos; el sueño puede volverse irregular unas semanas.', 'Come de todo y mama menos veces, pero el pecho sigue aportando defensas y calorías.', 'Aguanta 3–4 h despierta entre siestas.'],
+          why: 'Andar le consume una cantidad enorme de energía y de atención: mama menos veces, pero las tomas que quedan valen más, sobre todo la de reconectar contigo al final del día. La leche del segundo año se concentra: más grasa y más anticuerpos por sorbo que antes.',
+          brain: ['Primeras palabras con intención.', 'Imita todo lo que te ve hacer.', 'Entiende mucho más de lo que es capaz de decir.'],
+          doing: ['Se suelta y da los primeros pasos.', 'Bebe de un vaso y maneja la cuchara a su manera.', 'Señala lo que quiere y te mira para confirmar.'],
+          next: 'Entre los 14 y los 18 meses pasará de dos siestas a una sola al mediodía. Habrá unas semanas raras en que una siesta se le queda corta y dos le sobran.'
+        },
+        {
+          n: 'Más de un año',
+          now: ['Una o dos siestas, y noches largas con algún despertar puntual.', 'Las tomas se agrupan alrededor del sueño: al despertar, antes de la siesta y antes de dormir.', 'El pecho sigue siendo válido mientras a las dos os vaya bien.'],
+          why: 'A partir del año el pecho deja de ser el alimento principal, pero no deja de ser alimento: sigue aportando grasas, calcio y anticuerpos. Y sobre todo sigue siendo su manera de regularse, por eso pide justo cuando está cansada, frustrada o enferma.',
+          brain: ['Rabietas: quiere cosas que su cerebro todavía no sabe gestionar.', 'Juego simbólico: da de comer al muñeco, habla por teléfono.', 'Explosión de vocabulario hacia los 18 meses.'],
+          doing: ['Anda con soltura y empieza a correr.', 'Apila, mete y saca, garabatea.', 'Dice entre 5 y 20 palabras y entiende muchas más.'],
+          next: 'A partir de aquí los cambios son más lentos y menos bruscos. El destete, cuando llegue, puede ser gradual y a su ritmo, al tuyo o a medias.'
+        },
       ],
       tlLabel: d => `Línea de tiempo de ${d}`,
       // Panel
@@ -632,23 +703,94 @@
       tFull: 'Base de données pleine : supprime d’anciens jours', tNoSync: 'Synchronisation impossible, enregistré sur le téléphone',
       // Âge et étape
       stTitle: 'Âge et étape', stBorn: 'Née le', stAge: (w, t) => `${w} semaines · ${t}`,
-      stHow: 'Où en est Aïna', stNow: 'Ce qui se passe maintenant', stNext: 'Ce qui arrive ensuite',
+      stHow: 'Où en est Aïna', stNow: 'Ce qui se passe maintenant', stWhy: 'Pourquoi', stBrain: 'Ce qui se passe dans son cerveau', stDoing: 'Ce qu’elle commence à faire', stNext: 'Le mois prochain',
+      stLme: 'Repères d’allaitement exclusif : un bébé au sein tète plus souvent et se réveille plus la nuit que dans les tableaux généraux.',
       stNeed: 'Avec 3 ou 4 jours enregistrés, tu verras ici sa comparaison avec ce qui est attendu à son âge.',
       stHers: 'Elle', stExp: 'Attendu', stOk: 'dans la norme', stUp: 'au-dessus', stDown: 'en dessous',
       stFeeds: 'Tétées / 24 h', stSleep: 'Sommeil / 24 h', stNaps: 'Siestes par jour', stStretch: 'Plus longue période de nuit', stWakes: 'Réveils la nuit', stWin: 'Fenêtre d’éveil',
-      stFoot: 'Repères indicatifs pour son âge ; c’est ton pédiatre qui confirme que tout va bien.',
+      stFoot: 'Repères indicatifs pour un allaitement exclusif à son âge ; c’est ton pédiatre qui confirme que tout va bien.',
       stChange: 'Changer la date',
       stages: [
-        { n: 'Nouveau-née', now: ['Elle tète à la demande jour et nuit, sans faire la différence.', 'Elle dort par courtes périodes ; se réveiller toutes les 2–3 h pour téter est normal.', 'Ce qui compte vraiment : les couches mouillées et la reprise du poids de naissance.'], next: 'Vers 3 semaines, la première poussée de croissance : elle réclamera presque sans arrêt pendant deux jours.' },
-        { n: 'Premier mois et demi', now: ['Poussées de croissance vers 3 et 6 semaines : deux ou trois jours de demandes continues.', 'Les pleurs atteignent leur pic vers 6 semaines, puis diminuent d’eux-mêmes.', 'Le sourire social apparaît : le vrai, pas celui des gaz.'], next: 'Entre 6 et 10 semaines, elle commence à distinguer le jour de la nuit et la première période longue s’allonge.' },
-        { n: 'Elle distingue le jour et la nuit', now: ['Son corps fabrique de la mélatonine : le sommeil s’organise et la nuit s’allonge.', 'Elle tient éveillée 1 h – 1 h 30 puis a besoin de dormir.', 'Les siestes restent courtes et irrégulières ; c’est normal.'], next: 'Vers 3 mois : tétées de jour plus courtes et distraites, nuits un peu plus longues.' },
-        { n: '3 mois', now: ['« Creux des 3 mois » : elle tète plus vite et se distrait de tout ; on dirait qu’elle mange moins et elle compense la nuit.', 'Elle découvre ses mains, les porte à la bouche et bave (ce ne sont pas les dents).', 'Les fenêtres d’éveil s’allongent jusqu’à 1 h 30 – 2 h.'], next: 'Entre 14 et 19 semaines arrivent en même temps le grand changement de sommeil des 4 mois et un bond de développement.' },
-        { n: 'Changement de sommeil des 4 mois', now: ['Son sommeil mûrit : elle a désormais des cycles d’adulte et se réveille complètement à la fin de chacun. Plus de réveils nocturnes, juste quand ça semblait s’améliorer.', 'Les siestes se coupent à 30–45 min (un cycle). Ce n’est pas une régression : c’est définitif et ça se réorganise en quelques semaines.', 'Bond de développement (semaines 14–19) : plus de bras, humeur difficile en fin de journée, sommeil agité.', 'Elle tète très vite : 5–10 minutes peuvent suffire.', 'Elle peut commencer à se retourner : bras libres pour dormir.'], next: 'Vers 5 mois, trois siestes se mettent en place et la période nocturne s’allonge de nouveau.' },
-        { n: '4 mois et demi à 6 mois', now: ['Trois siestes se stabilisent et la nuit s’allonge vraiment.', 'Elle tient 1 h 30 – 2 h 30 éveillée.', 'Elle s’assoit avec appui et attrape tout pour le porter à la bouche.'], next: 'À 6 mois commence la diversification ; le lait reste l’essentiel jusqu’à un an.' },
-        { n: '6 à 8 mois', now: ['La nourriture solide commence, mais le lait reste l’aliment principal.', 'Angoisse de séparation : elle pleure quand tu sors de la pièce. C’est un progrès, pas un recul.', 'Le quatre-pattes et les premières dents peuvent perturber le sommeil quelques semaines.'], next: 'Entre 8 et 10 mois, un autre bond : elle se met debout et s’entraîne la nuit.' },
-        { n: '8 à 10 mois', now: ['Elle se met debout dans le lit et s’entraîne à 3 h du matin. Ça passera.', 'Deux siestes bien marquées ; celle de l’après-midi raccourcit.', 'Elle peut refuser des tétées de jour, trop occupée.'], next: 'Vers un an, les 2 siestes deviennent une seule et le sevrage nocturne devient possible si tu le souhaites.' },
-        { n: '10 à 13 mois', now: ['Premiers pas ; le sommeil peut devenir irrégulier quelques semaines.', 'Elle mange de tout et tète moins souvent, mais le lait apporte encore défenses et calories.', 'Elle tient 3–4 h éveillée entre les siestes.'], next: 'Entre 14 et 18 mois, elle passera de deux siestes à une seule, en milieu de journée.' },
-        { n: 'Plus d’un an', now: ['Une ou deux siestes, et des nuits longues avec un réveil ponctuel.', 'L’allaitement reste valable tant que ça vous convient à toutes les deux.'], next: 'À partir d’ici les changements sont plus lents et moins brusques.' },
+        {
+          n: 'Nouveau-née',
+          now: ['Elle tète à la demande jour et nuit, sans faire la différence.', 'Elle dort par courtes périodes réparties également sur 24 h.', 'Ce qui compte vraiment : les couches mouillées et la reprise du poids de naissance.'],
+          why: 'Son estomac a la taille d’une noix et le lait maternel se digère en 60–90 minutes : elle ne peut pas tenir longtemps entre deux tétées. Et chaque succion est le message qui dit à ton sein combien de lait fabriquer — les tétées très fréquentes de ces semaines sont exactement ce qui installe ta production pour les mois suivants.',
+          brain: ['Presque tout passe par des réflexes : fouissement, succion, Moro.', 'La moitié de son sommeil est du sommeil agité, celui où se construisent les nouvelles connexions.', 'Elle ne sait pas se calmer seule : tes bras, ton odeur et ton cœur sont littéralement son régulateur.'],
+          doing: ['Elle fait le point à 20–30 cm, pile la distance de ton visage pendant la tétée.', 'Elle se tourne vers ta voix.', 'Elle serre fort ce qu’on lui met dans la main.'],
+          next: 'Vers 3 semaines arrive la première poussée de croissance, deux ou trois jours de demandes continues (ce n’est pas un manque de lait, elle en commande davantage). Et les pleurs montent vers leur pic de 6 semaines.'
+        },
+        {
+          n: 'Premier mois et demi',
+          now: ['Poussées de croissance vers 3 et 6 semaines : deux ou trois jours de demandes continues.', 'Les pleurs atteignent leur pic vers 6 semaines, puis diminuent d’eux-mêmes.', 'Le sourire social apparaît : le vrai, pas celui des gaz.'],
+          why: 'La poussée est sa façon d’augmenter ta production : elle tète plus souvent pendant 48–72 h, ton sein répond en fabriquant plus, et tout se stabilise. Les pleurs du soir ne sont ni de la faim ni des coliques : c’est une courbe normale du développement qui monte jusqu’à 6 semaines puis redescend seule.',
+          brain: ['Le nombre de connexions nouvelles explose : d’où le pic de pleurs, puis l’accalmie.', 'Elle commence à associer ton visage au calme et à la nourriture.', 'Son système nerveux sature en fin de journée : moins de lumière et moins de stimulation le soir l’aident vraiment.'],
+          doing: ['Elle sourit en te voyant, vers 6 semaines.', 'Elle tient sa tête quelques secondes sur le ventre.', 'Elle suit du regard un objet qui bouge lentement.'],
+          next: 'Entre 6 et 10 semaines son corps commence à fabriquer sa propre mélatonine, elle distingue le jour de la nuit et la première longue période de sommeil apparaît.'
+        },
+        {
+          n: 'Elle distingue le jour et la nuit',
+          now: ['Son corps fabrique de la mélatonine : le sommeil s’organise et la nuit s’allonge.', 'Elle tient éveillée 1 h – 1 h 30 puis a besoin de dormir.', 'Les siestes restent courtes et irrégulières ; c’est normal.', 'Le lait du petit matin contient plus de mélatonine et de tryptophane : téter la nuit l’aide aussi à dormir.'],
+          why: 'Jusqu’ici elle utilisait la mélatonine qui passait dans ton lait ; maintenant elle la fabrique et son horloge interne s’accroche à la lumière. La nuit s’allonge donc toute seule : ce n’est pas quelque chose à lui apprendre, c’est une hormone qui arrive. Lumière naturelle dès le réveil et pénombre à partir du dîner, c’est ce qui met son horloge à l’heure.',
+          brain: ['Son horloge circadienne se met en route : elle différencie enfin le jour de la nuit.', 'Elle commence à anticiper : elle se calme en reconnaissant la position de tétée.', 'De plus en plus de moments d’éveil calme, ceux où elle apprend.'],
+          doing: ['Elle contrôle bien sa tête sur le ventre.', 'Elle fait des sons de voyelles et répond quand tu lui parles.', 'Elle fixe ses propres mains.'],
+          next: 'Vers 3 mois les tétées de jour deviennent courtes et distraites — 5–10 minutes et on dirait qu’elle mange moins — et elle compense la nuit. Tu sentiras aussi le sein souple : ta production s’est ajustée, elle ne baisse pas.'
+        },
+        {
+          n: '3 mois',
+          now: ['« Creux des 3 mois » : elle tète plus vite et se distrait de tout ; on dirait qu’elle mange moins et elle compense la nuit.', 'Elle découvre ses mains, les porte à la bouche et bave (ce ne sont pas les dents).', 'Les fenêtres d’éveil s’allongent jusqu’à 1 h 30 – 2 h.', 'Le sein ne paraît plus plein et les montées disparaissent : ta production s’est ajustée à elle.'],
+          why: 'Elle tète beaucoup plus efficacement : ce qui lui prenait 20 minutes, elle le sort en 5–10. On dirait qu’elle mange moins, mais non. En même temps sa vue couvre toute la pièce et le moindre bruit la décroche du sein : les tétées de jour raccourcissent et elle rattrape la nuit, quand il n’y a rien à regarder.',
+          brain: ['Elle sort des réflexes et entre dans le mouvement volontaire : elle regarde sa main et décide de la porter à la bouche.', 'Elle distingue les visages connus des inconnus.', 'Elle anticipe : elle se calme en te voyant, avant même de téter.'],
+          doing: ['Elle joint les deux mains au milieu du corps.', 'Sur le ventre, elle s’appuie sur les avant-bras et décolle la poitrine.', 'Elle rit aux éclats et « discute » en sons quand tu lui parles.'],
+          next: 'Entre 14 et 19 semaines arrivent en même temps le changement de sommeil des 4 mois et un bond de développement. Attends-toi à plus de réveils nocturnes, des siestes de 30–45 minutes et une humeur difficile en fin de journée. C’est le mois le plus dur, et il est temporaire.'
+        },
+        {
+          n: 'Changement de sommeil des 4 mois',
+          now: ['Plus de réveils nocturnes, juste quand ça semblait s’améliorer.', 'Les siestes se coupent à 30–45 min, soit un cycle entier.', 'Elle tète très vite : 5–10 minutes peuvent suffire.', 'Elle peut demander plus la nuit que le jour : dans le noir il n’y a pas de distractions et la prolactine est plus haute.', 'Humeur difficile en fin de journée et sommeil agité : c’est le bond de développement des semaines 14–19.'],
+          why: 'Jusqu’ici elle dormait en deux phases et tombait directement dans le sommeil profond. Maintenant son sommeil se réorganise en quatre phases, comme celui d’un adulte, avec un réveil complet à la fin de chaque cycle de 30–45 minutes. Avant elle se rendormait sans s’en apercevoir ; maintenant elle se réveille vraiment et doit se rendormir, en cherchant ce qui l’avait endormie. Ce n’est pas une régression ni une erreur de votre part : c’est un changement définitif dans sa façon de dormir, et il met 2 à 6 semaines à se réorganiser.',
+          brain: ['Son sommeil passe de 2 à 4 phases : cycles d’adulte et réveil complet entre chacun.', 'Elle commence à percevoir les transitions douces — comment une chose se transforme en une autre — et ça la déborde.', 'La permanence de l’objet démarre : elle remarque que tu disparais, et ça se paie sur les réveils.', 'Sa mémoire dure plus longtemps : elle se souvient de comment elle s’est endormie et réclame les mêmes conditions à 3 h du matin.'],
+          doing: ['Elle se retourne du ventre au dos, et bientôt l’inverse : bras libres pour dormir, fini l’emmaillotage.', 'Elle attrape exprès ce qu’elle veut.', 'Elle porte tout à la bouche pour explorer, pas parce que les dents poussent.', 'Elle babille des chaînes de syllabes et s’écoute.'],
+          next: 'Vers 20–22 semaines trois siestes se mettent en place (matin, midi et une courte en fin de journée) et la période nocturne s’allonge de nouveau. Les tétées de jour se remettent en ordre quand elle se distrait moins, et celles de nuit descendent souvent à 1–3. Si elle dort mal en ce moment, c’est le mois où ça se recale.'
+        },
+        {
+          n: '4 mois et demi à 6 mois',
+          now: ['Trois siestes se stabilisent et la nuit s’allonge vraiment.', 'Elle tient 1 h 30 – 2 h 30 éveillée.', 'Elle tète encore la nuit : c’est normal et c’est toujours de la nourriture, pas une habitude à corriger.', 'Jusqu’à 6 mois le lait suffit à tout : ni eau ni céréales.'],
+          why: 'Ses cycles de sommeil sont mûrs et son horloge interne est installée : les siestes cessent de tomber n’importe quand et se regroupent en trois. Elle a encore besoin de téter la nuit parce que le lait maternel se digère vite et parce que la prolactine monte la nuit : ces tétées-là soutiennent ta production.',
+          brain: ['Permanence de l’objet en route : elle cherche du regard ce qui tombe.', 'Elle distingue les émotions sur ton visage et te les copie.', 'Elle comprend la cause et l’effet : elle jette et regarde ce qui se passe.'],
+          doing: ['Elle s’assoit avec appui et tient la tête bien droite.', 'Elle fait passer un objet d’une main à l’autre.', 'Elle se retourne dans les deux sens.', 'Elle proteste si on lui retire quelque chose : elle a ses propres intentions.'],
+          next: 'À 6 mois commence la diversification. Le lait reste l’aliment principal jusqu’à un an — la nourriture sert d’abord à explorer, pas à remplacer des tétées. Propose toujours le sein avant l’assiette.'
+        },
+        {
+          n: '6 à 8 mois',
+          now: ['La nourriture solide commence, mais le lait reste l’essentiel : d’abord le sein, ensuite l’assiette.', 'Angoisse de séparation : elle pleure quand tu sors de la pièce. C’est un progrès, pas un recul.', 'Le quatre-pattes et les premières dents peuvent perturber le sommeil quelques semaines.', 'Elle peut téter plus la nuit pour compenser une journée pleine de nouveautés.'],
+          why: 'La nourriture vient compléter, pas remplacer : jusqu’à un an le lait apporte l’essentiel des calories, des graisses et des défenses. Si les solides prennent la place des tétées trop vite, ta production baisse et elle finit par manger moins que ce dont elle a besoin. D’où l’importance de l’ordre.',
+          brain: ['Elle sait que tu continues d’exister même sans te voir : d’où les protestations quand tu pars.', 'Elle reconnaît son prénom et se tourne quand on l’appelle.', 'Elle découvre qu’un geste à elle provoque une réponse de toi : la vraie communication commence.'],
+          doing: ['Elle s’assoit seule sans appui.', 'Elle commence à ramper ou à marcher à quatre pattes.', 'Vers 8 mois elle attrape en pince, pouce et index.', 'Elle dit ba-ba, ma-ma, encore sans signification.'],
+          next: 'Entre 8 et 10 mois arrive un autre bond — elle se met debout dans le lit et s’entraîne à l’aube — et les siestes se réduisent à deux.'
+        },
+        {
+          n: '8 à 10 mois',
+          now: ['Elle se met debout dans le lit et s’entraîne à 3 h du matin. Ça passera.', 'Deux siestes bien marquées ; celle de l’après-midi raccourcit.', 'Elle peut refuser des tétées de jour, trop occupée : propose-lui au calme et dans la pénombre.'],
+          why: 'Tout ce qu’elle apprend le jour, elle le répète la nuit : le cerveau consolide pendant le sommeil les nouvelles habiletés motrices, d’où la station debout dans le lit à l’aube. Ce n’est pas qu’elle dort moins bien, c’est qu’elle s’entraîne. Ça dure quelques semaines.',
+          brain: ['Elle consolide en dormant ce qu’elle a appris éveillée.', 'Elle comprend des consignes simples et le « non ».', 'Elle pointe du doigt pour demander, et aussi juste pour partager avec toi ce qu’elle voit.'],
+          doing: ['Elle se met debout en se tenant et se déplace de côté le long des meubles.', 'Elle mange à la main des morceaux mous.', 'Elle fait au revoir de la main et joue à coucou.'],
+          next: 'Vers un an les deux siestes se rapprochent et celle du matin commence à disparaître. C’est aussi l’âge où le sevrage nocturne devient possible si tu en as envie ; continuer est tout aussi valable.'
+        },
+        {
+          n: '10 à 13 mois',
+          now: ['Premiers pas ; le sommeil peut devenir irrégulier quelques semaines.', 'Elle mange de tout et tète moins souvent, mais le lait apporte encore défenses et calories.', 'Elle tient 3–4 h éveillée entre les siestes.'],
+          why: 'Marcher lui coûte énormément d’énergie et d’attention : elle tète moins souvent, mais les tétées qui restent valent plus, surtout celle qui sert à se reconnecter à toi en fin de journée. Le lait de la deuxième année se concentre : plus de graisses et d’anticorps par gorgée qu’avant.',
+          brain: ['Premiers mots avec intention.', 'Elle imite tout ce qu’elle te voit faire.', 'Elle comprend bien plus qu’elle ne sait dire.'],
+          doing: ['Elle lâche tout et fait ses premiers pas.', 'Elle boit au verre et manie la cuillère à sa façon.', 'Elle montre du doigt ce qu’elle veut et te regarde pour confirmer.'],
+          next: 'Entre 14 et 18 mois elle passera de deux siestes à une seule, en milieu de journée. Il y aura quelques semaines bizarres où une sieste est trop peu et deux c’est trop.'
+        },
+        {
+          n: 'Plus d’un an',
+          now: ['Une ou deux siestes, et des nuits longues avec un réveil ponctuel.', 'Les tétées se regroupent autour du sommeil : au réveil, avant la sieste et avant la nuit.', 'L’allaitement reste valable tant que ça vous convient à toutes les deux.'],
+          why: 'Après un an le lait cesse d’être l’aliment principal, mais il reste un aliment : graisses, calcium et anticorps. Et surtout il reste sa façon de se réguler, d’où les demandes pile quand elle est fatiguée, frustrée ou malade.',
+          brain: ['Colères : elle veut des choses que son cerveau ne sait pas encore gérer.', 'Jeu symbolique : elle fait manger la poupée, elle téléphone.', 'Explosion du vocabulaire vers 18 mois.'],
+          doing: ['Elle marche avec aisance et commence à courir.', 'Elle empile, met et sort, gribouille.', 'Elle dit 5 à 20 mots et en comprend beaucoup plus.'],
+          next: 'À partir d’ici les changements sont plus lents et moins brusques. Le sevrage, quand il viendra, pourra être progressif, à son rythme, au tien ou à mi-chemin.'
+        },
       ],
       tlLabel: d => `Chronologie du ${d}`,
       // Panel
@@ -736,17 +878,19 @@
   const dayOf = (ms = Date.now()) => dayId(ms + WIN_OFF);  // a qué día lógico pertenece un instante
   const winStart = id => dayStart(id) - WIN_OFF;           // ese día empieza a las 19:30 de la víspera
   // Rangos orientativos por etapa (semanas cumplidas). El texto de cada etapa está en I18N.stages
+  // Rangos de lactancia materna exclusiva: más tomas y más despertares que las tablas
+  // generales, que mezclan biberón. Un bebé de pecho mama más a menudo y más meses de noche.
   const ETAPAS = [
-    { to: 2,  tomas: [8, 12], sueno: [14, 18], siestas: [4, 8], tramo: [2, 4],  desp: [3, 6], vent: '40–60 min' },
+    { to: 2,  tomas: [8, 12], sueno: [14, 18], siestas: [5, 8], tramo: [2, 4],  desp: [3, 6], vent: '30–60 min' },
     { to: 6,  tomas: [8, 12], sueno: [14, 17], siestas: [4, 6], tramo: [3, 4],  desp: [3, 5], vent: '45–75 min' },
     { to: 10, tomas: [8, 12], sueno: [14, 17], siestas: [4, 5], tramo: [3, 5],  desp: [2, 4], vent: '1 h – 1 h 30' },
     { to: 14, tomas: [8, 12], sueno: [14, 17], siestas: [3, 5], tramo: [4, 6],  desp: [2, 4], vent: '1 h – 2 h' },
-    { to: 19, tomas: [8, 11], sueno: [14, 16], siestas: [3, 4], tramo: [4, 7],  desp: [2, 4], vent: '1 h 15 – 2 h' },
-    { to: 26, tomas: [6, 10], sueno: [13, 16], siestas: [3, 3], tramo: [5, 8],  desp: [1, 3], vent: '1 h 30 – 2 h 30' },
-    { to: 35, tomas: [5, 8],  sueno: [12, 15], siestas: [2, 3], tramo: [6, 9],  desp: [0, 3], vent: '2 h – 3 h' },
-    { to: 44, tomas: [4, 6],  sueno: [12, 15], siestas: [2, 2], tramo: [7, 11], desp: [0, 2], vent: '2 h 30 – 3 h 30' },
-    { to: 56, tomas: [3, 5],  sueno: [11, 14], siestas: [1, 2], tramo: [8, 11], desp: [0, 2], vent: '3 h – 4 h' },
-    { to: 999, tomas: [2, 5], sueno: [11, 14], siestas: [1, 2], tramo: [9, 12], desp: [0, 1], vent: '4 h – 6 h' },
+    { to: 19, tomas: [8, 12], sueno: [13, 16], siestas: [3, 4], tramo: [3, 6],  desp: [2, 4], vent: '1 h 15 – 2 h' },
+    { to: 26, tomas: [7, 10], sueno: [13, 15], siestas: [3, 3], tramo: [4, 7],  desp: [1, 3], vent: '1 h 30 – 2 h 30' },
+    { to: 35, tomas: [6, 9],  sueno: [12, 15], siestas: [2, 3], tramo: [5, 8],  desp: [1, 3], vent: '2 h – 3 h' },
+    { to: 44, tomas: [5, 8],  sueno: [12, 15], siestas: [2, 2], tramo: [6, 9],  desp: [0, 3], vent: '2 h 30 – 3 h 30' },
+    { to: 56, tomas: [4, 7],  sueno: [11, 14], siestas: [1, 2], tramo: [6, 10], desp: [0, 2], vent: '3 h – 4 h' },
+    { to: 999, tomas: [3, 6], sueno: [11, 14], siestas: [1, 2], tramo: [8, 12], desp: [0, 2], vent: '4 h – 6 h' },
   ];
   const BIRTH_DEF = '2026-06-15';
   const birthId = () => { try { return localStorage.getItem('ainadays.birth') || BIRTH_DEF; } catch { return BIRTH_DEF; } };
@@ -1659,7 +1803,7 @@
   };
   // Edad y etapa: dónde está, qué le pasa ahora y qué viene
   function etapaHTML() {
-    const i = etapaIdx(), r = ETAPAS[i], t = L.stages[i], sig = L.stages[i];
+    const i = etapaIdx(), r = ETAPAS[i], t = L.stages[i];
     const evs = allEvents(), today = dayOf(Date.now());
     const ids = []; for (let k = 7; k >= 1; k--) ids.push(shiftDay(today, -k));
     const rs = panelRows(evs, ids).filter(x => x.has && x.nightDone);
@@ -1678,14 +1822,17 @@
         ${fila(L.stStretch, avg(x => x.longest / H), r.tramo, ' ' + L.h)}
         ${fila(L.stWakes, avg(x => x.feedsN), r.desp)}
         <tr><td>${L.stWin}</td><td class="n">—</td><td class="n muted" colspan="2">${r.vent}</td></tr>
-      </tbody></table>` : `<div class="note">${L.stNeed}</div>`;
+      </tbody></table><p class="note" style="margin-top:8px">${L.stLme}</p>` : `<div class="note">${L.stNeed}</div>`;
     return `<section class="etapa">
       <h3 style="margin-top:4px">${L.stTitle}</h3>
       <div class="etapa-h"><b>${L.stAge(ageWeeks(), ageText())}</b><span>${t.n}</span></div>
       <div class="etapa-born">${L.stBorn} <input type="date" id="f-birth" value="${birthId()}" max="${dayId(Date.now())}"></div>
       <h4>${L.stHow}</h4>${tabla}
       <h4>${L.stNow}</h4><ul>${t.now.map(x => `<li>${x}</li>`).join('')}</ul>
-      <h4>${L.stNext}</h4><p>${sig.next}</p>
+      <h4>${L.stWhy}</h4><p>${t.why}</p>
+      <h4>${L.stBrain}</h4><ul>${t.brain.map(x => `<li>${x}</li>`).join('')}</ul>
+      <h4>${L.stDoing}</h4><ul>${t.doing.map(x => `<li>${x}</li>`).join('')}</ul>
+      <h4>${L.stNext}</h4><p>${t.next}</p>
       <p class="note">${L.stFoot}</p>
     </section>`;
   }
