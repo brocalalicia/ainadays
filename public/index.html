@@ -303,6 +303,30 @@
   .tip { position: fixed; z-index: 30; pointer-events: none; background: var(--text); color: var(--bg); padding: 7px 10px; border-radius: 10px; font-size: 12.5px; line-height: 1.35; box-shadow: var(--shadow); max-width: 220px; }
   .tip b { font-size: 14px; }
 
+  /* Edad y etapa */
+  .etapa { background: var(--surface); border-radius: var(--radius); padding: 14px 16px 16px; box-shadow: var(--shadow); margin-bottom: 18px; }
+  .etapa h3 { font-family: var(--display); font-weight: 600; font-size: 20px; margin: 0 0 6px; }
+  .etapa h4 { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 16px 0 6px; }
+  .etapa-h { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; font-size: 15px; }
+  .etapa-h b { font-size: 17px; }
+  .etapa-h span { color: var(--sueno); font-weight: 700; }
+  .etapa-born { font-size: 12.5px; color: var(--muted); margin-top: 6px; display: flex; gap: 6px; align-items: center; }
+  .etapa-born input { font: inherit; font-size: 12.5px; padding: 3px 6px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); }
+  .etapa-t { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .etapa-t th { font-size: 11.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; padding-bottom: 4px; }
+  .etapa-t td { padding: 6px 0; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  .etapa-t tr:last-child td { border-bottom: 0; }
+  .etapa-t .n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .etapa-t .muted { color: var(--muted); }
+  .etapa-t td:first-child { padding-right: 8px; }
+  .tag-ok, .tag-up, .tag-down { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
+  .tag-ok { background: var(--panal-soft); color: var(--ok); }
+  .tag-up { background: var(--toma-soft); color: var(--toma-ink); }
+  .tag-down { background: var(--toma-soft); color: var(--toma-ink); }
+  .etapa ul { padding-left: 18px; margin: 0; font-size: 15px; line-height: 1.5; }
+  .etapa li { margin-bottom: 6px; }
+  .etapa p { font-size: 15px; line-height: 1.5; margin: 0; }
+  .etapa .note { font-size: 12.5px; color: var(--muted); margin-top: 14px; }
   /* Guide */
   .guide { font-size: 15.5px; max-width: 62ch; }
   .guide h3 { font-family: var(--display); font-weight: 600; font-size: 20px; margin: 26px 0 8px; text-wrap: balance; }
@@ -455,6 +479,26 @@
       tMissingStart: 'Falta la hora de inicio', tEndBefore: 'El final no puede ser antes del inicio', tWriteNote: 'Escribe la nota', tSaved: 'Guardado',
       tFeedSaved: d => `Toma de ${d} guardada`, tSlept: d => `Ha dormido ${d}`, tPoo: 'Pañal con caca anotado', tPee: 'Pañal de pipí anotado',
       tFull: 'Base de datos llena: borra días antiguos', tNoSync: 'No se pudo sincronizar, guardado en el móvil',
+      // Edad y etapa
+      stTitle: 'Edad y etapa', stBorn: 'Nacida el', stAge: (w, t) => `${w} semanas · ${t}`,
+      stHow: 'Cómo va Aïna', stNow: 'Qué pasa ahora', stNext: 'Lo que viene',
+      stNeed: 'Con 3 o 4 días registrados aquí verás su comparación con lo esperable a su edad.',
+      stHers: 'Suya', stExp: 'Esperable', stOk: 'en rango', stUp: 'por encima', stDown: 'por debajo',
+      stFeeds: 'Tomas / 24 h', stSleep: 'Sueño / 24 h', stNaps: 'Siestas al día', stStretch: 'Tramo nocturno máx.', stWakes: 'Despertares de noche', stWin: 'Ventana de vigilia',
+      stFoot: 'Rangos orientativos para su edad; quien confirma que va bien es tu pediatra.',
+      stChange: 'Cambiar fecha',
+      stages: [
+        { n: 'Recién nacida', now: ['Come a demanda día y noche, sin distinguir uno de otro.', 'Duerme a ratos cortos; lo normal es despertarse cada 2–3 h para mamar.', 'Lo que de verdad importa ahora: pañales mojados y que recupere el peso del nacimiento.'], next: 'Hacia las 3 semanas, el primer estirón: pedirá pecho casi sin parar un par de días.' },
+        { n: 'Primer mes y medio', now: ['Estirones alrededor de las 3 y las 6 semanas: dos o tres días de pedir sin parar.', 'El llanto alcanza su pico hacia las 6 semanas; después baja solo.', 'Aparece la sonrisa social: la primera de verdad, no por gases.'], next: 'Entre las 6 y las 10 semanas empieza a distinguir el día de la noche y el primer tramo largo se alarga.' },
+        { n: 'Empieza a distinguir día y noche', now: ['Su cuerpo ya fabrica melatonina: el sueño se organiza y la noche empieza a alargarse.', 'Aguanta despierta 1 h – 1 h 30 y luego necesita dormir.', 'Las siestas siguen siendo cortas e irregulares; es normal.'], next: 'Hacia los 3 meses, tomas de día más cortas y distraídas, y noches algo más largas.' },
+        { n: '3 meses', now: ['«Bache de los 3 meses»: mama más rápido y se distrae con todo; parece que come menos y compensa de noche.', 'Descubre sus manos: se las lleva a la boca y babea (no es que estén saliendo dientes).', 'Las ventanas de vigilia se alargan hasta 1 h 30 – 2 h.'], next: 'Entre las 14 y las 19 semanas llegan a la vez el gran cambio de sueño de los 4 meses y un salto de desarrollo.' },
+        { n: 'Cambio de sueño de los 4 meses', now: ['Su sueño madura: ahora tiene ciclos como los de un adulto y al terminar cada uno se despierta del todo. Más despertares nocturnos, justo cuando parecía que mejoraba.', 'Las siestas se cortan en 30–45 min (un ciclo). No es un retroceso: es permanente y se reorganiza en unas semanas.', 'Salto de desarrollo (semanas 14–19): más brazos, peor humor al atardecer, sueño inquieto.', 'Mama muy rápido: 5–10 minutos pueden ser una toma completa.', 'Puede empezar a girarse: brazos libres para dormir.'], next: 'Hacia los 5 meses se asientan 3 siestas y el tramo nocturno vuelve a crecer.' },
+        { n: '4 meses y medio a 6 meses', now: ['Se asientan tres siestas y la noche se alarga de verdad.', 'Aguanta 1 h 30 – 2 h 30 despierta.', 'Se sienta con apoyo, agarra lo que quiere y se lo lleva a la boca.'], next: 'A los 6 meses empieza la alimentación complementaria; el pecho sigue siendo lo principal hasta el año.' },
+        { n: '6 a 8 meses', now: ['Empieza la comida sólida, pero el pecho sigue siendo el alimento principal.', 'Ansiedad de separación: llora cuando sales de la habitación. Es un avance, no un retroceso.', 'Gateo y primeros dientes pueden alterar el sueño unas semanas.'], next: 'Entre los 8 y los 10 meses, otro salto: se pone de pie y practica de noche.' },
+        { n: '8 a 10 meses', now: ['Se pone de pie en la cuna y practica a las 3 de la mañana. Pasará.', 'Dos siestas bien marcadas; la de la tarde empieza a acortarse.', 'Puede rechazar tomas de día por estar demasiado ocupada.'], next: 'Hacia el año, 2 siestas se convierten en una y el destete nocturno es posible si lo deseas.' },
+        { n: '10 a 13 meses', now: ['Primeros pasos; el sueño puede volverse irregular unas semanas.', 'Come de todo y mama menos veces, pero el pecho sigue aportando defensas y calorías.', 'Aguanta 3–4 h despierta entre siestas.'], next: 'Entre los 14 y los 18 meses pasará de dos siestas a una sola, al mediodía.' },
+        { n: 'Más de un año', now: ['Una o dos siestas, y noches largas con algún despertar puntual.', 'El pecho sigue siendo válido mientras a las dos os vaya bien.'], next: 'A partir de aquí los cambios son más lentos y menos bruscos.' },
+      ],
       tlLabel: d => `Línea de tiempo de ${d}`,
       // Panel
       pTitle: 'Panel de seguimiento', pRange: n => `Últimos ${n} días`, pVsPrev: 'vs. periodo anterior', pNoData: 'Todavía no hay días completos para comparar. Con 3–4 días registrados el panel cobra sentido.',
@@ -583,6 +627,26 @@
       tMissingStart: 'Il manque l’heure de début', tEndBefore: 'La fin ne peut pas précéder le début', tWriteNote: 'Écris la note', tSaved: 'Enregistré',
       tFeedSaved: d => `Tétée de ${d} enregistrée`, tSlept: d => `Elle a dormi ${d}`, tPoo: 'Couche avec caca notée', tPee: 'Couche pipi notée',
       tFull: 'Base de données pleine : supprime d’anciens jours', tNoSync: 'Synchronisation impossible, enregistré sur le téléphone',
+      // Âge et étape
+      stTitle: 'Âge et étape', stBorn: 'Née le', stAge: (w, t) => `${w} semaines · ${t}`,
+      stHow: 'Où en est Aïna', stNow: 'Ce qui se passe maintenant', stNext: 'Ce qui arrive ensuite',
+      stNeed: 'Avec 3 ou 4 jours enregistrés, tu verras ici sa comparaison avec ce qui est attendu à son âge.',
+      stHers: 'Elle', stExp: 'Attendu', stOk: 'dans la norme', stUp: 'au-dessus', stDown: 'en dessous',
+      stFeeds: 'Tétées / 24 h', stSleep: 'Sommeil / 24 h', stNaps: 'Siestes par jour', stStretch: 'Plus longue période de nuit', stWakes: 'Réveils la nuit', stWin: 'Fenêtre d’éveil',
+      stFoot: 'Repères indicatifs pour son âge ; c’est ton pédiatre qui confirme que tout va bien.',
+      stChange: 'Changer la date',
+      stages: [
+        { n: 'Nouveau-née', now: ['Elle tète à la demande jour et nuit, sans faire la différence.', 'Elle dort par courtes périodes ; se réveiller toutes les 2–3 h pour téter est normal.', 'Ce qui compte vraiment : les couches mouillées et la reprise du poids de naissance.'], next: 'Vers 3 semaines, la première poussée de croissance : elle réclamera presque sans arrêt pendant deux jours.' },
+        { n: 'Premier mois et demi', now: ['Poussées de croissance vers 3 et 6 semaines : deux ou trois jours de demandes continues.', 'Les pleurs atteignent leur pic vers 6 semaines, puis diminuent d’eux-mêmes.', 'Le sourire social apparaît : le vrai, pas celui des gaz.'], next: 'Entre 6 et 10 semaines, elle commence à distinguer le jour de la nuit et la première période longue s’allonge.' },
+        { n: 'Elle distingue le jour et la nuit', now: ['Son corps fabrique de la mélatonine : le sommeil s’organise et la nuit s’allonge.', 'Elle tient éveillée 1 h – 1 h 30 puis a besoin de dormir.', 'Les siestes restent courtes et irrégulières ; c’est normal.'], next: 'Vers 3 mois : tétées de jour plus courtes et distraites, nuits un peu plus longues.' },
+        { n: '3 mois', now: ['« Creux des 3 mois » : elle tète plus vite et se distrait de tout ; on dirait qu’elle mange moins et elle compense la nuit.', 'Elle découvre ses mains, les porte à la bouche et bave (ce ne sont pas les dents).', 'Les fenêtres d’éveil s’allongent jusqu’à 1 h 30 – 2 h.'], next: 'Entre 14 et 19 semaines arrivent en même temps le grand changement de sommeil des 4 mois et un bond de développement.' },
+        { n: 'Changement de sommeil des 4 mois', now: ['Son sommeil mûrit : elle a désormais des cycles d’adulte et se réveille complètement à la fin de chacun. Plus de réveils nocturnes, juste quand ça semblait s’améliorer.', 'Les siestes se coupent à 30–45 min (un cycle). Ce n’est pas une régression : c’est définitif et ça se réorganise en quelques semaines.', 'Bond de développement (semaines 14–19) : plus de bras, humeur difficile en fin de journée, sommeil agité.', 'Elle tète très vite : 5–10 minutes peuvent suffire.', 'Elle peut commencer à se retourner : bras libres pour dormir.'], next: 'Vers 5 mois, trois siestes se mettent en place et la période nocturne s’allonge de nouveau.' },
+        { n: '4 mois et demi à 6 mois', now: ['Trois siestes se stabilisent et la nuit s’allonge vraiment.', 'Elle tient 1 h 30 – 2 h 30 éveillée.', 'Elle s’assoit avec appui et attrape tout pour le porter à la bouche.'], next: 'À 6 mois commence la diversification ; le lait reste l’essentiel jusqu’à un an.' },
+        { n: '6 à 8 mois', now: ['La nourriture solide commence, mais le lait reste l’aliment principal.', 'Angoisse de séparation : elle pleure quand tu sors de la pièce. C’est un progrès, pas un recul.', 'Le quatre-pattes et les premières dents peuvent perturber le sommeil quelques semaines.'], next: 'Entre 8 et 10 mois, un autre bond : elle se met debout et s’entraîne la nuit.' },
+        { n: '8 à 10 mois', now: ['Elle se met debout dans le lit et s’entraîne à 3 h du matin. Ça passera.', 'Deux siestes bien marquées ; celle de l’après-midi raccourcit.', 'Elle peut refuser des tétées de jour, trop occupée.'], next: 'Vers un an, les 2 siestes deviennent une seule et le sevrage nocturne devient possible si tu le souhaites.' },
+        { n: '10 à 13 mois', now: ['Premiers pas ; le sommeil peut devenir irrégulier quelques semaines.', 'Elle mange de tout et tète moins souvent, mais le lait apporte encore défenses et calories.', 'Elle tient 3–4 h éveillée entre les siestes.'], next: 'Entre 14 et 18 mois, elle passera de deux siestes à une seule, en milieu de journée.' },
+        { n: 'Plus d’un an', now: ['Une ou deux siestes, et des nuits longues avec un réveil ponctuel.', 'L’allaitement reste valable tant que ça vous convient à toutes les deux.'], next: 'À partir d’ici les changements sont plus lents et moins brusques.' },
+      ],
       tlLabel: d => `Chronologie du ${d}`,
       // Panel
       pTitle: 'Tableau de suivi', pRange: n => `${n} derniers jours`, pVsPrev: 'vs période précédente', pNoData: 'Pas encore de journées complètes à comparer. Avec 3–4 jours enregistrés, le tableau prend du sens.',
@@ -664,6 +728,36 @@
   const WAKE_OK = 75, WAKE_WARN = 105, WAKE_MAX = 120;
   // Noche: de 19:30 a 07:00 no hay ventanas de vigilia, solo toma y vuelta a dormir
   const DUR_SHORT = 8, DUR_LONG = 20; // minutos, tomas aproximadas
+  // Rangos orientativos por etapa (semanas cumplidas). El texto de cada etapa está en I18N.stages
+  const ETAPAS = [
+    { to: 2,  tomas: [8, 12], sueno: [14, 18], siestas: [4, 8], tramo: [2, 4],  desp: [3, 6], vent: '40–60 min' },
+    { to: 6,  tomas: [8, 12], sueno: [14, 17], siestas: [4, 6], tramo: [3, 4],  desp: [3, 5], vent: '45–75 min' },
+    { to: 10, tomas: [8, 12], sueno: [14, 17], siestas: [4, 5], tramo: [3, 5],  desp: [2, 4], vent: '1 h – 1 h 30' },
+    { to: 14, tomas: [8, 12], sueno: [14, 17], siestas: [3, 5], tramo: [4, 6],  desp: [2, 4], vent: '1 h – 2 h' },
+    { to: 19, tomas: [8, 11], sueno: [14, 16], siestas: [3, 4], tramo: [4, 7],  desp: [2, 4], vent: '1 h 15 – 2 h' },
+    { to: 26, tomas: [6, 10], sueno: [13, 16], siestas: [3, 3], tramo: [5, 8],  desp: [1, 3], vent: '1 h 30 – 2 h 30' },
+    { to: 35, tomas: [5, 8],  sueno: [12, 15], siestas: [2, 3], tramo: [6, 9],  desp: [0, 3], vent: '2 h – 3 h' },
+    { to: 44, tomas: [4, 6],  sueno: [12, 15], siestas: [2, 2], tramo: [7, 11], desp: [0, 2], vent: '2 h 30 – 3 h 30' },
+    { to: 56, tomas: [3, 5],  sueno: [11, 14], siestas: [1, 2], tramo: [8, 11], desp: [0, 2], vent: '3 h – 4 h' },
+    { to: 999, tomas: [2, 5], sueno: [11, 14], siestas: [1, 2], tramo: [9, 12], desp: [0, 1], vent: '4 h – 6 h' },
+  ];
+  const BIRTH_DEF = '2026-06-15';
+  const birthId = () => { try { return localStorage.getItem('ainadays.birth') || BIRTH_DEF; } catch { return BIRTH_DEF; } };
+  const ageWeeks = () => Math.max(0, Math.floor((Date.now() - dayStart(birthId())) / (7 * DAY)));
+  function ageText() {
+    const b = new Date(dayStart(birthId())), n = new Date();
+    let m = (n.getFullYear() - b.getFullYear()) * 12 + n.getMonth() - b.getMonth();
+    if (n.getDate() < b.getDate()) m--;
+    const marca = new Date(b.getFullYear(), b.getMonth() + m, b.getDate());
+    const dias = Math.floor((n - marca) / DAY), sem = Math.floor(dias / 7);
+    const fr = lang === 'fr';
+    const pm = m === 1 ? (fr ? '1 mois' : '1 mes') : `${m} ${fr ? 'mois' : 'meses'}`;
+    if (m < 1) return `${sem} ${fr ? 'semaines' : 'semanas'}`;
+    if (sem < 1) return pm;
+    return `${pm} ${fr ? 'et' : 'y'} ${sem === 1 ? (fr ? '1 semaine' : '1 semana') : `${sem} ${fr ? 'semaines' : 'semanas'}`}`;
+  }
+  const etapaIdx = () => { const w = ageWeeks(); return ETAPAS.findIndex(e => w < e.to) === -1 ? ETAPAS.length - 1 : ETAPAS.findIndex(e => w < e.to); };
+
   const isNight = ms => { const d = new Date(ms); const h = d.getHours() + d.getMinutes() / 60; return h >= 19.5 || h < 7; };
 
   // ---------- Estado ----------
@@ -1203,12 +1297,13 @@
       const feedsD = evs.filter(e => e.t === 'toma' && e.ini >= s + 7 * H && e.ini < s + 20 * H).length;
       const feedsN = evs.filter(e => e.t === 'toma' && e.ini >= s + 20 * H && e.ini < s + 31 * H).length;
       const naps = clipSum(evs, s + 8 * H, s + 19 * H, 'sueno');
+      const napsN = evs.filter(e => e.t === 'sueno' && e.fin != null && e.ini >= s + 8 * H && e.ini < s + 19 * H).length;
       const nightSleep = clipSum(evs, s + 19 * H, s + 32 * H, 'sueno');
       const n = nightStats(evs, id);
       const wake = morningWake(evs.filter(e => e.t === 'sueno'), s + DAY);
       const has = clipToDay(evs, id).length > 0;
       const hours = evs.filter(e => e.t === 'toma' && e.ini >= s && e.ini < s + DAY).map(e => new Date(e.ini).getHours());
-      return { id, has, feedsD, feedsN, naps, nightSleep, longest: n && (n.bedtime || n.feeds) ? n.longest : null, nightDone: !!(n && n.finished && (n.bedtime || n.feeds)), bed: n && n.bedtime ? minutesOfDay(n.bedtime) : null, wake: wake != null ? minutesOfDay(wake) : null, hours, future: s > now };
+      return { id, has, feedsD, feedsN, naps, napsN, nightSleep, longest: n && (n.bedtime || n.feeds) ? n.longest : null, nightDone: !!(n && n.finished && (n.bedtime || n.feeds)), bed: n && n.bedtime ? minutesOfDay(n.bedtime) : null, wake: wake != null ? minutesOfDay(wake) : null, hours, future: s > now };
     });
   }
 
@@ -1535,7 +1630,43 @@
       </ul>
     </div>`,
   };
-  function renderGuia() { main.innerHTML = GUIDE[lang]; }
+  // Edad y etapa: dónde está, qué le pasa ahora y qué viene
+  function etapaHTML() {
+    const i = etapaIdx(), r = ETAPAS[i], t = L.stages[i], sig = L.stages[i];
+    const evs = allEvents(), today = dayId(Date.now());
+    const ids = []; for (let k = 7; k >= 1; k--) ids.push(shiftDay(today, -k));
+    const rs = panelRows(evs, ids).filter(x => x.has && x.nightDone);
+    const avg = f => rs.length ? rs.reduce((a, x) => a + f(x), 0) / rs.length : null;
+    const num = x => x == null ? '—' : (Math.round(x * 10) / 10).toString().replace('.', ',');
+    const fila = (label, val, rango, unidad = '') => {
+      if (val == null) return '';
+      const [lo, hi] = rango;
+      const est = val < lo * 0.92 ? ['down', L.stDown] : val > hi * 1.08 ? ['up', L.stUp] : ['ok', L.stOk];
+      return `<tr><td>${label}</td><td class="n">${num(val)}${unidad}</td><td class="n muted">${lo === hi ? lo : lo + '–' + hi}${unidad}</td><td class="n"><span class="tag-${est[0]}">${est[1]}</span></td></tr>`;
+    };
+    const tabla = rs.length >= 3 ? `<table class="etapa-t"><thead><tr><th></th><th class="n">${L.stHers}</th><th class="n">${L.stExp}</th><th></th></tr></thead><tbody>
+        ${fila(L.stFeeds, avg(x => x.feedsD + x.feedsN), r.tomas)}
+        ${fila(L.stSleep, avg(x => (x.naps + x.nightSleep) / H), r.sueno, ' ' + L.h)}
+        ${fila(L.stNaps, avg(x => x.napsN), r.siestas)}
+        ${fila(L.stStretch, avg(x => x.longest / H), r.tramo, ' ' + L.h)}
+        ${fila(L.stWakes, avg(x => x.feedsN), r.desp)}
+        <tr><td>${L.stWin}</td><td class="n">—</td><td class="n muted" colspan="2">${r.vent}</td></tr>
+      </tbody></table>` : `<div class="note">${L.stNeed}</div>`;
+    return `<section class="etapa">
+      <h3 style="margin-top:4px">${L.stTitle}</h3>
+      <div class="etapa-h"><b>${L.stAge(ageWeeks(), ageText())}</b><span>${t.n}</span></div>
+      <div class="etapa-born">${L.stBorn} <input type="date" id="f-birth" value="${birthId()}" max="${dayId(Date.now())}"></div>
+      <h4>${L.stHow}</h4>${tabla}
+      <h4>${L.stNow}</h4><ul>${t.now.map(x => `<li>${x}</li>`).join('')}</ul>
+      <h4>${L.stNext}</h4><p>${sig.next}</p>
+      <p class="note">${L.stFoot}</p>
+    </section>`;
+  }
+  function renderGuia() {
+    main.innerHTML = `<div class="guide">${etapaHTML()}</div>` + GUIDE[lang];
+    const inp = document.getElementById('f-birth');
+    if (inp) inp.addEventListener('change', () => { if (!inp.value) return; try { localStorage.setItem('ainadays.birth', inp.value); } catch {} render(); });
+  }
 
   // ---------- Toma rápida (dos toques): corta/larga + cuándo terminó ----------
   function openQuickFeed(lado) {
