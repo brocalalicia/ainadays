@@ -280,6 +280,7 @@
   .card { background: var(--surface); border-radius: var(--radius); padding: 14px 14px 10px; box-shadow: var(--shadow); margin-top: 12px; }
   .card h3 { margin: 0; font-size: 15px; font-weight: 700; }
   .card .sub { font-size: 12.5px; color: var(--muted); margin: 2px 0 8px; }
+  .card .note { font-size: 13px; line-height: 1.45; color: var(--muted); margin-top: 8px; }
   .card svg { width: 100%; height: auto; display: block; overflow: visible; }
   .card svg text { font-family: var(--ui); font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
   .card svg .grid { stroke: var(--c-grid); stroke-width: 1; }
@@ -293,7 +294,6 @@
   .legend .line::before { height: 3px; border-radius: 2px; vertical-align: 3px; }
   .heat { display: grid; grid-template-columns: repeat(24, 1fr); gap: 2px; }
   .heat div { aspect-ratio: 1 / 1.4; border-radius: 3px; background: var(--surface-2); }
-  .heat-x { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 4px; font-variant-numeric: tabular-nums; }
   .ptable { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
   .ptable th, .ptable td { padding: 6px 4px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
   .ptable th { color: var(--muted); font-weight: 700; font-size: 11.5px; }
@@ -464,6 +464,13 @@
       cSleep: 'Sueño por día', cSleepSub: 'noche (19–08 h) y siestas, en horas', sNightSleep: 'noche', sNaps: 'siestas',
       cTimes: 'Hora de acostarse y de despertar', cTimesSub: 'cuanto más planas las líneas, más estable el ritmo', sBed: 'se duerme', sWake: 'despierta',
       cHeat: 'A qué horas come', cHeatSub: n => `tomas por hora del día, sumadas en ${n} días`,
+      hPeak: (a, b, p) => `Concentra las tomas entre las ${a} y las ${b}: ahí hace el ${p} % del total.`,
+      hNight: p => `De noche (20:00–07:00) hace el ${p} % de las tomas.`,
+      hGap: (a, b, n) => `El hueco más largo sin tomas va de las ${a} a las ${b} (${n} h).`,
+      hNightHigh: 'Más de un tercio de noche: cargar más el día ayudaría a aligerarla.',
+      hNightOk: 'Reparto razonable para 3 meses; la noche irá bajando sola si el día se mantiene.',
+      hShare: (d, n) => `media del periodo: ${d} % día · ${n} % noche`,
+      hShareSleep: (d, n) => `media del periodo: ${d} % noche · ${n} % siestas`,
       tTable: 'Tabla por día', thDay: 'Día', thFeedsD: 'Tomas día', thFeedsN: 'Tomas noche', thSleep: 'Sueño', thNaps: 'Siestas', thLongest: 'Tramo máx.', thBed: 'Acostada', thWake: 'Despierta',
       tipFeeds: 'tomas', tipHours: 'h', night: 'noche del', pending: 'noche en curso',
       // Consejo
@@ -585,6 +592,13 @@
       cSleep: 'Sommeil par jour', cSleepSub: 'nuit (19–8 h) et siestes, en heures', sNightSleep: 'nuit', sNaps: 'siestes',
       cTimes: 'Heure du coucher et du réveil', cTimesSub: 'plus les lignes sont plates, plus le rythme est stable', sBed: 's’endort', sWake: 'se réveille',
       cHeat: 'À quelles heures elle tète', cHeatSub: n => `tétées par heure de la journée, cumulées sur ${n} jours`,
+      hPeak: (a, b, p) => `Elle concentre les tétées entre ${a} et ${b} : ${p} % du total s’y trouvent.`,
+      hNight: p => `La nuit (20 h–7 h), elle fait ${p} % des tétées.`,
+      hGap: (a, b, n) => `Le plus long créneau sans tétée va de ${a} à ${b} (${n} h).`,
+      hNightHigh: 'Plus d’un tiers la nuit : remplir davantage la journée l’allégerait.',
+      hNightOk: 'Répartition correcte à 3 mois ; la nuit baissera d’elle-même si la journée tient.',
+      hShare: (d, n) => `moyenne de la période : ${d} % jour · ${n} % nuit`,
+      hShareSleep: (d, n) => `moyenne de la période : ${d} % nuit · ${n} % siestes`,
       tTable: 'Tableau par jour', thDay: 'Jour', thFeedsD: 'Tétées jour', thFeedsN: 'Tétées nuit', thSleep: 'Sommeil', thNaps: 'Siestes', thLongest: 'Max. nuit', thBed: 'Couchée', thWake: 'Réveil',
       tipFeeds: 'tétées', tipHours: 'h', night: 'nuit du', pending: 'nuit en cours',
       // Conseil
@@ -1222,6 +1236,7 @@
       ${kpi(L.kLongest, avg(fullDays, r => r.longest / H), avg(prev.filter(r => r.nightDone), r => r.longest / H), dec, ' ' + L.h, true)}
     </div>`;
 
+    const withDataAll = rows.filter(r => r.has);
     // Geometría común
     const W = 400, PL = 26, PR = 8, PT = 8, PB = 20, IH = 120, PH = PT + IH + PB;
     const n = rows.length, slot = (W - PL - PR) / n, bw = Math.min(24, slot * 0.62);
@@ -1240,30 +1255,39 @@
     let c1 = yTicks(lmax, 2, '');
     c1 += `<line class="ref" x1="${PL}" x2="${W - PR}" y1="${y1(4)}" y2="${y1(4)}"></line>`;
     rows.forEach((r, i) => { if (r.longest == null) return; const v = r.longest / H; const tip = `<b>${fmtDur(r.longest)}</b><br>${L.night} ${dayName(r.id)}${r.nightDone ? '' : ' · ' + L.pending}`; c1 += `<rect class="hit" x="${PL + slot * i}" y="${PT}" width="${slot}" height="${IH}" ${tipAttr(tip)}></rect>` + col(i, y1(0), IH - (y1(v) - PT), 'var(--c-sueno)', tip, r.nightDone ? '' : 'pending'); });
-    const lastL = [...rows].reverse().find(r => r.longest != null && r.nightDone);
-    if (lastL) { const i = rows.indexOf(lastL); c1 += `<text x="${x(i) + bw / 2}" y="${y1(lastL.longest / H) - 4}" text-anchor="middle" style="fill:var(--text);font-weight:700">${fmtDur(lastL.longest)}</text>`; }
+    // número encima de cada barra (formato corto si hay poco sitio)
+    const corto = ms => { const m = Math.round(ms / MIN); return slot >= 34 ? `${Math.floor(m / 60)}h${pad(m % 60)}` : (m / 60).toFixed(1).replace('.', ','); };
+    if (slot >= 20) rows.forEach((r, i) => { if (r.longest == null) return;
+      c1 += `<text x="${x(i) + bw / 2}" y="${y1(r.longest / H) - 4}" text-anchor="middle" style="font-size:${slot >= 34 ? 10 : 9}px;fill:var(--text);font-weight:700${r.nightDone ? '' : ';opacity:.45'}">${corto(r.longest)}</text>`; });
 
     // 2. Tomas día / noche (apiladas)
     const fmax = Math.max(4, ...rows.map(r => r.feedsD + r.feedsN));
     const fm = Math.ceil(fmax / 2) * 2;
     const y2 = v => PT + IH - v / fm * IH;
     let c2 = yTicks(fm, fm > 8 ? 4 : 2);
-    rows.forEach((r, i) => { if (!r.has) return; const tip = `<b>${r.feedsD + r.feedsN} ${L.tipFeeds}</b><br>${dayName(r.id)}<br>${L.sDay}: ${r.feedsD} · ${L.sNight}: ${r.feedsN}`;
+    rows.forEach((r, i) => { if (!r.has) return; const t0 = r.feedsD + r.feedsN, pD = t0 ? Math.round(r.feedsD / t0 * 100) : 0; const tip = `<b>${t0} ${L.tipFeeds}</b><br>${dayName(r.id)}<br>${L.sDay}: ${r.feedsD} (${pD} %) · ${L.sNight}: ${r.feedsN} (${100 - pD} %)`;
       c2 += `<rect class="hit" x="${PL + slot * i}" y="${PT}" width="${slot}" height="${IH}" ${tipAttr(tip)}></rect>`;
       const hD = IH - (y2(r.feedsD) - PT), hN = IH - (y2(r.feedsN) - PT);
       c2 += col(i, y2(0), hD, 'var(--c-toma)', tip);
-      if (hN > 0) c2 += col(i, y2(0) - hD - 2, hN, 'var(--c-sueno)', tip); });
+      if (hN > 0) c2 += col(i, y2(0) - hD - 2, hN, 'var(--c-sueno)', tip);
+      const tot = r.feedsD + r.feedsN;
+      if (slot >= 20 && tot) c2 += `<text x="${x(i) + bw / 2}" y="${y2(tot) - 4}" text-anchor="middle" style="font-size:${slot >= 30 ? 9.5 : 8.5}px;fill:var(--muted)">${Math.round(r.feedsN / tot * 100)}%</text>`; });
+    const totD = withDataAll.reduce((a, r) => a + r.feedsD, 0), totN = withDataAll.reduce((a, r) => a + r.feedsN, 0);
+    const share2 = totD + totN ? L.hShare(Math.round(totD / (totD + totN) * 100), Math.round(totN / (totD + totN) * 100)) : '';
 
     // 3. Sueño noche / siestas (apiladas, horas)
     const smax = Math.max(12, ...rows.map(r => (r.naps + r.nightSleep) / H));
     const sm = Math.ceil(smax / 4) * 4;
     const y3 = v => PT + IH - v / sm * IH;
     let c3 = yTicks(sm, 4, '');
-    rows.forEach((r, i) => { if (!r.has) return; const tot = (r.naps + r.nightSleep) / H; const tip = `<b>${fmtHours(r.naps + r.nightSleep)} ${L.h}</b><br>${dayName(r.id)}<br>${L.sNightSleep}: ${fmtHours(r.nightSleep)} ${L.h} · ${L.sNaps}: ${fmtHours(r.naps)} ${L.h}`;
+    rows.forEach((r, i) => { if (!r.has) return; const tot = (r.naps + r.nightSleep) / H; const pN = (r.naps + r.nightSleep) ? Math.round(r.nightSleep / (r.naps + r.nightSleep) * 100) : 0; const tip = `<b>${fmtHours(r.naps + r.nightSleep)} ${L.h}</b><br>${dayName(r.id)}<br>${L.sNightSleep}: ${fmtHours(r.nightSleep)} ${L.h} (${pN} %) · ${L.sNaps}: ${fmtHours(r.naps)} ${L.h} (${100 - pN} %)`;
       c3 += `<rect class="hit" x="${PL + slot * i}" y="${PT}" width="${slot}" height="${IH}" ${tipAttr(tip)}></rect>`;
       const hN = IH - (y3(r.nightSleep / H) - PT), hS = IH - (y3(r.naps / H) - PT);
       c3 += col(i, y3(0), hN, 'var(--c-sueno)', tip);
-      if (hS > 0) c3 += col(i, y3(0) - hN - 2, hS, 'var(--c-sueno-2)', tip); });
+      if (hS > 0) c3 += col(i, y3(0) - hN - 2, hS, 'var(--c-sueno-2)', tip);
+      if (slot >= 20 && tot) c3 += `<text x="${x(i) + bw / 2}" y="${y3(tot) - 4}" text-anchor="middle" style="font-size:${slot >= 30 ? 9.5 : 8.5}px;fill:var(--muted)">${Math.round(r.nightSleep / (r.nightSleep + r.naps) * 100)}%</text>`; });
+    const sumN = withDataAll.reduce((a, r) => a + r.nightSleep, 0), sumS = withDataAll.reduce((a, r) => a + r.naps, 0);
+    const share3 = sumN + sumS ? L.hShareSleep(Math.round(sumN / (sumN + sumS) * 100), Math.round(sumS / (sumN + sumS) * 100)) : '';
 
     // 4. Hora de acostarse y de despertar (eje: 18:00 → 12:00 del día siguiente)
     const tmin = 18 * 60, tmax = 36 * 60;
@@ -1279,12 +1303,30 @@
     bedPts.forEach(p => c4 += dot(p, 'var(--c-sueno)', L.sBed));
     wakePts.forEach(p => c4 += dot(p, 'var(--c-toma)', L.sWake));
 
-    // 5. Mapa de calor: tomas por hora
+    // 5. Mapa de calor: tomas por hora + lectura
     const heat = new Array(24).fill(0);
     withData.forEach(r => r.hours.forEach(h => heat[h]++));
-    const hmax = Math.max(1, ...heat);
-    const heatHTML = `<div class="heat">${heat.map((v, h) => `<div style="background:${v ? `color-mix(in oklab, var(--c-toma) ${Math.round(25 + 75 * v / hmax)}%, var(--surface-2))` : 'var(--surface-2)'}" ${tipAttr(`<b>${v} ${L.tipFeeds}</b><br>${pad(h)}:00–${pad((h + 1) % 24)}:00`)}></div>`).join('')}</div>
-      <div class="heat-x"><span>0</span><span>6</span><span>12</span><span>18</span><span>24 ${L.h}</span></div>`;
+    const hmax = Math.max(1, ...heat), hTotal = heat.reduce((a, b) => a + b, 0);
+    const heatCells = `<div class="heat">${heat.map((v, h) => `<div style="background:${v ? `color-mix(in oklab, var(--c-toma) ${Math.round(25 + 75 * v / hmax)}%, var(--surface-2))` : 'var(--surface-2)'}" ${tipAttr(`<b>${v} ${L.tipFeeds}</b><br>${pad(h)}:00–${pad((h + 1) % 24)}:00`)}></div>`).join('')}</div>
+      <div class="tl-hours" style="margin-top:4px">${[0, 6, 12, 18, 24].map(h => `<span class="${h === 0 ? 'first' : h === 24 ? 'last' : ''}" style="left:${h / 24 * 100}%">${h === 24 ? '24 ' + L.h : pad(h)}</span>`).join('')}</div>`;
+    let heatRead = '';
+    if (hTotal >= 8) {
+      // ventana de 3 h con más tomas
+      let best = -1, bi = 0;
+      for (let h = 0; h < 24; h++) { const v = heat[h] + heat[(h + 1) % 24] + heat[(h + 2) % 24]; if (v > best) { best = v; bi = h; } }
+      const nightN = heat.reduce((a, v, h) => a + ((h >= 20 || h < 7) ? v : 0), 0);
+      const nightPct = Math.round(nightN / hTotal * 100);
+      // hueco más largo sin ninguna toma
+      let gapLen = 0, gapStart = null, curLen = 0, curStart = 0;
+      for (let k = 0; k < 48; k++) { const h = k % 24;
+        if (!heat[h]) { if (curLen === 0) curStart = h; curLen++; if (curLen > gapLen && curLen <= 24) { gapLen = curLen; gapStart = curStart; } }
+        else curLen = 0; }
+      const frases = [L.hPeak(pad(bi) + ':00', pad((bi + 3) % 24) + ':00', Math.round(best / hTotal * 100)), L.hNight(nightPct)];
+      if (gapLen >= 3 && gapStart != null) frases.push(L.hGap(pad(gapStart) + ':00', pad((gapStart + gapLen) % 24) + ':00', gapLen));
+      frases.push(nightPct >= 34 ? L.hNightHigh : L.hNightOk);
+      heatRead = `<div class="note" style="margin-top:8px">${frases.join(' ')}</div>`;
+    }
+    const heatHTML = heatCells + heatRead;
 
     // 6. Tabla
     const table = `<div class="tscroll"><table class="ptable"><thead><tr><th>${L.thDay}</th><th>${L.thFeedsD}</th><th>${L.thFeedsN}</th><th>${L.thSleep}</th><th>${L.thNaps}</th><th>${L.thLongest}</th><th>${L.thBed}</th><th>${L.thWake}</th></tr></thead><tbody>${
@@ -1299,8 +1341,8 @@
         <div class="filters">${[7, 14, 30].map(d => `<button data-range="${d}" aria-pressed="${d === panelRange}">${d}</button>`).join('')}<span style="align-self:center;font-size:12.5px;color:var(--muted);margin-left:4px">${L.pRange(panelRange)}</span></div>
         ${withData.length ? kpis : `<div class="empty">${L.pNoData}</div>`}
         <div class="card"><h3>${L.cLongest}</h3><div class="sub">${L.cLongestSub}</div>${svg(c1)}</div>
-        <div class="card"><h3>${L.cFeeds}</h3><div class="sub">${L.cFeedsSub}</div>${svg(c2)}${legend([[L.sDay, 'var(--c-toma)'], [L.sNight, 'var(--c-sueno)']])}</div>
-        <div class="card"><h3>${L.cSleep}</h3><div class="sub">${L.cSleepSub}</div>${svg(c3)}${legend([[L.sNightSleep, 'var(--c-sueno)'], [L.sNaps, 'var(--c-sueno-2)']])}</div>
+        <div class="card"><h3>${L.cFeeds}</h3><div class="sub">${L.cFeedsSub}</div>${svg(c2)}${legend([[L.sDay, 'var(--c-toma)'], [L.sNight, 'var(--c-sueno)']])}${share2 ? `<div class="note">${share2}</div>` : ''}</div>
+        <div class="card"><h3>${L.cSleep}</h3><div class="sub">${L.cSleepSub}</div>${svg(c3)}${legend([[L.sNightSleep, 'var(--c-sueno)'], [L.sNaps, 'var(--c-sueno-2)']])}${share3 ? `<div class="note">${share3}</div>` : ''}</div>
         <div class="card"><h3>${L.cTimes}</h3><div class="sub">${L.cTimesSub}</div>${svg(c4)}${legend([[L.sBed, 'var(--c-sueno)', true], [L.sWake, 'var(--c-toma)', true]])}</div>
         <div class="card"><h3>${L.cHeat}</h3><div class="sub">${L.cHeatSub(withData.length)}</div>${heatHTML}</div>
         <div class="card"><h3>${L.tTable}</h3><div class="sub">&nbsp;</div>${table}</div>
