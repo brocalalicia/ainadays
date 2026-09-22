@@ -1027,9 +1027,9 @@
     const numH = x => num(x) + ' ' + L.h;
     const kpis = `<div class="eyebrow ins-h">${L.kpiSoFar(fmtTime(now))}</div><div class="kpis">
       ${kpi(L.kpiFeedsD, hoyU.tomasDia, ayerU.has ? ayerU.tomasDia : null, mean(d => d.tomasDia), num, true, L.kpiSubNow)}
-      ${kpi(L.kpiSleepN, noche.done || noche.sleep ? noche.sleep / H : null, nocheAyer ? nocheAyer.sleep / H : null, meanN(n => n.sleep / H), numH, true, L.kpiSubNight)}
-      ${kpi(L.kpiFeedsN, noche.done || noche.feeds ? noche.feeds : null, nocheAyer ? nocheAyer.feeds : null, meanN(n => n.feeds), num, false, noche.longest ? L.kpiStretchSub(fmtDur(noche.longest)) : L.kpiSubNight)}
       ${kpi(L.kpiNaps, hoyU.siestas, ayerU.has ? ayerU.siestas : null, mean(d => d.siestas), num, true, L.kpiNapsSub(num(hoyU.napH / H)))}
+      ${kpi(L.kpiFeedsN, noche.done || noche.feeds ? noche.feeds : null, nocheAyer ? nocheAyer.feeds : null, meanN(n => n.feeds), num, false, noche.longest ? L.kpiStretchSub(fmtDur(noche.longest)) : L.kpiSubNight)}
+      ${kpi(L.kpiSleepN, noche.done || noche.sleep ? noche.sleep / H : null, nocheAyer ? nocheAyer.sleep / H : null, meanN(n => n.sleep / H), numH, true, L.kpiSubNight)}
     </div>`;
     return { rows, notes, next, kpis };
   }
