@@ -188,7 +188,8 @@
   .tl-bar.solo .ev-sueno { top: 3px; bottom: 3px; height: auto; }
   .tl-bar.feeds { height: 14px; margin-top: 3px; }
   .tl-bar.feeds .ev-toma { top: 2px; bottom: 2px; width: 3px; }
-  .wrow .tl { gap: 0; }
+  .tl-bar.feeds.solo-feeds { height: 22px; margin-top: 0; }
+  .tl-bar.feeds.solo-feeds .ev-toma { top: 3px; bottom: 3px; }
   .tl-bar .night { position: absolute; top: 0; bottom: 0; background: var(--night); }
   .tl-bar .gl { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--c-grid); opacity: .7; }
   .tl-bar .gl.h6 { opacity: 1; }
@@ -465,7 +466,7 @@
       aiThinking: 'Pensando… (puede tardar medio minuto)', aiWriting: 'Escribiendo…',
       aiNotGranted: 'Sin permiso para preguntar a Claude desde esta página.', aiRate: 'Demasiadas peticiones seguidas; prueba en un rato.', aiFail: 'No se pudo obtener la lectura. Inténtalo de nuevo.',
       aiLang: 'Escribe en español',
-      last7: 'Últimos 7 días', axisNight: 'Noche centrada', axisDay: '00–24 h', axisNightSub: 'cada fila: de las 19:30 a las 19:30 del día siguiente', axisDaySub: 'cada fila: de medianoche a medianoche', noRecords: 'sin registros', wFeeds: 'tomas', wSleep: 'sueño', wNight: 'noche:', wMax: 'máx.',
+      last7: 'Últimos 7 días', wSleepTitle: 'Sueño por día', wFeedsTitle: 'Tomas por día', axisNight: 'Noche centrada', axisDay: '00–24 h', axisNightSub: 'cada fila: de las 19:30 a las 19:30 del día siguiente', axisDaySub: 'cada fila: de medianoche a medianoche', noRecords: 'sin registros', wFeeds: 'tomas', wSleep: 'sueño', wNight: 'noche:', wMax: 'máx.',
       weekReading: 'Lectura de la semana',
       weekEmpty: 'Con 3–4 días registrados aparecerá aquí una lectura: hora habitual de despertar y de acostarse, tomas de día y de noche, y el tramo nocturno más largo. Registra unos días sin cambiar nada; primero entender, luego ajustar.',
       wkWake: 'Despierta por la mañana sobre las', wkBed: 'Se duerme por la noche sobre las', varies: d => `(varía ${d})`,
@@ -613,7 +614,7 @@
       aiThinking: 'Réflexion… (peut prendre une trentaine de secondes)', aiWriting: 'Rédaction…',
       aiNotGranted: 'Pas d’autorisation pour interroger Claude depuis cette page.', aiRate: 'Trop de demandes d’affilée ; réessaie dans un moment.', aiFail: 'Impossible d’obtenir la lecture. Réessaie.',
       aiLang: 'Écris en français',
-      last7: '7 derniers jours', axisNight: 'Nuit centrée', axisDay: '0–24 h', axisNightSub: 'chaque ligne : de 19 h 30 à 19 h 30 le lendemain', axisDaySub: 'chaque ligne : de minuit à minuit', noRecords: 'aucun enregistrement', wFeeds: 'tétées', wSleep: 'sommeil', wNight: 'nuit :', wMax: 'max.',
+      last7: '7 derniers jours', wSleepTitle: 'Sommeil par jour', wFeedsTitle: 'Tétées par jour', axisNight: 'Nuit centrée', axisDay: '0–24 h', axisNightSub: 'chaque ligne : de 19 h 30 à 19 h 30 le lendemain', axisDaySub: 'chaque ligne : de minuit à minuit', noRecords: 'aucun enregistrement', wFeeds: 'tétées', wSleep: 'sommeil', wNight: 'nuit :', wMax: 'max.',
       weekReading: 'Lecture de la semaine',
       weekEmpty: 'Après 3–4 jours enregistrés, une lecture apparaîtra ici : heure habituelle de réveil et de coucher, tétées de jour et de nuit, et plus longue période nocturne. Enregistre quelques jours sans rien changer ; comprendre d’abord, ajuster ensuite.',
       wkWake: 'Réveil le matin vers', wkBed: 'Endormie le soir vers', varies: d => `(varie de ${d})`,
@@ -1222,20 +1223,29 @@
     const now = Date.now(), evs = allEvents(), today = dayId(now);
     const originH = weekAxis === 'night' ? WIN_H : 0;   // 19:00 → 19:00 deja la noche entera en una fila
     const ids = []; for (let i = 6; i >= 0; i--) ids.push(shiftDay(today, -i));
-    const rows = ids.map(id => {
+    // Una fila por día con una sola barra: 'sueno' o 'toma'
+    const filaHTML = (id, tipo) => {
       const from = dayStart(id) + originH * H, to = from + DAY;
       const cl = clipToWindow(evs, from, to);
-      const tomas = cl.filter(e => e.t === 'toma').length;
-      const sueno = cl.filter(e => e.t === 'sueno').reduce((a, e) => a + (e.b - e.a), 0);
       const n = nightStats(evs, id);
       const d = new Date(dayStart(id));
+      const bar = timelineHTML(evs, from, { hours: false, small: true, only: tipo, cls: tipo === 'sueno' ? 'solo' : 'feeds solo-feeds' });
+      let stats;
+      if (!cl.length) stats = `<span>${L.noRecords}</span>`;
+      else if (tipo === 'sueno') {
+        const sueno = cl.filter(e => e.t === 'sueno').reduce((a, e) => a + (e.b - e.a), 0);
+        const nocturno = clipSum(evs, dayStart(id) + 19 * H, dayStart(id) + 32 * H, 'sueno');
+        stats = `<span><b>${fmtHours(sueno)} ${L.h}</b> ${L.wSleep}</span>${n && n.finished ? `<span>${L.wNight} <b>${fmtHours(nocturno)} ${L.h}</b>, ${L.wMax} <b>${fmtDur(n.longest)}</b></span>` : ''}`;
+      } else {
+        const tomas = cl.filter(e => e.t === 'toma').length;
+        stats = `<span><b>${tomas}</b> ${L.wFeeds}</span>${n && n.finished ? `<span>${L.wNight} <b>${n.feeds}</b> ${L.wFeeds}</span>` : ''}`;
+      }
       return `<div class="wrow${id === today ? ' today' : ''}">
         <div class="dl"><b>${WDs(d)}</b>${weekAxis === 'night' ? d.getDate() + '→' + new Date(dayStart(id) + DAY).getDate() : d.getDate() + ' ' + L.mo[d.getMonth()]}</div>
-        <div>${timelineHTML(evs, from, { hours: false, small: true, only: 'sueno', cls: 'solo' })}
-          ${timelineHTML(evs, from, { hours: false, small: true, only: 'toma', cls: 'feeds' })}
-          <div class="wstats">${cl.length ? `<span><b>${tomas}</b> ${L.wFeeds}</span><span><b>${fmtHours(sueno)} ${L.h}</b> ${L.wSleep}</span>${n && n.finished ? `<span>${L.wNight} <b>${n.feeds}</b> ${L.wFeeds}, ${L.wMax} <b>${fmtDur(n.longest)}</b></span>` : ''}` : `<span>${L.noRecords}</span>`}</div>
-        </div></div>`;
-    }).join('');
+        <div>${bar}<div class="wstats">${stats}</div></div></div>`;
+    };
+    const rowsSueno = ids.map(id => filaHTML(id, 'sueno')).join('');
+    const rowsTomas = ids.map(id => filaHTML(id, 'toma')).join('');
     const eje = `<div class="wrow"><div class="dl"></div><div>${axisHTML(dayStart(today) + originH * H)}</div></div>`;
 
     const withData = ids.filter(id => clipToDay(evs, id).length > 0 && id !== today);
@@ -1279,10 +1289,15 @@
 
     main.innerHTML = `
       <section class="block" style="margin-top:0">
-        <h2>${L.last7}</h2>
+        <h2>${L.wSleepTitle}</h2>
         <div class="filters"><button data-axis="night" aria-pressed="${weekAxis === 'night'}">${L.axisNight}</button><button data-axis="day" aria-pressed="${weekAxis === 'day'}">${L.axisDay}</button><span style="align-self:center;font-size:12.5px;color:var(--muted);margin-left:4px">${weekAxis === 'night' ? L.axisNightSub : L.axisDaySub}</span></div>
-        <div class="week">${eje}${rows}${eje}</div>
-        <div class="tl-legend" style="margin-top:8px"><span class="l-sueno">${L.legend.sueno}</span><span class="l-toma">${L.legend.toma}</span></div>
+        <div class="week">${eje}${rowsSueno}${eje}</div>
+        <div class="tl-legend" style="margin-top:8px"><span class="l-sueno">${L.legend.sueno}</span></div>
+      </section>
+      <section class="block">
+        <h2>${L.wFeedsTitle}</h2>
+        <div class="week">${eje}${rowsTomas}${eje}</div>
+        <div class="tl-legend" style="margin-top:8px"><span class="l-toma">${L.legend.toma}</span></div>
       </section>
       <section class="block">
         <h2>${L.weekReading}</h2>
