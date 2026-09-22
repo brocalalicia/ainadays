@@ -157,7 +157,7 @@
   /* Consejo */
   .ask { background: var(--surface); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); margin-top: 14px; display: grid; gap: 10px; }
   .ask h2 { font-family: var(--display); font-weight: 600; font-size: 18px; margin: 0; }
-  .ask textarea { font: inherit; font-size: 15px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); color: var(--text); width: 100%; min-height: 64px; resize: vertical; }
+  .ask textarea { font: inherit; font-size: 16px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); color: var(--text); width: 100%; min-height: 64px; resize: vertical; }
   .ask .row2 { display: flex; gap: 8px; align-items: center; }
   .ask .go { background: var(--sueno); color: #fff; border: 0; border-radius: 12px; padding: 11px 16px; font-weight: 700; }
   .ask .go:disabled { opacity: .6; }
@@ -480,6 +480,10 @@
       lateEvening: 'Ya es la hora de dormir: ritual ahora, luz baja, toma completa y a la cuna.',
       // InstAïna
       igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Todavía no hay foto de hoy. Manda una sonrisa a papá.', igCaption: 'Pie de foto (opcional)', igCaptionPh: 'p. ej. se ha reído con el sonajero', igPublish: 'Publicar', igPublishing: 'Subiendo…', igReading: 'Preparando la foto…', igPublished: 'Publicada. Papá ya puede verla.', igDelete: 'Eliminar foto', igDeleted: 'Foto eliminada', igFail: 'No se pudo subir la foto. Inténtalo de nuevo.', igAlbum: 'InstAïna · álbum', igAlbumEmpty: 'Las fotos que mandes irán apareciendo aquí, día a día.', igOnlyOnline: 'InstAïna necesita conexión con el servidor.', qShowFr: 'Voir en français', qHide: 'Ocultar', qMic: 'Hablar', qMicStop: 'Escuchando… toca para parar', qMicFail: 'El micrófono no está disponible en este navegador',
+      micDenied: 'No has dado permiso al micrófono. Actívalo en los ajustes del navegador, o usa el micrófono del teclado.',
+      micNet: 'El dictado necesita conexión. Prueba otra vez o escribe con el teclado.',
+      micNone: 'No he oído nada. Acerca el móvil y habla, o usa el micrófono del teclado.',
+      micListening: 'Escuchando…', micKeyboard: 'Si el micro falla, usa el del teclado (🎤 junto a la barra espaciadora).',
     },
     fr: {
       wd: ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'],
@@ -595,6 +599,10 @@
       lateEvening: 'C’est déjà l’heure du coucher : rituel maintenant, lumière basse, tétée complète et au lit.',
       // InstAïna
       igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Pas encore de photo aujourd’hui. Envoie un sourire à papa.', igCaption: 'Légende (facultatif)', igCaptionPh: 'ex. elle a ri avec le hochet', igPublish: 'Publier', igPublishing: 'Envoi…', igReading: 'Préparation de la photo…', igPublished: 'Publiée. Papa peut la voir.', igDelete: 'Supprimer la photo', igDeleted: 'Photo supprimée', igFail: 'Impossible d’envoyer la photo. Réessaie.', igAlbum: 'InstAïna · album', igAlbumEmpty: 'Les photos que tu envoies apparaîtront ici, jour après jour.', igOnlyOnline: 'InstAïna a besoin de la connexion au serveur.', qShowFr: 'Ver en español', qHide: 'Masquer', qMic: 'Parler', qMicStop: 'À l’écoute… touche pour arrêter', qMicFail: 'Le micro n’est pas disponible dans ce navigateur',
+      micDenied: 'Tu n’as pas autorisé le micro. Active-le dans les réglages du navigateur, ou utilise le micro du clavier.',
+      micNet: 'La dictée a besoin de connexion. Réessaie ou écris au clavier.',
+      micNone: 'Je n’ai rien entendu. Rapproche le téléphone et parle, ou utilise le micro du clavier.',
+      micListening: 'À l’écoute…', micKeyboard: 'Si le micro ne marche pas, utilise celui du clavier (🎤 à côté de la barre d’espace).',
     },
   };
   let lang = 'es';
@@ -1478,30 +1486,43 @@
     return n;
   }
   function openVoiceLog() {
-    const st = { text: '', proposed: null, state: 'idle', listening: false };
+    const st = { text: '', proposed: null, state: 'idle' };
     const draw = () => {
       modalRoot.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-label="${L.vTitle}"><div class="sheet">
         <h3>${L.vTitle}</h3>
         <div class="src" style="font-size:13.5px;color:var(--muted)">${L.vHint}</div>
-        <textarea id="v-text" placeholder="${L.vPh}" style="font:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text);width:100%;min-height:64px">${esc(st.text)}</textarea>
-        <div class="row2" style="display:flex;gap:8px">${SR ? `<button class="mic${st.listening ? ' on' : ''}" data-m="mic">${st.listening ? L.qMicStop : L.qMic}</button>` : ''}<button class="primary" style="flex:1;border:0;border-radius:12px;padding:11px;font-weight:700;background:var(--sueno);color:#fff" data-m="interpret" ${st.state === 'loading' ? 'disabled' : ''}>${st.state === 'loading' ? L.vInterpreting : L.vInterpret}</button></div>
+        <textarea id="v-text" placeholder="${L.vPh}" style="font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text);width:100%;min-height:76px">${esc(st.text)}</textarea>
+        <div id="v-status" class="src" style="font-size:12.5px;color:var(--muted);min-height:1.2em">${SR ? L.micKeyboard : ''}</div>
+        <div class="row2" style="display:flex;gap:8px">${SR ? `<button class="mic" data-m="mic">${L.qMic}</button>` : ''}<button class="primary" style="flex:1;border:0;border-radius:12px;padding:11px;font-weight:700;background:var(--sueno);color:#fff" data-m="interpret" ${st.state === 'loading' ? 'disabled' : ''}>${st.state === 'loading' ? L.vInterpreting : L.vInterpret}</button></div>
         ${st.proposed ? (st.proposed.length ? `<div class="field"><label>${L.vProposal}</label><div class="list">${st.proposed.map((e, i) => `<label class="item" style="cursor:pointer;grid-template-columns:24px 1fr"><input type="checkbox" data-i="${i}" ${e.on ? 'checked' : ''}><span>${describeProposed(e)}</span></label>`).join('')}</div></div>
           <div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button><button class="primary" data-m="save">${L.vSave}</button></div>` : `<div class="empty">${L.vNothing}</div><div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button></div>`) : `<div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button></div>`}
       </div></div>`;
       const ta = modalRoot.querySelector('#v-text');
       ta.addEventListener('input', () => { st.text = ta.value; });
+      if (!st.proposed && st.state === 'idle') setTimeout(() => ta.focus(), 60);
     };
     draw();
-    const close = () => { if (rec) rec.stop(); modalRoot.innerHTML = ''; modalRoot.onclick = null; };
+    const close = () => { stopDictation(); modalRoot.innerHTML = ''; modalRoot.onclick = null; };
+    const readText = () => { const t = modalRoot.querySelector('#v-text'); return t ? t.value.trim() : st.text; };
     modalRoot.onclick = async e => {
       const cb = e.target.closest('input[type=checkbox]'); if (cb) { st.proposed[Number(cb.dataset.i)].on = cb.checked; return; }
       const m = e.target.closest('[data-m]');
       if (!m) { if (e.target.classList.contains('modal')) close(); return; }
       if (m.dataset.m === 'cancel') return close();
-      if (m.dataset.m === 'mic') { startDictation('v-text', () => { st.listening = false; st.text = modalRoot.querySelector('#v-text').value; draw(); }); st.listening = true; draw(); return; }
+      if (m.dataset.m === 'mic') {
+        const btn = modalRoot.querySelector('.mic'), status = modalRoot.querySelector('#v-status');
+        if (rec) { stopDictation(); return; }
+        startDictation('v-text', msg => {
+          const listening = msg === L.micListening;
+          if (btn) { btn.classList.toggle('on', listening); btn.textContent = listening ? L.qMicStop : L.qMic; }
+          if (status) status.textContent = listening ? L.micListening : (msg || L.micKeyboard);
+          if (!listening) st.text = readText();
+        });
+        return;
+      }
       if (m.dataset.m === 'interpret') {
-        if (rec) rec.stop();
-        st.text = modalRoot.querySelector('#v-text').value.trim();
+        stopDictation();
+        st.text = readText();
         if (!st.text) { toast(L.qNeedText); return; }
         st.state = 'loading'; draw();
         let list = null;
@@ -1605,28 +1626,72 @@
 
   // Dictado por voz con el reconocimiento del navegador (Chrome, Safari iOS 14.5+; requiere HTTPS)
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
-  let rec = null, recBase = '';
-  function startDictation(textareaId, onEnd) {
-    if (!SR) { toast(L.qMicFail); return; }
-    if (rec) { rec.stop(); return; }
+  let rec = null;
+  // Dictado: escribe en el campo indicado y mantiene la escucha aunque el
+  // navegador la corte en cada pausa (iOS lo hace siempre).
+  const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  let dict = null; // { id, base, want, onState }
+  function setDictStatus(msg) { if (dict && dict.onState) dict.onState(msg); }
+  function startDictation(textareaId, onState) {
+    if (!SR) { toast(L.qMicFail); return false; }
+    if (rec) { stopDictation(); return false; }
     const ta = document.getElementById(textareaId);
-    recBase = ta ? ta.value.trim() : '';
-    rec = new SR();
-    rec.lang = lang === 'fr' ? 'fr-FR' : 'es-ES';
-    rec.interimResults = true; rec.continuous = true;
-    rec.onresult = ev => {
-      let finalTxt = '', interim = '';
-      for (let i = 0; i < ev.results.length; i++) { const r = ev.results[i]; if (r.isFinal) finalTxt += r[0].transcript + ' '; else interim += r[0].transcript; }
-      const t = document.getElementById(textareaId); if (t) t.value = (recBase + ' ' + finalTxt + interim).trim();
+    if (!ta) return false;
+    dict = { id: textareaId, base: ta.value.trim(), want: true, onState, heard: false, strikes: 0, t0: 0 };
+    const run = () => {
+      rec = new SR();
+      rec.lang = lang === 'fr' ? 'fr-FR' : 'es-ES';
+      rec.interimResults = true;
+      rec.continuous = !IS_IOS;        // en iOS la escucha continua no funciona: se reinicia sola
+      rec.onresult = ev => {
+        let fin = '', interim = '';
+        for (let i = ev.resultIndex; i < ev.results.length; i++) {
+          const r = ev.results[i];
+          if (r.isFinal) fin += r[0].transcript + ' '; else interim += r[0].transcript;
+        }
+        if (fin) { dict.base = (dict.base + ' ' + fin).trim(); dict.heard = true; }
+        const t = document.getElementById(dict.id);
+        if (t) t.value = (dict.base + ' ' + interim).trim();
+        if (fin || interim) setDictStatus(L.micListening);
+      };
+      rec.onerror = e => {
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { dict.want = false; setDictStatus(L.micDenied); }
+        else if (e.error === 'network') { dict.want = false; setDictStatus(L.micNet); }
+        // 'no-speech' y 'aborted' no son errores reales: se reintenta en onend
+      };
+      rec.onend = () => {
+        rec = null;
+        if (dict && dict.want) {
+          // Si el navegador corta enseguida y sin oír nada varias veces, no insistimos
+          dict.strikes = (Date.now() - dict.t0 < 400) ? dict.strikes + 1 : 0;
+          if (dict.strikes < 3) { try { run(); return; } catch {} }
+        }
+        const fin = dict; dict = null;
+        if (fin && fin.onState) fin.onState(fin.heard ? '' : L.micNone);
+      };
+      dict.t0 = Date.now();
+      rec.start();
     };
-    rec.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast(L.qMicFail); };
-    rec.onend = () => { rec = null; onEnd && onEnd(); };
-    try { rec.start(); } catch { rec = null; toast(L.qMicFail); }
+    try { run(); setDictStatus(L.micListening); return true; }
+    catch { rec = null; dict = null; toast(L.qMicFail); return false; }
   }
+  function stopDictation() {
+    if (dict) dict.want = false;
+    if (rec) { try { rec.stop(); } catch { rec = null; } }
+  }
+
   function toggleMic() {
-    if (rec) { rec.stop(); return; }
-    startDictation('q-text', () => { ask.listening = false; const t = document.getElementById('q-text'); if (t) ask.text = t.value; render(); });
-    ask.listening = true; render();
+    const btn = main.querySelector('.ask .mic');
+    const paint = on => { if (btn) { btn.classList.toggle('on', on); btn.textContent = on ? L.qMicStop : L.qMic; } };
+    if (rec) { stopDictation(); return; }
+    const ok = startDictation('q-text', msg => {
+      const listening = msg === L.micListening;
+      paint(listening);
+      ask.listening = listening;
+      if (msg && !listening) toast(msg);
+      if (!listening) { const t = document.getElementById('q-text'); if (t) ask.text = t.value; }
+    });
+    if (ok) { ask.listening = true; paint(true); }
   }
 
   // Contexto compacto de ahora mismo, para las reglas y para Claude
