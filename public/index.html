@@ -360,10 +360,12 @@
   .modal { position: fixed; inset: 0; background: rgba(20, 16, 30, 0.55); display: grid; place-items: end center; z-index: 10; }
   .modal .sheet { background: var(--surface); width: 100%; max-width: 480px; border-radius: 22px 22px 0 0; padding: 18px 18px calc(18px + env(safe-area-inset-bottom)); display: grid; gap: 12px; max-height: 92vh; overflow: auto; }
   .sheet h3 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 20px; }
-  .cap-edit { display: flex; gap: 6px; align-items: stretch; }
-  .cap-edit input { flex: 1; min-width: 0; font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--text); }
-  .cap-edit button { border: 0; border-radius: 10px; padding: 0 14px; font-weight: 700; background: var(--sueno); color: #fff; white-space: nowrap; }
-  .cap-edit button:disabled { background: var(--surface-2); color: var(--muted); }
+  .cap-box .cap-txt { margin: 0; padding: 4px 0; cursor: pointer; }
+  .cap-box .cap-add { background: none; border: 0; font: inherit; color: var(--muted); padding: 4px 0; text-align: left; }
+  .cap-box.editando { display: flex; gap: 6px; align-items: stretch; }
+  .cap-box.editando input { flex: 1; min-width: 0; font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--text); }
+  .cap-box.editando button { border: 0; border-radius: 10px; padding: 0 14px; font-weight: 700; background: var(--sueno); color: #fff; white-space: nowrap; }
+  .cap-box.editando button:disabled { background: var(--surface-2); color: var(--muted); }
   .field { display: grid; gap: 4px; }
   .field label { font-size: 12.5px; font-weight: 700; color: var(--muted); }
   .field input, .field select, .field textarea { font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--text); width: 100%; }
@@ -636,7 +638,7 @@
       kNight2: 'Noche', nightNextSleeping: 'Durmiendo. Si se despierta, toma y de vuelta a dormir; registra la toma con los botones grandes.', nightNextAwake: 'Toma con luz mínima y sin hablar; en cuanto termine, a la cuna. Si no se duerme en 10 min, brazos y shhh, sin encender luces.',
       lateEvening: 'Ya es la hora de dormir: ritual ahora, luz baja, toma completa y a la cuna.',
       // InstAïna
-      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Todavía no hay foto de hoy. Manda una sonrisa a papá.', igCaption: 'Pie de foto (opcional)', igSaving: 'Guardando…', igSaved: 'Guardado', igCaptionPh: 'p. ej. se ha reído con el sonajero', igPublish: 'Publicar', igPublishing: 'Subiendo…', igReading: 'Preparando la foto…', igPublished: 'Publicada. Papá ya puede verla.', igDelete: 'Eliminar foto', igDelSure: '¿Eliminarla? No se puede deshacer.', igDelNo: 'No', igDelYes: 'Sí, eliminar', igDeleted: 'Foto eliminada', igFail: 'No se pudo subir la foto. Inténtalo de nuevo.', igAlbum: 'InstAïna · álbum', igVer: v => `Aïna ${v}`, igPhotos: n => n === 1 ? '1 foto' : `${n} fotos`, igAlbumEmpty: 'Las fotos que mandes irán apareciendo aquí, día a día.', igOlder: 'Foto anterior', igNewer: 'Foto siguiente', igOf: (i, n) => `${i} de ${n}`, igOnlyOnline: 'InstAïna necesita conexión con el servidor.', qShowFr: 'Voir en français', qHide: 'Ocultar', qMic: 'Hablar', qMicStop: 'Escuchando… toca para parar', qMicFail: 'El micrófono no está disponible en este navegador',
+      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Todavía no hay foto de hoy. Manda una sonrisa a papá.', igCaption: 'Pie de foto (opcional)', igSaving: 'Guardando…', igAddCaption: '+ Añadir un pie de foto', igCaptionPh: 'p. ej. se ha reído con el sonajero', igPublish: 'Publicar', igPublishing: 'Subiendo…', igReading: 'Preparando la foto…', igPublished: 'Publicada. Papá ya puede verla.', igDelete: 'Eliminar foto', igDelSure: '¿Eliminarla? No se puede deshacer.', igDelNo: 'No', igDelYes: 'Sí, eliminar', igDeleted: 'Foto eliminada', igFail: 'No se pudo subir la foto. Inténtalo de nuevo.', igAlbum: 'InstAïna · álbum', igVer: v => `Aïna ${v}`, igPhotos: n => n === 1 ? '1 foto' : `${n} fotos`, igAlbumEmpty: 'Las fotos que mandes irán apareciendo aquí, día a día.', igOlder: 'Foto anterior', igNewer: 'Foto siguiente', igOf: (i, n) => `${i} de ${n}`, igOnlyOnline: 'InstAïna necesita conexión con el servidor.', qShowFr: 'Voir en français', qHide: 'Ocultar', qMic: 'Hablar', qMicStop: 'Escuchando… toca para parar', qMicFail: 'El micrófono no está disponible en este navegador',
       micDenied: 'No has dado permiso al micrófono. Actívalo en los ajustes del navegador, o usa el micrófono del teclado.',
       micNet: 'El dictado necesita conexión. Prueba otra vez o escribe con el teclado.',
       micNone: 'No he oído nada. Acerca el móvil y habla, o usa el micrófono del teclado.',
@@ -855,7 +857,7 @@
       kNight2: 'Nuit', nightNextSleeping: 'Elle dort. Si elle se réveille, tétée puis retour au dodo ; enregistre la tétée avec les grands boutons.', nightNextAwake: 'Tétée avec un minimum de lumière et sans parler ; dès la fin, au lit. Si elle ne se rendort pas en 10 min, dans les bras et chhh, sans allumer.',
       lateEvening: 'C’est déjà l’heure du coucher : rituel maintenant, lumière basse, tétée complète et au lit.',
       // InstAïna
-      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Pas encore de photo aujourd’hui. Envoie un sourire à papa.', igCaption: 'Légende (facultatif)', igSaving: 'Enregistrement…', igSaved: 'Enregistré', igCaptionPh: 'ex. elle a ri avec le hochet', igPublish: 'Publier', igPublishing: 'Envoi…', igReading: 'Préparation de la photo…', igPublished: 'Publiée. Papa peut la voir.', igDelete: 'Supprimer la photo', igDelSure: 'La supprimer ? C’est définitif.', igDelNo: 'Non', igDelYes: 'Oui, supprimer', igDeleted: 'Photo supprimée', igFail: 'Impossible d’envoyer la photo. Réessaie.', igAlbum: 'InstAïna · album', igVer: v => `Aïna ${v}`, igPhotos: n => n === 1 ? '1 photo' : `${n} photos`, igAlbumEmpty: 'Les photos que tu envoies apparaîtront ici, jour après jour.', igOlder: 'Photo précédente', igNewer: 'Photo suivante', igOf: (i, n) => `${i} sur ${n}`, igOnlyOnline: 'InstAïna a besoin de la connexion au serveur.', qShowFr: 'Ver en español', qHide: 'Masquer', qMic: 'Parler', qMicStop: 'À l’écoute… touche pour arrêter', qMicFail: 'Le micro n’est pas disponible dans ce navigateur',
+      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Pas encore de photo aujourd’hui. Envoie un sourire à papa.', igCaption: 'Légende (facultatif)', igSaving: 'Enregistrement…', igAddCaption: '+ Ajouter une légende', igCaptionPh: 'ex. elle a ri avec le hochet', igPublish: 'Publier', igPublishing: 'Envoi…', igReading: 'Préparation de la photo…', igPublished: 'Publiée. Papa peut la voir.', igDelete: 'Supprimer la photo', igDelSure: 'La supprimer ? C’est définitif.', igDelNo: 'Non', igDelYes: 'Oui, supprimer', igDeleted: 'Photo supprimée', igFail: 'Impossible d’envoyer la photo. Réessaie.', igAlbum: 'InstAïna · album', igVer: v => `Aïna ${v}`, igPhotos: n => n === 1 ? '1 photo' : `${n} photos`, igAlbumEmpty: 'Les photos que tu envoies apparaîtront ici, jour après jour.', igOlder: 'Photo précédente', igNewer: 'Photo suivante', igOf: (i, n) => `${i} sur ${n}`, igOnlyOnline: 'InstAïna a besoin de la connexion au serveur.', qShowFr: 'Ver en español', qHide: 'Masquer', qMic: 'Parler', qMicStop: 'À l’écoute… touche pour arrêter', qMicFail: 'Le micro n’est pas disponible dans ce navigateur',
       micDenied: 'Tu n’as pas autorisé le micro. Active-le dans les réglages du navigateur, ou utilise le micro du clavier.',
       micNet: 'La dictée a besoin de connexion. Réessaie ou écris au clavier.',
       micNone: 'Je n’ai rien entendu. Rapproche le téléphone et parle, ou utilise le micro du clavier.',
@@ -2099,6 +2101,10 @@
     // Eliminar aparece siempre, tambien en el album, pero pide confirmacion:
     // la foto solo vive en la base de datos y borrarla no tiene vuelta atras.
     const isNew = !!ph.data;
+    // El pie tiene dos caras: el texto a secas, y la caja de escribir al tocarlo.
+    const vistaPie = f => f.nota
+      ? `<p class="cap-txt" data-m="editcap">${esc(f.nota)}</p>`
+      : `<button class="cap-add" data-m="editcap">${L.igAddCaption}</button>`;
     const idx = isNew ? -1 : momentos.findIndex(m => String(m.id) === String(ph.id));
     const hayNewer = idx > 0, hayOlder = idx >= 0 && idx < momentos.length - 1;
     const ir = n => { const m = momentos[n]; if (m) openPhotoSheet(m); };
@@ -2112,7 +2118,7 @@
       </div>
       ${isNew ? `<div class="field"><label>${L.igCaption}</label><input type="text" id="ig-cap" placeholder="${L.igCaptionPh}" maxlength="300"></div>
         <div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button><button class="primary" data-m="publish">${L.igPublish}</button></div>`
-      : `<div class="cap-edit"><input type="text" id="ig-cap" value="${esc(ph.nota || '')}" placeholder="${L.igCaptionPh}" maxlength="300"><button data-m="savecap" disabled>${L.save}</button></div>${momentos.length > 1 ? `<span class="count">${L.igOf(idx + 1, momentos.length)}</span>` : ''}<div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button></div>${sePuedeBorrar ? `<div class="delwrap"><button class="del" data-m="delete">${L.igDelete}</button></div>` : ''}`}
+      : `<div class="cap-box">${vistaPie(ph)}</div>${momentos.length > 1 ? `<span class="count">${L.igOf(idx + 1, momentos.length)}</span>` : ''}<div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button></div>${sePuedeBorrar ? `<div class="delwrap"><button class="del" data-m="delete">${L.igDelete}</button></div>` : ''}`}
     </div></div>`;
     if (teclasFoto) document.removeEventListener('keydown', teclasFoto);
     const teclas = e => {
@@ -2124,17 +2130,18 @@
     document.addEventListener('keydown', teclas);
     teclasFoto = teclas;
     const close = () => { modalRoot.innerHTML = ''; modalRoot.onclick = null; document.removeEventListener('keydown', teclas); teclasFoto = null; };
+    const caja = () => modalRoot.querySelector('.cap-box');
+    const pintaVista = () => { const c = caja(); if (c) { c.classList.remove('editando'); c.innerHTML = vistaPie(ph); } };
+    const pintaEdicion = () => {
+      const c = caja(); if (!c) return;
+      c.classList.add('editando');
+      c.innerHTML = `<input type="text" id="ig-cap" value="${esc(ph.nota || '')}" placeholder="${L.igCaptionPh}" maxlength="300"><button data-m="savecap" disabled>${L.save}</button>`;
+      const campo = c.querySelector('#ig-cap'), guardar = c.querySelector('[data-m="savecap"]'), original = ph.nota || '';
+      campo.addEventListener('input', () => { guardar.disabled = campo.value.trim() === original; });
+      campo.addEventListener('keydown', e => { if (e.key === 'Enter' && !guardar.disabled) guardar.click(); });
+      campo.focus();
+    };
     if (!isNew) {
-      // El boton de guardar solo se enciende si el pie ha cambiado
-      const campo = modalRoot.querySelector('#ig-cap'), guardar = modalRoot.querySelector('[data-m="savecap"]');
-      if (campo && guardar) {
-        const original = ph.nota || '';
-        campo.addEventListener('input', () => {
-          const cambiado = campo.value.trim() !== original;
-          guardar.disabled = !cambiado;
-          if (cambiado) guardar.textContent = L.save;
-        });
-      }
       // Deslizar el dedo sobre la foto, que es como se pasa en el movil.
       const img = modalRoot.querySelector('img.prev');
       let x0 = null, y0 = null;
@@ -2158,16 +2165,17 @@
         m.parentElement.innerHTML = `<span class="delq">${L.igDelSure}</span><button class="delno" data-m="delno">${L.igDelNo}</button><button class="del" data-m="delyes">${L.igDelYes}</button>`;
         return;
       }
+      if (m.dataset.m === 'editcap') { pintaEdicion(); return; }
       if (m.dataset.m === 'savecap') {
-        const campo = modalRoot.querySelector('#ig-cap');
+        const campo = modalRoot.querySelector('#ig-cap'), texto = campo.value.trim();
         m.disabled = true; m.textContent = L.igSaving;
         try {
-          const r = await apiFetch('/api/momentos/' + ph.id, { method: 'PATCH', body: JSON.stringify({ nota: campo.value.trim() }) });
+          const r = await apiFetch('/api/momentos/' + ph.id, { method: 'PATCH', body: JSON.stringify({ nota: texto }) });
           if (!r.ok) throw new Error(r.status);
-          ph.nota = campo.value.trim();
+          ph.nota = texto;
           const enLista = momentos.find(x => String(x.id) === String(ph.id));
-          if (enLista) enLista.nota = ph.nota;
-          m.textContent = L.igSaved;
+          if (enLista) enLista.nota = texto;
+          pintaVista();   // se recoge la caja y queda solo el texto
           render();
         } catch { m.disabled = false; m.textContent = L.save; toast(L.igFail); }
         return;
