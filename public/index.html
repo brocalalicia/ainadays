@@ -907,16 +907,16 @@
   const BIRTH_DEF = '2026-06-15';
   const birthId = () => { try { return localStorage.getItem('ainadays.birth') || BIRTH_DEF; } catch { return BIRTH_DEF; } };
   const ageWeeks = () => Math.max(0, Math.floor((Date.now() - dayStart(birthId())) / (7 * DAY)));
-  // Mes de vida: el 1 va del día que nació al mismo día del mes siguiente (15 jun → 15 jul)
+  // Meses cumplidos: el 15 de septiembre cumple 3 y los tiene hasta el 15 de octubre
   const monthAdd = (b, n) => { const y = b.getFullYear(), m = b.getMonth() + n; return new Date(y, m, Math.min(b.getDate(), new Date(y, m + 1, 0).getDate())); };
-  const monthOfLife = ms => {
+  const ageMonthsAt = ms => {
     const b = new Date(dayStart(birthId())), d = new Date(ms);
     let m = (d.getFullYear() - b.getFullYear()) * 12 + d.getMonth() - b.getMonth();
     if (d.getDate() < b.getDate()) m--;
-    return Math.max(1, m + 1);
+    return Math.max(0, m);
   };
-  // El primer año va 0.1 … 0.12 y al cumplir el año salta a 1.0, 1.1 … 1.11, 2.0
-  const versionOf = n => n <= 12 ? '0.' + n : `${Math.floor((n - 1) / 12)}.${(n - 1) % 12}`;
+  // Los meses cumplidos son el decimal y los años el entero: 0.0 … 0.11, luego 1.0 al cumplir el año
+  const versionOf = m => `${Math.floor(m / 12)}.${m % 12}`;
   function ageText() {
     const b = new Date(dayStart(birthId())), n = new Date();
     let m = (n.getFullYear() - b.getFullYear()) * 12 + n.getMonth() - b.getMonth();
@@ -1864,14 +1864,14 @@
     if (!api) { main.innerHTML = `<div class="card"><h3>${L.igAlbum}</h3><div class="note">${L.igOnlyOnline}</div></div>`; return; }
     if (!momentos.length) { main.innerHTML = `<div class="card"><h3>${L.igAlbum}</h3><div class="note">${L.igAlbumEmpty}</div></div>`; return; }
     const b = new Date(dayStart(birthId())), grupos = new Map();
-    for (const m of momentos) { const n = monthOfLife(new Date(m.ts).getTime()); (grupos.get(n) || grupos.set(n, []).get(n)).push(m); }
+    for (const m of momentos) { const n = ageMonthsAt(new Date(m.ts).getTime()); (grupos.get(n) || grupos.set(n, []).get(n)).push(m); }
     const corta = d => `${d.getDate()} ${L.mo[d.getMonth()]}`;
     // La foto se pide con su enlace firmado: así el navegador puede cargarlas
     // a medida que se bajan (loading="lazy") en vez de traerse el álbum entero.
     const bloques = [...grupos.keys()].sort((x, y) => y - x).map(n => {
       const fotos = grupos.get(n);
       return `<section class="mes"><h4>${L.igVer(versionOf(n))}</h4>
-        <div class="sub">${corta(monthAdd(b, n - 1))} – ${corta(monthAdd(b, n))} · ${L.igPhotos(fotos.length)}</div>
+        <div class="sub">${corta(monthAdd(b, n))} – ${corta(monthAdd(b, n + 1))} · ${L.igPhotos(fotos.length)}</div>
         <div class="album">${fotos.map(m => `<button data-act="ig-open" data-id="${m.id}"><img alt="" loading="lazy" src="${m.url}"><span class="dd">${new Date(m.ts).getDate()} ${L.mo[new Date(m.ts).getMonth()]}</span></button>`).join('')}</div></section>`;
     }).join('');
     main.innerHTML = `<div class="card"><h3>${L.igAlbum}</h3>${bloques}</div>`;
