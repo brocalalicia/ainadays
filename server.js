@@ -193,6 +193,14 @@ app.post('/api/momentos', async (req, res) => {
   res.json({ ok: true, id: rows[0].id, ts: rows[0].ts, url: imgLink(rows[0].id) });
 });
 
+// Cambiar el pie de una foto ya publicada
+app.patch('/api/momentos/:id', async (req, res) => {
+  if (!/^\d+$/.test(req.params.id)) return res.status(400).json({ error: 'id inválido' });
+  const nota = String((req.body || {}).nota ?? '').slice(0, 300);
+  const { rows } = await pool.query('UPDATE momentos SET nota = $1 WHERE id = $2 RETURNING id, ts, nota', [nota, req.params.id]);
+  if (!rows.length) return res.status(404).json({ error: 'no existe' });
+  res.json({ ok: true, ...rows[0] });
+});
 app.delete('/api/momentos/:id', async (req, res) => {
   await pool.query('DELETE FROM momentos WHERE id = $1', [req.params.id]);
   res.json({ ok: true });
