@@ -149,6 +149,10 @@
   .ig .cap { padding: 10px 16px 12px; font-size: 15px; line-height: 1.45; }
   .ig .cap .d { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
   .ig .empty { margin: 0 16px 14px; }
+  .mes { margin-top: 20px; }
+  .mes:first-of-type { margin-top: 10px; }
+  .mes h4 { font-family: var(--display); font-weight: 600; font-size: 21px; margin: 0; }
+  .mes .sub { font-size: 12.5px; color: var(--muted); margin: 1px 0 8px; }
   .album { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
   .album button { border: 0; padding: 0; background: var(--surface-2); border-radius: 10px; aspect-ratio: 1; overflow: hidden; position: relative; }
   .album img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -625,7 +629,7 @@
       kNight2: 'Noche', nightNextSleeping: 'Durmiendo. Si se despierta, toma y de vuelta a dormir; registra la toma con los botones grandes.', nightNextAwake: 'Toma con luz mínima y sin hablar; en cuanto termine, a la cuna. Si no se duerme en 10 min, brazos y shhh, sin encender luces.',
       lateEvening: 'Ya es la hora de dormir: ritual ahora, luz baja, toma completa y a la cuna.',
       // InstAïna
-      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Todavía no hay foto de hoy. Manda una sonrisa a papá.', igCaption: 'Pie de foto (opcional)', igCaptionPh: 'p. ej. se ha reído con el sonajero', igPublish: 'Publicar', igPublishing: 'Subiendo…', igReading: 'Preparando la foto…', igPublished: 'Publicada. Papá ya puede verla.', igDelete: 'Eliminar foto', igDeleted: 'Foto eliminada', igFail: 'No se pudo subir la foto. Inténtalo de nuevo.', igAlbum: 'InstAïna · álbum', igAlbumEmpty: 'Las fotos que mandes irán apareciendo aquí, día a día.', igOlder: 'Foto anterior', igNewer: 'Foto siguiente', igOf: (i, n) => `${i} de ${n}`, igOnlyOnline: 'InstAïna necesita conexión con el servidor.', qShowFr: 'Voir en français', qHide: 'Ocultar', qMic: 'Hablar', qMicStop: 'Escuchando… toca para parar', qMicFail: 'El micrófono no está disponible en este navegador',
+      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Todavía no hay foto de hoy. Manda una sonrisa a papá.', igCaption: 'Pie de foto (opcional)', igCaptionPh: 'p. ej. se ha reído con el sonajero', igPublish: 'Publicar', igPublishing: 'Subiendo…', igReading: 'Preparando la foto…', igPublished: 'Publicada. Papá ya puede verla.', igDelete: 'Eliminar foto', igDeleted: 'Foto eliminada', igFail: 'No se pudo subir la foto. Inténtalo de nuevo.', igAlbum: 'InstAïna · álbum', igVer: v => `Aïna ${v}`, igPhotos: n => n === 1 ? '1 foto' : `${n} fotos`, igAlbumEmpty: 'Las fotos que mandes irán apareciendo aquí, día a día.', igOlder: 'Foto anterior', igNewer: 'Foto siguiente', igOf: (i, n) => `${i} de ${n}`, igOnlyOnline: 'InstAïna necesita conexión con el servidor.', qShowFr: 'Voir en français', qHide: 'Ocultar', qMic: 'Hablar', qMicStop: 'Escuchando… toca para parar', qMicFail: 'El micrófono no está disponible en este navegador',
       micDenied: 'No has dado permiso al micrófono. Actívalo en los ajustes del navegador, o usa el micrófono del teclado.',
       micNet: 'El dictado necesita conexión. Prueba otra vez o escribe con el teclado.',
       micNone: 'No he oído nada. Acerca el móvil y habla, o usa el micrófono del teclado.',
@@ -844,7 +848,7 @@
       kNight2: 'Nuit', nightNextSleeping: 'Elle dort. Si elle se réveille, tétée puis retour au dodo ; enregistre la tétée avec les grands boutons.', nightNextAwake: 'Tétée avec un minimum de lumière et sans parler ; dès la fin, au lit. Si elle ne se rendort pas en 10 min, dans les bras et chhh, sans allumer.',
       lateEvening: 'C’est déjà l’heure du coucher : rituel maintenant, lumière basse, tétée complète et au lit.',
       // InstAïna
-      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Pas encore de photo aujourd’hui. Envoie un sourire à papa.', igCaption: 'Légende (facultatif)', igCaptionPh: 'ex. elle a ri avec le hochet', igPublish: 'Publier', igPublishing: 'Envoi…', igReading: 'Préparation de la photo…', igPublished: 'Publiée. Papa peut la voir.', igDelete: 'Supprimer la photo', igDeleted: 'Photo supprimée', igFail: 'Impossible d’envoyer la photo. Réessaie.', igAlbum: 'InstAïna · album', igAlbumEmpty: 'Les photos que tu envoies apparaîtront ici, jour après jour.', igOlder: 'Photo précédente', igNewer: 'Photo suivante', igOf: (i, n) => `${i} sur ${n}`, igOnlyOnline: 'InstAïna a besoin de la connexion au serveur.', qShowFr: 'Ver en español', qHide: 'Masquer', qMic: 'Parler', qMicStop: 'À l’écoute… touche pour arrêter', qMicFail: 'Le micro n’est pas disponible dans ce navigateur',
+      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Pas encore de photo aujourd’hui. Envoie un sourire à papa.', igCaption: 'Légende (facultatif)', igCaptionPh: 'ex. elle a ri avec le hochet', igPublish: 'Publier', igPublishing: 'Envoi…', igReading: 'Préparation de la photo…', igPublished: 'Publiée. Papa peut la voir.', igDelete: 'Supprimer la photo', igDeleted: 'Photo supprimée', igFail: 'Impossible d’envoyer la photo. Réessaie.', igAlbum: 'InstAïna · album', igVer: v => `Aïna ${v}`, igPhotos: n => n === 1 ? '1 photo' : `${n} photos`, igAlbumEmpty: 'Les photos que tu envoies apparaîtront ici, jour après jour.', igOlder: 'Photo précédente', igNewer: 'Photo suivante', igOf: (i, n) => `${i} sur ${n}`, igOnlyOnline: 'InstAïna a besoin de la connexion au serveur.', qShowFr: 'Ver en español', qHide: 'Masquer', qMic: 'Parler', qMicStop: 'À l’écoute… touche pour arrêter', qMicFail: 'Le micro n’est pas disponible dans ce navigateur',
       micDenied: 'Tu n’as pas autorisé le micro. Active-le dans les réglages du navigateur, ou utilise le micro du clavier.',
       micNet: 'La dictée a besoin de connexion. Réessaie ou écris au clavier.',
       micNone: 'Je n’ai rien entendu. Rapproche le téléphone et parle, ou utilise le micro du clavier.',
@@ -903,6 +907,16 @@
   const BIRTH_DEF = '2026-06-15';
   const birthId = () => { try { return localStorage.getItem('ainadays.birth') || BIRTH_DEF; } catch { return BIRTH_DEF; } };
   const ageWeeks = () => Math.max(0, Math.floor((Date.now() - dayStart(birthId())) / (7 * DAY)));
+  // Mes de vida: el 1 va del día que nació al mismo día del mes siguiente (15 jun → 15 jul)
+  const monthAdd = (b, n) => { const y = b.getFullYear(), m = b.getMonth() + n; return new Date(y, m, Math.min(b.getDate(), new Date(y, m + 1, 0).getDate())); };
+  const monthOfLife = ms => {
+    const b = new Date(dayStart(birthId())), d = new Date(ms);
+    let m = (d.getFullYear() - b.getFullYear()) * 12 + d.getMonth() - b.getMonth();
+    if (d.getDate() < b.getDate()) m--;
+    return Math.max(1, m + 1);
+  };
+  // El primer año va 0.1 … 0.12 y al cumplir el año salta a 1.0, 1.1 … 1.11, 2.0
+  const versionOf = n => n <= 12 ? '0.' + n : `${Math.floor((n - 1) / 12)}.${(n - 1) % 12}`;
   function ageText() {
     const b = new Date(dayStart(birthId())), n = new Date();
     let m = (n.getFullYear() - b.getFullYear()) * 12 + n.getMonth() - b.getMonth();
@@ -1848,9 +1862,19 @@
   // una foto solo se puede eliminar el mismo dia, desde la pantalla de Hoy.
   function renderInsta() {
     if (!api) { main.innerHTML = `<div class="card"><h3>${L.igAlbum}</h3><div class="note">${L.igOnlyOnline}</div></div>`; return; }
-    main.innerHTML = `<div class="card"><h3>${L.igAlbum}</h3><div class="sub">&nbsp;</div>${momentos.length
-      ? `<div class="album">${momentos.map(m => `<button data-act="ig-open" data-id="${m.id}"><img alt="" src="${imgUrl(m.id)}"><span class="dd">${new Date(m.ts).getDate()} ${L.mo[new Date(m.ts).getMonth()]}</span></button>`).join('')}</div>`
-      : `<div class="note">${L.igAlbumEmpty}</div>`}</div>`;
+    if (!momentos.length) { main.innerHTML = `<div class="card"><h3>${L.igAlbum}</h3><div class="note">${L.igAlbumEmpty}</div></div>`; return; }
+    const b = new Date(dayStart(birthId())), grupos = new Map();
+    for (const m of momentos) { const n = monthOfLife(new Date(m.ts).getTime()); (grupos.get(n) || grupos.set(n, []).get(n)).push(m); }
+    const corta = d => `${d.getDate()} ${L.mo[d.getMonth()]}`;
+    // La foto se pide con su enlace firmado: así el navegador puede cargarlas
+    // a medida que se bajan (loading="lazy") en vez de traerse el álbum entero.
+    const bloques = [...grupos.keys()].sort((x, y) => y - x).map(n => {
+      const fotos = grupos.get(n);
+      return `<section class="mes"><h4>${L.igVer(versionOf(n))}</h4>
+        <div class="sub">${corta(monthAdd(b, n - 1))} – ${corta(monthAdd(b, n))} · ${L.igPhotos(fotos.length)}</div>
+        <div class="album">${fotos.map(m => `<button data-act="ig-open" data-id="${m.id}"><img alt="" loading="lazy" src="${m.url}"><span class="dd">${new Date(m.ts).getDate()} ${L.mo[new Date(m.ts).getMonth()]}</span></button>`).join('')}</div></section>`;
+    }).join('');
+    main.innerHTML = `<div class="card"><h3>${L.igAlbum}</h3>${bloques}</div>`;
   }
 
   function renderGuia() {
@@ -2021,7 +2045,7 @@
   async function pullMomentos() {
     if (!api) return;
     try {
-      const r = await apiFetch('/api/momentos?desde=' + new Date(Date.now() - 35 * DAY).toISOString());
+      const r = await apiFetch('/api/momentos?desde=' + new Date(dayStart(birthId())).toISOString());
       if (!r.ok) return;
       const d = await r.json();
       const changed = JSON.stringify(d.momentos.map(m => m.id)) !== JSON.stringify(momentos.map(m => m.id));
