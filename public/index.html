@@ -362,10 +362,14 @@
   .sheet h3 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 20px; }
   .cap-box .cap-txt { margin: 0; padding: 4px 0; cursor: pointer; }
   .cap-box .cap-add { background: none; border: 0; font: inherit; color: var(--muted); padding: 4px 0; text-align: left; }
-  .cap-box.editando { display: flex; gap: 6px; align-items: stretch; }
-  .cap-box.editando input { flex: 1; min-width: 0; font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--text); }
-  .cap-box.editando button { border: 0; border-radius: 10px; padding: 0 14px; font-weight: 700; background: var(--sueno); color: #fff; white-space: nowrap; }
-  .cap-box.editando button:disabled { background: var(--surface-2); color: var(--muted); }
+  .cap-box .cap-row { display: flex; gap: 6px; align-items: stretch; }
+  .cap-box .cap-row input { flex: 1; min-width: 0; font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--text); }
+  .cap-box .cap-row button { border: 0; border-radius: 10px; padding: 0 14px; font-weight: 700; background: var(--sueno); color: #fff; white-space: nowrap; }
+  .cap-box .cap-row button:disabled { background: var(--surface-2); color: var(--muted); }
+  .cap-box .emojis { display: flex; gap: 2px; margin-top: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .cap-box .emojis::-webkit-scrollbar { display: none; }
+  .cap-box .emojis button { flex: 0 0 auto; background: none; border: 0; font-size: 23px; line-height: 1; padding: 6px 6px; border-radius: 9px; }
+  .cap-box .emojis button:active { background: var(--surface-2); }
   .field { display: grid; gap: 4px; }
   .field label { font-size: 12.5px; font-weight: 700; color: var(--muted); }
   .field input, .field select, .field textarea { font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--text); width: 100%; }
@@ -892,6 +896,9 @@
 
   // Ventana de vigilia orientativa a los 3 meses (minutos)
   const WAKE_OK = 75, WAKE_WARN = 105, WAKE_MAX = 120;
+  // Atajo para los pies de foto: el teclado del movil ya trae emojis, pero con
+  // una mano y a oscuras es mas comodo tenerlos a un toque.
+  const EMOJIS = ['🥰', '😍', '😂', '🤍', '💛', '👶', '🍼', '🤱', '😴', '💤', '🌙', '☀️', '🛁', '🧸', '👣', '🌸', '🐻', '🎉'];
   // Noche: de 19:30 a 07:00 no hay ventanas de vigilia, solo toma y vuelta a dormir
   const DUR_SHORT = 8, DUR_LONG = 20; // minutos, tomas aproximadas
   // El día de Aïna va de las 19:30 a las 19:30: la tarde del 22 ya cuenta como el 23
@@ -2135,10 +2142,28 @@
     const pintaEdicion = () => {
       const c = caja(); if (!c) return;
       c.classList.add('editando');
-      c.innerHTML = `<input type="text" id="ig-cap" value="${esc(ph.nota || '')}" placeholder="${L.igCaptionPh}" maxlength="300"><button data-m="savecap" disabled>${L.save}</button>`;
+      c.innerHTML = `<div class="cap-row"><input type="text" id="ig-cap" value="${esc(ph.nota || '')}" placeholder="${L.igCaptionPh}" maxlength="300"><button data-m="savecap" disabled>${L.save}</button></div>
+        <div class="emojis">${EMOJIS.map(e => `<button type="button">${e}</button>`).join('')}</div>`;
       const campo = c.querySelector('#ig-cap'), guardar = c.querySelector('[data-m="savecap"]'), original = ph.nota || '';
       campo.addEventListener('input', () => { guardar.disabled = campo.value.trim() === original; });
       campo.addEventListener('keydown', e => { if (e.key === 'Enter' && !guardar.disabled) guardar.click(); });
+      // Donde estaba el cursor, para meter el emoji ahi y no siempre al final
+      let cursor = (ph.nota || '').length;
+      const recuerda = () => { cursor = campo.selectionStart ?? campo.value.length; };
+      ['keyup', 'click', 'blur', 'select'].forEach(ev => campo.addEventListener(ev, recuerda));
+      c.querySelectorAll('.emojis button').forEach(b => {
+        b.addEventListener('mousedown', e => e.preventDefault());   // no perder el foco del campo
+        b.addEventListener('click', () => {
+          const emoji = b.textContent, v = campo.value;
+          if (v.length + emoji.length > 300) return;
+          const pos = Math.min(cursor, v.length);
+          campo.value = v.slice(0, pos) + emoji + v.slice(pos);
+          cursor = pos + emoji.length;
+          campo.setSelectionRange(cursor, cursor);
+          campo.dispatchEvent(new Event('input'));
+          campo.focus();
+        });
+      });
       campo.focus();
     };
     if (!isNew) {
