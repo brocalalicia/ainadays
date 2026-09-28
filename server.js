@@ -177,12 +177,19 @@ app.get('/api/momentos/:id/img', async (req, res) => {
 });
 
 app.post('/api/momentos', async (req, res) => {
-  const { nota = '', data = '' } = req.body || {};
+  const { nota = '', data = '', ts = null } = req.body || {};
   const m = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/.exec(String(data));
   if (!m) return res.status(400).json({ error: 'imagen inválida' });
   const img = Buffer.from(m[2], 'base64');
   if (img.length > 2 * 1024 * 1024) return res.status(413).json({ error: 'imagen demasiado grande (máx. 2 MB)' });
-  const { rows } = await pool.query('INSERT INTO momentos (nota, mime, img) VALUES ($1, $2, $3) RETURNING id, ts', [String(nota).slice(0, 300), m[1], img]);
+  // ts opcional: solo para recuperar fotos antiguas con su fecha real. Sin él, ahora.
+  let cuando = null;
+  if (ts != null && ts !== '') {
+    const d = new Date(String(ts));
+    if (isNaN(d.getTime()) || d.getTime() > Date.now() + 86400000) return res.status(400).json({ error: 'fecha inválida' });
+    cuando = d.toISOString();
+  }
+  const { rows } = await pool.query('INSERT INTO momentos (ts, nota, mime, img) VALUES (COALESCE($1::timestamptz, now()), $2, $3, $4) RETURNING id, ts', [cuando, String(nota).slice(0, 300), m[1], img]);
   res.json({ ok: true, id: rows[0].id, ts: rows[0].ts, url: imgLink(rows[0].id) });
 });
 
