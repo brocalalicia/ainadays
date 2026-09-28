@@ -372,6 +372,9 @@
   .sheet .btns .primary { background: var(--sueno); color: #fff; border: 0; border-radius: 12px; padding: 13px; font-weight: 700; }
   .sheet .btns .ghost { background: var(--surface-2); border: 0; border-radius: 12px; padding: 13px; font-weight: 700; }
   .sheet .del { background: none; border: 0; color: var(--bad); font-weight: 700; padding: 8px; justify-self: center; }
+  .sheet .delwrap { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; margin-top: 2px; }
+  .sheet .delwrap .delq { flex: 1 0 100%; text-align: center; font-size: 13px; color: var(--muted); }
+  .sheet .delwrap .delno { background: var(--surface-2); border: 0; border-radius: 10px; color: var(--text); font-weight: 700; padding: 8px 18px; }
   /* Pasar de foto sin cerrar la ficha: flechas a los lados de la imagen. */
   .sheet .shot { position: relative; }
   .sheet .shot button { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(20, 16, 30, .55); color: #fff; font-size: 20px; line-height: 1; display: grid; place-items: center; }
@@ -629,7 +632,7 @@
       kNight2: 'Noche', nightNextSleeping: 'Durmiendo. Si se despierta, toma y de vuelta a dormir; registra la toma con los botones grandes.', nightNextAwake: 'Toma con luz mínima y sin hablar; en cuanto termine, a la cuna. Si no se duerme en 10 min, brazos y shhh, sin encender luces.',
       lateEvening: 'Ya es la hora de dormir: ritual ahora, luz baja, toma completa y a la cuna.',
       // InstAïna
-      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Todavía no hay foto de hoy. Manda una sonrisa a papá.', igCaption: 'Pie de foto (opcional)', igCaptionPh: 'p. ej. se ha reído con el sonajero', igPublish: 'Publicar', igPublishing: 'Subiendo…', igReading: 'Preparando la foto…', igPublished: 'Publicada. Papá ya puede verla.', igDelete: 'Eliminar foto', igDeleted: 'Foto eliminada', igFail: 'No se pudo subir la foto. Inténtalo de nuevo.', igAlbum: 'InstAïna · álbum', igVer: v => `Aïna ${v}`, igPhotos: n => n === 1 ? '1 foto' : `${n} fotos`, igAlbumEmpty: 'Las fotos que mandes irán apareciendo aquí, día a día.', igOlder: 'Foto anterior', igNewer: 'Foto siguiente', igOf: (i, n) => `${i} de ${n}`, igOnlyOnline: 'InstAïna necesita conexión con el servidor.', qShowFr: 'Voir en français', qHide: 'Ocultar', qMic: 'Hablar', qMicStop: 'Escuchando… toca para parar', qMicFail: 'El micrófono no está disponible en este navegador',
+      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Todavía no hay foto de hoy. Manda una sonrisa a papá.', igCaption: 'Pie de foto (opcional)', igCaptionPh: 'p. ej. se ha reído con el sonajero', igPublish: 'Publicar', igPublishing: 'Subiendo…', igReading: 'Preparando la foto…', igPublished: 'Publicada. Papá ya puede verla.', igDelete: 'Eliminar foto', igDelSure: '¿Eliminarla? No se puede deshacer.', igDelNo: 'No', igDelYes: 'Sí, eliminar', igDeleted: 'Foto eliminada', igFail: 'No se pudo subir la foto. Inténtalo de nuevo.', igAlbum: 'InstAïna · álbum', igVer: v => `Aïna ${v}`, igPhotos: n => n === 1 ? '1 foto' : `${n} fotos`, igAlbumEmpty: 'Las fotos que mandes irán apareciendo aquí, día a día.', igOlder: 'Foto anterior', igNewer: 'Foto siguiente', igOf: (i, n) => `${i} de ${n}`, igOnlyOnline: 'InstAïna necesita conexión con el servidor.', qShowFr: 'Voir en français', qHide: 'Ocultar', qMic: 'Hablar', qMicStop: 'Escuchando… toca para parar', qMicFail: 'El micrófono no está disponible en este navegador',
       micDenied: 'No has dado permiso al micrófono. Actívalo en los ajustes del navegador, o usa el micrófono del teclado.',
       micNet: 'El dictado necesita conexión. Prueba otra vez o escribe con el teclado.',
       micNone: 'No he oído nada. Acerca el móvil y habla, o usa el micrófono del teclado.',
@@ -848,7 +851,7 @@
       kNight2: 'Nuit', nightNextSleeping: 'Elle dort. Si elle se réveille, tétée puis retour au dodo ; enregistre la tétée avec les grands boutons.', nightNextAwake: 'Tétée avec un minimum de lumière et sans parler ; dès la fin, au lit. Si elle ne se rendort pas en 10 min, dans les bras et chhh, sans allumer.',
       lateEvening: 'C’est déjà l’heure du coucher : rituel maintenant, lumière basse, tétée complète et au lit.',
       // InstAïna
-      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Pas encore de photo aujourd’hui. Envoie un sourire à papa.', igCaption: 'Légende (facultatif)', igCaptionPh: 'ex. elle a ri avec le hochet', igPublish: 'Publier', igPublishing: 'Envoi…', igReading: 'Préparation de la photo…', igPublished: 'Publiée. Papa peut la voir.', igDelete: 'Supprimer la photo', igDeleted: 'Photo supprimée', igFail: 'Impossible d’envoyer la photo. Réessaie.', igAlbum: 'InstAïna · album', igVer: v => `Aïna ${v}`, igPhotos: n => n === 1 ? '1 photo' : `${n} photos`, igAlbumEmpty: 'Les photos que tu envoies apparaîtront ici, jour après jour.', igOlder: 'Photo précédente', igNewer: 'Photo suivante', igOf: (i, n) => `${i} sur ${n}`, igOnlyOnline: 'InstAïna a besoin de la connexion au serveur.', qShowFr: 'Ver en español', qHide: 'Masquer', qMic: 'Parler', qMicStop: 'À l’écoute… touche pour arrêter', qMicFail: 'Le micro n’est pas disponible dans ce navigateur',
+      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Pas encore de photo aujourd’hui. Envoie un sourire à papa.', igCaption: 'Légende (facultatif)', igCaptionPh: 'ex. elle a ri avec le hochet', igPublish: 'Publier', igPublishing: 'Envoi…', igReading: 'Préparation de la photo…', igPublished: 'Publiée. Papa peut la voir.', igDelete: 'Supprimer la photo', igDelSure: 'La supprimer ? C’est définitif.', igDelNo: 'Non', igDelYes: 'Oui, supprimer', igDeleted: 'Photo supprimée', igFail: 'Impossible d’envoyer la photo. Réessaie.', igAlbum: 'InstAïna · album', igVer: v => `Aïna ${v}`, igPhotos: n => n === 1 ? '1 photo' : `${n} photos`, igAlbumEmpty: 'Les photos que tu envoies apparaîtront ici, jour après jour.', igOlder: 'Photo précédente', igNewer: 'Photo suivante', igOf: (i, n) => `${i} sur ${n}`, igOnlyOnline: 'InstAïna a besoin de la connexion au serveur.', qShowFr: 'Ver en español', qHide: 'Masquer', qMic: 'Parler', qMicStop: 'À l’écoute… touche pour arrêter', qMicFail: 'Le micro n’est pas disponible dans ce navigateur',
       micDenied: 'Tu n’as pas autorisé le micro. Active-le dans les réglages du navigateur, ou utilise le micro du clavier.',
       micNet: 'La dictée a besoin de connexion. Réessaie ou écris au clavier.',
       micNone: 'Je n’ai rien entendu. Rapproche le téléphone et parle, ou utilise le micro du clavier.',
@@ -2089,13 +2092,13 @@
     //
     // Una foto ya publicada se puede pasar sin cerrar la ficha: flechas, teclas
     // y deslizar el dedo recorren `momentos` (la mas reciente es la primera).
-    // Eliminar solo aparece el mismo dia en que se subio y desde la pantalla de
-    // Hoy: en el album se mira, no se borra.
+    // Eliminar aparece siempre, tambien en el album, pero pide confirmacion:
+    // la foto solo vive en la base de datos y borrarla no tiene vuelta atras.
     const isNew = !!ph.data;
     const idx = isNew ? -1 : momentos.findIndex(m => String(m.id) === String(ph.id));
     const hayNewer = idx > 0, hayOlder = idx >= 0 && idx < momentos.length - 1;
     const ir = n => { const m = momentos[n]; if (m) openPhotoSheet(m); };
-    const sePuedeBorrar = !isNew && tab === 'hoy' && dayOf(new Date(ph.ts).getTime()) === dayOf(Date.now());
+    const sePuedeBorrar = !isNew;
     modalRoot.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-label="${L.igTitle}"><div class="sheet">
       <h3>${L.igTitle}${!isNew ? ` <span class="eyebrow" style="font-family:var(--ui)">${fmtDay(dayId(new Date(ph.ts).getTime()))} · ${fmtTime(new Date(ph.ts).getTime())}</span>` : ''}</h3>
       <div class="shot">
@@ -2105,7 +2108,7 @@
       </div>
       ${isNew ? `<div class="field"><label>${L.igCaption}</label><input type="text" id="ig-cap" placeholder="${L.igCaptionPh}" maxlength="300"></div>
         <div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button><button class="primary" data-m="publish">${L.igPublish}</button></div>`
-      : `${ph.nota ? `<p style="margin:0">${esc(ph.nota)}</p>` : ''}${momentos.length > 1 ? `<span class="count">${L.igOf(idx + 1, momentos.length)}</span>` : ''}<div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button></div>${sePuedeBorrar ? `<button class="del" data-m="delete">${L.igDelete}</button>` : ''}`}
+      : `${ph.nota ? `<p style="margin:0">${esc(ph.nota)}</p>` : ''}${momentos.length > 1 ? `<span class="count">${L.igOf(idx + 1, momentos.length)}</span>` : ''}<div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button></div>${sePuedeBorrar ? `<div class="delwrap"><button class="del" data-m="delete">${L.igDelete}</button></div>` : ''}`}
     </div></div>`;
     if (teclasFoto) document.removeEventListener('keydown', teclasFoto);
     const teclas = e => {
@@ -2136,7 +2139,21 @@
       if (m.dataset.m === 'cancel') return close();
       if (m.dataset.m === 'newer') return ir(idx - 1);
       if (m.dataset.m === 'older') return ir(idx + 1);
-      if (m.dataset.m === 'delete') { try { await apiFetch('/api/momentos/' + ph.id, { method: 'DELETE' }); toast(L.igDeleted); } catch { toast(L.igFail); } close(); await pullMomentos(); render(); return; }
+      if (m.dataset.m === 'delete') {
+        // primer toque: preguntar. Segundo: borrar de verdad.
+        m.parentElement.innerHTML = `<span class="delq">${L.igDelSure}</span><button class="delno" data-m="delno">${L.igDelNo}</button><button class="del" data-m="delyes">${L.igDelYes}</button>`;
+        return;
+      }
+      if (m.dataset.m === 'delno') { m.parentElement.innerHTML = `<button class="del" data-m="delete">${L.igDelete}</button>`; return; }
+      if (m.dataset.m === 'delyes') {
+        m.disabled = true;
+        try {
+          const r = await apiFetch('/api/momentos/' + ph.id, { method: 'DELETE' });
+          if (!r.ok) throw new Error(r.status);
+          toast(L.igDeleted);
+        } catch { toast(L.igFail); m.disabled = false; return; }
+        close(); await pullMomentos(); render(); return;
+      }
       if (m.dataset.m === 'publish') {
         m.disabled = true; m.textContent = L.igPublishing;
         try {
