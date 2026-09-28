@@ -347,8 +347,8 @@
 
   /* Tabs */
   nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--line); padding: 6px 0 calc(6px + env(safe-area-inset-bottom)); }
-  nav.tabs .in { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
-  nav.tabs button { border: 0; background: none; padding: 12px 4px; font-size: 15px; font-weight: 700; color: var(--muted); border-radius: 10px; }
+  nav.tabs .in { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
+  nav.tabs button { border: 0; background: none; padding: 12px 2px; font-size: 14px; font-weight: 700; color: var(--muted); border-radius: 10px; }
   nav.tabs button[aria-selected="true"] { color: var(--sueno); }
   nav.tabs button[aria-selected="true"]::after { content: ""; display: block; width: 22px; height: 3px; border-radius: 2px; background: var(--sueno); margin: 5px auto 0; }
 
@@ -368,6 +368,13 @@
   .sheet .btns .primary { background: var(--sueno); color: #fff; border: 0; border-radius: 12px; padding: 13px; font-weight: 700; }
   .sheet .btns .ghost { background: var(--surface-2); border: 0; border-radius: 12px; padding: 13px; font-weight: 700; }
   .sheet .del { background: none; border: 0; color: var(--bad); font-weight: 700; padding: 8px; justify-self: center; }
+  /* Pasar de foto sin cerrar la ficha: flechas a los lados de la imagen. */
+  .sheet .shot { position: relative; }
+  .sheet .shot button { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(20, 16, 30, .55); color: #fff; font-size: 20px; line-height: 1; display: grid; place-items: center; }
+  .sheet .shot button[data-m="older"] { right: 8px; }
+  .sheet .shot button[data-m="newer"] { left: 8px; }
+  .sheet .shot button[disabled] { opacity: 0; pointer-events: none; }
+  .sheet .count { font-size: 12.5px; color: var(--muted); justify-self: center; }
 
   .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: 90px; background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-size: 14px; font-weight: 700; z-index: 20; box-shadow: var(--shadow); }
 </style>
@@ -392,6 +399,7 @@
     <button data-tab="hoy" aria-selected="true"></button>
     <button data-tab="semana" aria-selected="false"></button>
     <button data-tab="panel" aria-selected="false"></button>
+    <button data-tab="insta" aria-selected="false"></button>
     <button data-tab="guia" aria-selected="false"></button>
   </div>
 </nav>
@@ -409,7 +417,7 @@
       mo: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
       min: 'min', h: 'h',
       syncLocal: 'Solo en este móvil', syncOn: 'Sincronizado', syncOff: 'Sin sincronizar',
-      tabs: { hoy: 'Hoy', semana: 'Semana', panel: 'Panel', guia: 'Guía' },
+      tabs: { hoy: 'Hoy', semana: 'Semana', panel: 'Panel', insta: 'InstAïna', guia: 'Guía' },
       side: { I: 'izquierdo', D: 'derecho', A: 'ambos' }, sideShort: { I: 'izq', D: 'der', A: 'ambos' },
       sleeping: 'Aïna duerme', since: t => `desde las ${t}`,
       hintShortNap: 'Si se despierta antes de 40 min suele ser un ciclo corto: prueba a volver a dormirla antes de sacarla.',
@@ -617,7 +625,7 @@
       kNight2: 'Noche', nightNextSleeping: 'Durmiendo. Si se despierta, toma y de vuelta a dormir; registra la toma con los botones grandes.', nightNextAwake: 'Toma con luz mínima y sin hablar; en cuanto termine, a la cuna. Si no se duerme en 10 min, brazos y shhh, sin encender luces.',
       lateEvening: 'Ya es la hora de dormir: ritual ahora, luz baja, toma completa y a la cuna.',
       // InstAïna
-      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Todavía no hay foto de hoy. Manda una sonrisa a papá.', igCaption: 'Pie de foto (opcional)', igCaptionPh: 'p. ej. se ha reído con el sonajero', igPublish: 'Publicar', igPublishing: 'Subiendo…', igReading: 'Preparando la foto…', igPublished: 'Publicada. Papá ya puede verla.', igDelete: 'Eliminar foto', igDeleted: 'Foto eliminada', igFail: 'No se pudo subir la foto. Inténtalo de nuevo.', igAlbum: 'InstAïna · álbum', igAlbumEmpty: 'Las fotos que mandes irán apareciendo aquí, día a día.', igOnlyOnline: 'InstAïna necesita conexión con el servidor.', qShowFr: 'Voir en français', qHide: 'Ocultar', qMic: 'Hablar', qMicStop: 'Escuchando… toca para parar', qMicFail: 'El micrófono no está disponible en este navegador',
+      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Todavía no hay foto de hoy. Manda una sonrisa a papá.', igCaption: 'Pie de foto (opcional)', igCaptionPh: 'p. ej. se ha reído con el sonajero', igPublish: 'Publicar', igPublishing: 'Subiendo…', igReading: 'Preparando la foto…', igPublished: 'Publicada. Papá ya puede verla.', igDelete: 'Eliminar foto', igDeleted: 'Foto eliminada', igFail: 'No se pudo subir la foto. Inténtalo de nuevo.', igAlbum: 'InstAïna · álbum', igAlbumEmpty: 'Las fotos que mandes irán apareciendo aquí, día a día.', igOlder: 'Foto anterior', igNewer: 'Foto siguiente', igOf: (i, n) => `${i} de ${n}`, igOnlyOnline: 'InstAïna necesita conexión con el servidor.', qShowFr: 'Voir en français', qHide: 'Ocultar', qMic: 'Hablar', qMicStop: 'Escuchando… toca para parar', qMicFail: 'El micrófono no está disponible en este navegador',
       micDenied: 'No has dado permiso al micrófono. Actívalo en los ajustes del navegador, o usa el micrófono del teclado.',
       micNet: 'El dictado necesita conexión. Prueba otra vez o escribe con el teclado.',
       micNone: 'No he oído nada. Acerca el móvil y habla, o usa el micrófono del teclado.',
@@ -628,7 +636,7 @@
       mo: ['janv', 'févr', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'],
       min: 'min', h: 'h',
       syncLocal: 'Cet appareil seulement', syncOn: 'Synchronisé', syncOff: 'Non synchronisé',
-      tabs: { hoy: "Aujourd'hui", semana: 'Semaine', panel: 'Tableau', guia: 'Guide' },
+      tabs: { hoy: "Aujourd'hui", semana: 'Semaine', panel: 'Tableau', insta: 'InstAïna', guia: 'Guide' },
       side: { I: 'gauche', D: 'droit', A: 'les deux' }, sideShort: { I: 'g.', D: 'd.', A: 'les deux' },
       sleeping: 'Aïna dort', since: t => `depuis ${t}`,
       hintShortNap: "Si elle se réveille avant 40 min, c'est souvent un cycle court : essaie de la rendormir avant de la lever.",
@@ -836,7 +844,7 @@
       kNight2: 'Nuit', nightNextSleeping: 'Elle dort. Si elle se réveille, tétée puis retour au dodo ; enregistre la tétée avec les grands boutons.', nightNextAwake: 'Tétée avec un minimum de lumière et sans parler ; dès la fin, au lit. Si elle ne se rendort pas en 10 min, dans les bras et chhh, sans allumer.',
       lateEvening: 'C’est déjà l’heure du coucher : rituel maintenant, lumière basse, tétée complète et au lit.',
       // InstAïna
-      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Pas encore de photo aujourd’hui. Envoie un sourire à papa.', igCaption: 'Légende (facultatif)', igCaptionPh: 'ex. elle a ri avec le hochet', igPublish: 'Publier', igPublishing: 'Envoi…', igReading: 'Préparation de la photo…', igPublished: 'Publiée. Papa peut la voir.', igDelete: 'Supprimer la photo', igDeleted: 'Photo supprimée', igFail: 'Impossible d’envoyer la photo. Réessaie.', igAlbum: 'InstAïna · album', igAlbumEmpty: 'Les photos que tu envoies apparaîtront ici, jour après jour.', igOnlyOnline: 'InstAïna a besoin de la connexion au serveur.', qShowFr: 'Ver en español', qHide: 'Masquer', qMic: 'Parler', qMicStop: 'À l’écoute… touche pour arrêter', qMicFail: 'Le micro n’est pas disponible dans ce navigateur',
+      igTitle: 'InstAïna', igBtn: '📷 InstAïna', igEmpty: 'Pas encore de photo aujourd’hui. Envoie un sourire à papa.', igCaption: 'Légende (facultatif)', igCaptionPh: 'ex. elle a ri avec le hochet', igPublish: 'Publier', igPublishing: 'Envoi…', igReading: 'Préparation de la photo…', igPublished: 'Publiée. Papa peut la voir.', igDelete: 'Supprimer la photo', igDeleted: 'Photo supprimée', igFail: 'Impossible d’envoyer la photo. Réessaie.', igAlbum: 'InstAïna · album', igAlbumEmpty: 'Les photos que tu envoies apparaîtront ici, jour après jour.', igOlder: 'Photo précédente', igNewer: 'Photo suivante', igOf: (i, n) => `${i} sur ${n}`, igOnlyOnline: 'InstAïna a besoin de la connexion au serveur.', qShowFr: 'Ver en español', qHide: 'Masquer', qMic: 'Parler', qMicStop: 'À l’écoute… touche pour arrêter', qMicFail: 'Le micro n’est pas disponible dans ce navigateur',
       micDenied: 'Tu n’as pas autorisé le micro. Active-le dans les réglages du navigateur, ou utilise le micro du clavier.',
       micNet: 'La dictée a besoin de connexion. Réessaie ou écris au clavier.',
       micNone: 'Je n’ai rien entendu. Rapproche le téléphone et parle, ou utilise le micro du clavier.',
@@ -1210,6 +1218,7 @@
     if (tab === 'hoy') renderHoy();
     else if (tab === 'semana') renderSemana();
     else if (tab === 'panel') renderPanel();
+    else if (tab === 'insta') renderInsta();
     else renderGuia();
   }
 
@@ -1612,7 +1621,6 @@
         <div class="card"><h3>${L.cTimes}</h3><div class="sub">${L.cTimesSub}</div>${svg(c4)}${legend([[L.sBed, 'var(--c-sueno)', true], [L.sWake, 'var(--c-toma)', true]])}</div>
         <div class="card"><h3>${L.cHeat}</h3><div class="sub">${L.cHeatSub(withData.length)}</div>${heatHTML}</div>
         <div class="card"><h3>${L.tTable}</h3><div class="sub">&nbsp;</div>${table}</div>
-        ${api ? `<div class="card"><h3>${L.igAlbum}</h3><div class="sub">&nbsp;</div>${momentos.length ? `<div class="album">${momentos.map(m => `<button data-act="ig-open" data-id="${m.id}"><img alt="" src="${imgUrl(m.id)}"><span class="dd">${new Date(m.ts).getDate()} ${L.mo[new Date(m.ts).getMonth()]}</span></button>`).join('')}</div>` : `<div class="note">${L.igAlbumEmpty}</div>`}</div>` : ''}
       </section>`;
   }
 
@@ -1836,6 +1844,15 @@
       <p class="note">${L.stFoot}</p>
     </section>`;
   }
+  // Todas las fotos en cuadricula, en su propia pestana. Desde aqui no se borra:
+  // una foto solo se puede eliminar el mismo dia, desde la pantalla de Hoy.
+  function renderInsta() {
+    if (!api) { main.innerHTML = `<div class="card"><h3>${L.igAlbum}</h3><div class="note">${L.igOnlyOnline}</div></div>`; return; }
+    main.innerHTML = `<div class="card"><h3>${L.igAlbum}</h3><div class="sub">&nbsp;</div>${momentos.length
+      ? `<div class="album">${momentos.map(m => `<button data-act="ig-open" data-id="${m.id}"><img alt="" src="${imgUrl(m.id)}"><span class="dd">${new Date(m.ts).getDate()} ${L.mo[new Date(m.ts).getMonth()]}</span></button>`).join('')}</div>`
+      : `<div class="note">${L.igAlbumEmpty}</div>`}</div>`;
+  }
+
   function renderGuia() {
     main.innerHTML = `<div class="guide">${etapaHTML()}</div>` + GUIDE[lang];
     const inp = document.getElementById('f-birth');
@@ -2042,21 +2059,59 @@
     if (!api) { toast(L.igOnlyOnline); return; }
     photoInput.click();
   }
+  let teclasFoto = null;       // el escuchador de teclas de la ficha abierta, si la hay
   function openPhotoSheet(ph) {
-    // ph: { data } para publicar una nueva, o { id, nota, ts } para ver/eliminar una existente
+    // ph: { data } para publicar una nueva, o { id, nota, ts } para ver una existente.
+    //
+    // Una foto ya publicada se puede pasar sin cerrar la ficha: flechas, teclas
+    // y deslizar el dedo recorren `momentos` (la mas reciente es la primera).
+    // Eliminar solo aparece el mismo dia en que se subio y desde la pantalla de
+    // Hoy: en el album se mira, no se borra.
     const isNew = !!ph.data;
+    const idx = isNew ? -1 : momentos.findIndex(m => String(m.id) === String(ph.id));
+    const hayNewer = idx > 0, hayOlder = idx >= 0 && idx < momentos.length - 1;
+    const ir = n => { const m = momentos[n]; if (m) openPhotoSheet(m); };
+    const sePuedeBorrar = !isNew && tab === 'hoy' && dayOf(new Date(ph.ts).getTime()) === dayOf(Date.now());
     modalRoot.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-label="${L.igTitle}"><div class="sheet">
       <h3>${L.igTitle}${!isNew ? ` <span class="eyebrow" style="font-family:var(--ui)">${fmtDay(dayId(new Date(ph.ts).getTime()))} · ${fmtTime(new Date(ph.ts).getTime())}</span>` : ''}</h3>
-      <img class="prev" alt="" src="${isNew ? ph.data : (imgCache.get(ph.id) || imgUrl(ph.id))}" data-id="${ph.id || ''}">
+      <div class="shot">
+        <img class="prev" alt="" src="${isNew ? ph.data : (imgCache.get(ph.id) || imgUrl(ph.id))}" data-id="${ph.id || ''}">
+        ${isNew ? '' : `<button data-m="newer" aria-label="${L.igNewer}" ${hayNewer ? '' : 'disabled'}>‹</button>
+          <button data-m="older" aria-label="${L.igOlder}" ${hayOlder ? '' : 'disabled'}>›</button>`}
+      </div>
       ${isNew ? `<div class="field"><label>${L.igCaption}</label><input type="text" id="ig-cap" placeholder="${L.igCaptionPh}" maxlength="300"></div>
         <div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button><button class="primary" data-m="publish">${L.igPublish}</button></div>`
-      : `${ph.nota ? `<p style="margin:0">${esc(ph.nota)}</p>` : ''}<div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button></div><button class="del" data-m="delete">${L.igDelete}</button>`}
+      : `${ph.nota ? `<p style="margin:0">${esc(ph.nota)}</p>` : ''}${momentos.length > 1 ? `<span class="count">${L.igOf(idx + 1, momentos.length)}</span>` : ''}<div class="btns"><button class="ghost" data-m="cancel">${L.cancel}</button></div>${sePuedeBorrar ? `<button class="del" data-m="delete">${L.igDelete}</button>` : ''}`}
     </div></div>`;
-    const close = () => { modalRoot.innerHTML = ''; modalRoot.onclick = null; };
+    if (teclasFoto) document.removeEventListener('keydown', teclasFoto);
+    const teclas = e => {
+      if (!modalRoot.firstChild) return;
+      if (e.key === 'Escape') return close();
+      if (e.key === 'ArrowLeft' && hayNewer) ir(idx - 1);
+      else if (e.key === 'ArrowRight' && hayOlder) ir(idx + 1);
+    };
+    document.addEventListener('keydown', teclas);
+    teclasFoto = teclas;
+    const close = () => { modalRoot.innerHTML = ''; modalRoot.onclick = null; document.removeEventListener('keydown', teclas); teclasFoto = null; };
+    if (!isNew) {
+      // Deslizar el dedo sobre la foto, que es como se pasa en el movil.
+      const img = modalRoot.querySelector('img.prev');
+      let x0 = null, y0 = null;
+      img.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+      img.addEventListener('touchend', e => {
+        if (x0 == null) return;
+        const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+        x0 = null;
+        if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+        if (dx < 0 && hayOlder) ir(idx + 1); else if (dx > 0 && hayNewer) ir(idx - 1);
+      }, { passive: true });
+    }
     modalRoot.onclick = async e => {
       const m = e.target.closest('[data-m]');
       if (!m) { if (e.target.classList.contains('modal')) close(); return; }
       if (m.dataset.m === 'cancel') return close();
+      if (m.dataset.m === 'newer') return ir(idx - 1);
+      if (m.dataset.m === 'older') return ir(idx + 1);
       if (m.dataset.m === 'delete') { try { await apiFetch('/api/momentos/' + ph.id, { method: 'DELETE' }); toast(L.igDeleted); } catch { toast(L.igFail); } close(); await pullMomentos(); render(); return; }
       if (m.dataset.m === 'publish') {
         m.disabled = true; m.textContent = L.igPublishing;
