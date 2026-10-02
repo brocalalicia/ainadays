@@ -121,7 +121,9 @@ function mergeDocs(existing, incoming, fecha) {
     if (!cur || (e.u || 0) >= (cur.u || 0)) byId.set(e.id, e);
   }
   const ev = [...byId.values()].filter(e => !del.has(e.id)).sort((a, b) => a.ini - b.ini);
-  return { fecha, ev, del: [...del].slice(-200) };
+  // pausa: el día sigue guardado pero no cuenta para medias ni comparaciones
+  const pausa = incoming.pausa !== undefined ? !!incoming.pausa : !!existing?.pausa;
+  return { fecha, ev, del: [...del].slice(-200), ...(pausa ? { pausa: true } : {}) };
 }
 
 app.put('/api/dias/:fecha', async (req, res) => {
@@ -133,7 +135,7 @@ app.put('/api/dias/:fecha', async (req, res) => {
   try {
     await client.query('BEGIN');
     const { rows } = await client.query('SELECT doc FROM dias WHERE fecha = $1 FOR UPDATE', [fecha]);
-    const merged = req.query.replace === '1' ? { fecha, ev: doc.ev, del: doc.del || [] } : mergeDocs(rows[0]?.doc, doc, fecha);
+    const merged = req.query.replace === '1' ? { fecha, ev: doc.ev, del: doc.del || [], ...(doc.pausa ? { pausa: true } : {}) } : mergeDocs(rows[0]?.doc, doc, fecha);
     await client.query(
       `INSERT INTO dias (fecha, doc, updated_at) VALUES ($1, $2, now())
        ON CONFLICT (fecha) DO UPDATE SET doc = EXCLUDED.doc, updated_at = now()`,
